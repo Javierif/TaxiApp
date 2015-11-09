@@ -23,7 +23,7 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('InicioLogoutCtrl', function($scope,Peticiones,$state,$ionicLoading,Usuario,Comercios,Ofertas,$compile) {
+.controller('iniciosesion', function($scope,Peticiones,$state,$ionicLoading,Usuario,Comercios,Ofertas,$compile) {
     var compruebacomercios = function (idcliente) {
         if(Comercios.loadcomercios()){
             var comercios = Peticiones.comercios(idcliente);
@@ -164,7 +164,15 @@ angular.module('starter.controllers', [])
 })
 
 .controller('MostradorOfertasCtrl', function($ionicPlatform,$scope,Peticiones,$state,Ofertas) {
+    $ionicLoading.show({
+        template: '<i class="icon ion-looping"></i>Espere un momento, descargando las ofertas...'
+    });
+    var ofertasGenerales = Peticiones.getOfertasGenerales();
+    ofertasGenerales.then(function(result) {
+       $scope.ofertasGenerales = result;
+    });
     $scope.ofertas = Ofertas.getofertas();
+
     $scope.detalle = function(oferta) {
         Ofertas.setViendoOferta(oferta);
         $state.go("app.detalleoferta");

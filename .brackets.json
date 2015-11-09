@@ -19,6 +19,7 @@
         "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/build/emulator/PharmaPrive.app/www/plugins/org.apache.cordova.geolocation/www/geolocation.js",
         "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/build/emulator/PharmaPrive.app/www/plugins/org.apache.cordova.geolocation/www/Position.js",
         "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/build/emulator/PharmaPrive.app/www/plugins/org.apache.cordova.geolocation/www/PositionError.js",
-        "/Users/Mirafarma/aplicaciones/pharmaprive2/platforms/ios/build/emulator/PharmaPrive.app/www/plugins/nl.x-services.plugins.toast/www/Toast.js"
+        "/Users/Mirafarma/aplicaciones/pharmaprive2/platforms/ios/build/emulator/PharmaPrive.app/www/plugins/nl.x-services.plugins.toast/www/Toast.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive2/platforms/ios/www/lib/ionic/js/ionic.bundle.min.js"
     ]
 }

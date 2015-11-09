@@ -29,15 +29,23 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.servicies_pe
     templateUrl: "templates/menu.html",
     controller: 'AppCtrl'
   })
-  .state('inicioLogout', {
+  .state('app.inicioLogout', {
     url: "/inicioLogout",
-    templateUrl: "templates/inicioLogout.html",
-    controller: 'InicioLogoutCtrl'
+    views: {
+        'menuContent': {
+              templateUrl: "templates/inicioLogout.html",
+              controller: 'InicioLogoutCtrl'
+        }
+    }
   })
-  .state('registro', {
-    url: "registro",
-    templateUrl: "templates/registro.html",
-    controller: 'RegistroCtrl'
+  .state('app.registro', {
+    url: "/ registro",
+    views: {
+        'menuContent': {
+            templateUrl: "templates/registro.html",
+            controller: 'RegistroCtrl'
+        }
+    }
   })
   .state('app.mostradorofertas', {
       url: "/mostradorofertas",
@@ -67,5 +75,5 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.servicies_pe
       }
     });
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/inicioLogout');
+  $urlRouterProvider.otherwise('/app/mostradorofertas');
 });
