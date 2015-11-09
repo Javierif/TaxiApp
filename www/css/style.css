@@ -1,0 +1,339 @@
+#map {
+  width: 100%;
+  height: 50%;
+}
+
+#wrapper {
+	min-height:100%;
+	position:relative;
+}
+#footer {
+	width:100%;
+	position:absolute;
+	bottom:0;
+	left:0;
+}
+.oculto {
+  -webkit-transform: translate(-100%, 0);
+     -moz-transform: translate(-100%, 0);
+      -ms-transform: translate(-100%, 0);
+       -o-transform: translate(-100%, 0);
+          transform: translate(-100%, 0);
+  -webkit-transition: -webkit-transform 1s ease-in; /* Changed here */
+     -moz-transition: -moz-transform 1s ease-in;
+       -o-transition: -o-transform 1s ease-in;
+          transition: transform 1s ease-in;
+    position:absolute;
+}
+
+.mostrado {
+     -webkit-transition: -webkit-transform 1s ease-in; /* Changed here */
+     -moz-transition: -moz-transform 1s ease-in;
+       -o-transition: -o-transform 1s ease-in;
+          transition: transform 1s ease-in;
+  -webkit-transform: translate(0, 0);
+     -moz-transform: translate(0, 0);
+      -ms-transform: translate(0, 0);
+       -o-transform: translate(0, 0);
+          transform: translate(0, 0);
+    position: absolute;
+}
+.scroll {
+  height: 100%;
+}
+
+/* Global */
+.lightblue{
+    background-color: #6BABC7;
+}
+
+.overlightblue{
+    background-color: #83D1F2;
+}
+
+.textbox{
+    position: relative;
+    top:30px;
+    padding-left: 5px;
+    width: 100%;
+    margin-bottom: 15px;
+     -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.hide {
+    display: none;
+}
+.show {
+    display: block;
+}
+/* Menu */
+
+.my-menu {
+    background-color: #F0F0F0;
+}
+
+.my-menu .list {
+    background-color: transparent;
+
+}
+.menues{
+    text-align: center;
+    vertical-align: text-bottom;
+    width:100%;
+    min-width: 100%;
+    height: auto;
+}
+.my-menu .item, .my-menu .item-content, .my-menu .item-complex{
+    background-color: transparent;
+    color: #000;
+    border-color: #FFF;
+}
+
+/* InicioLogout */
+#iniciologout_contenedor{
+    width: 90%;
+    margin-top: 3em;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 2%;
+    padding-right: 2%;
+    height: 140px;
+    background: #FFFFFF;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+}
+
+#iniciologout_contenedor button{
+    top:30px;
+    width: 49%;
+     -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.round-button {
+    display:block;
+    width:200px;
+    height:200px;
+    line-height:50px;
+    border: 2px solid #f5f5f5;
+    border-radius: 50%;
+    color:#f5f5f5;
+    text-align:center;
+    text-decoration:none;
+    background: #464646;
+    box-shadow: 0 0 3px gray;
+    font-size:20px;
+    font-weight:bold;
+    margin: 40px auto;
+}
+.round-button:hover {
+    background: #4BD1F7;
+}
+
+
+#iniciologout_contenedor input {
+      border:#F1F1F1 2px solid;
+
+}
+.imglogin{
+        width: 100%;
+        height: 220px;
+}
+@media only screen and (min-device-height : 568px) {
+    .imglogin{
+        width: 100%;
+        height: 320px;
+    }
+}
+
+/* Registro */
+
+#imgregistro{
+    height: 120px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+
+    width: 120px;
+
+    display: block;
+    margin: 0 auto;
+    clear: right;
+}
+
+#registro_contenedor {
+    position: relative;
+    width: 98%;
+    margin-top: 5px;;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 5%;
+    padding-bottom: 10%;
+    height: 100%;
+    background: #FFFFFF;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+}
+
+#registro_contenedor button{
+    position: relative;
+    top:30px;
+    border: #F1F1F1 2px solid;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+#registro_contenedor input {
+    border:#F1F1F1 2px solid;
+}
+
+/* MOSTRADOR DE OFERTAS */
+
+.rojomostrador{
+    margin-top: 5px;
+    height: 45px;
+    background-color: #BF0808;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+.rojomostrador img{
+    position:absolute;
+    right:0px;
+    max-height:52px;
+}
+
+.verticalcenter {
+    position: absolute;
+    font-size: 16px;
+    margin:10px;
+    color: white;
+    white-space:nowrap;
+}
+
+.simbolodescuento{
+    margin-top: 16px;
+    color:#D4A304;
+    font-size: 20px;
+}
+
+.caducidad {
+    margin-top: 5px;
+    font-size: 10px;
+}
+
+.seccionoferta{
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -khtml-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    margin-left: 1px;
+    margin-right: 1px;
+    margin-bottom: 5px;
+}
+
+.relleno{
+    height: 120px;
+    position: relative;
+    width: 100%;
+}
+
+.imgofertamostrador {
+    height: 125px;
+    position: absolute;
+    margin-right: 0px;
+    margin-left: 0px;
+    margin-top: 0px;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    border: 5px solid #E3E3E3;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -khtml-border-radius: 10px;
+    -webkit-border-radius: 10px;
+}
+
+.carrusel {
+    height: 100%;
+    background: white;
+    text-align: center;
+}
+
+
+/*  DETALLE OFERTA */
+.detalleimagenproducto {
+    height: 125px;
+    position: absolute;
+    margin-right: 0px;
+    margin-left: 0px;
+    margin-top: 0px;
+    width: 100%;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+}
+
+.carrusel_detalle{
+    height: 100%;
+    background: white;
+    text-align: center;
+}
+
+.titulodetalle {
+    background-color: #487386;
+    color: white;
+
+    text-align: center;
+    font-size: 14px;
+}
+
+.contenedor_detalle{
+    width: 95%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1%;
+    padding-right: 1%;
+    height: 140px;
+    background: #FFFFFF;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.descripcionLarga {
+    position: absolute;
+    height: 120px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.condiciones {
+    font-size: 0.8em;
+    background: rgba(0, 0, 0, 0.5);
+    color: whitesmoke;
+    text-align: center;
+}
+.leermas {
+    width: 100%;
+    position: relative;
+    top: 122px;
+    text-align: center;
+    color: blue;
+}
+
+.componente_img{
+    border: 5px solid #E3E3E3;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -khtml-border-radius: 10px;
+    -webkit-border-radius: 10px;
+}
+
+.cuponimg {
+    width: 100%;
+    height: 350px;
+}

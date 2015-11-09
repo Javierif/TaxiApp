@@ -1,0 +1,24 @@
+{
+    "jscodehints.detectedExclusions": [
+        "/Users/Mirafarma/aplicaciones/pharmaprive/www/js/controllers.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/www/lib/ionic/js/ionic.min.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/www/lib/ionic/js/ionic.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/www/lib/ionic/js/angular/angular-resource.min.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/www/lib/ionic/js/angular/angular-sanitize.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/www/js/Controlador/servicies_peticiones.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/www/lib/ionic/js/angular/angular-animate.min.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/www/lib/ionic/js/angular/angular-resource.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/www/lib/ionic/js/angular/angular-sanitize.min.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/build/emulator/PharmaPrive.app/www/plugins/nl.x-services.plugins.toast/www/Toast.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/www/lib/ionic/js/angular/angular.min.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/www/js/Modelo/servicies_modelos.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/www/lib/ionic/js/angular/angular-animate.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/www/js/Modelo/servicies_modelos.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/build/emulator/PharmaPrive.app/www/plugins/nl.x-services.plugins.toast/test/tests.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/www/js/app.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/build/emulator/PharmaPrive.app/www/plugins/org.apache.cordova.geolocation/www/geolocation.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/build/emulator/PharmaPrive.app/www/plugins/org.apache.cordova.geolocation/www/Position.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive/platforms/ios/build/emulator/PharmaPrive.app/www/plugins/org.apache.cordova.geolocation/www/PositionError.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive2/platforms/ios/build/emulator/PharmaPrive.app/www/plugins/nl.x-services.plugins.toast/www/Toast.js"
+    ]
+}

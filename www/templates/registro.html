@@ -1,0 +1,30 @@
+<ion-view view-title="Descubra nuestros descuentos" class="lightblue">
+    <ion-nav-bar>
+      <ion-nav-back-button class="button-clear"
+        ng-click="back()">
+        <i class="ion-arrow-left-c"></i>
+      </ion-nav-back-button>
+    </ion-nav-bar>
+  <ion-content>
+    <img id="imgregistro" src="./img/logo_pharma_transparente.png">
+    <div id="registro_contenedor">
+        <h2>Registro:</h2>
+            <input class="textbox" type="number" placeholder="Código Postal" ng-model="cp">
+            <input class="textbox" type="email" placeholder="Email" ng-model="email">
+            <input class="textbox" type="date" placeholder="Fecha nacimiento" ng-model="fnac">
+            <div class="textbox"  ng-model="sex">
+                <input id="redRadio" type="radio" ng-model="sex" value="masculino" />
+                <label for="redRadio">Maculino </label>
+
+                <input id="greenRadio" type="radio" ng-model="sex" value="femenino" />
+                <label for="greenRadio">Femenino</label>
+            </div>
+
+            <input class="textbox" type="number" placeholder="Teléfono (No requerido)"  ng-model="telf">
+            <input class="textbox" type="number" placeholder="Código Farmacia (No requerido)"  ng-model="codfarma"∫>
+           <button class="button button-full button-calm" ng-click="registrarse(cp,email,fnac,sex,telf,codfarma)">
+            Registro
+            </button>
+    </div>
+  </ion-content>
+</ion-view>

@@ -1,0 +1,8 @@
++ Guardar comercios para geolocalizarlos en el mapa segun la oferta
+- Una vez guardado los comercios ponerlos en el mapa segun la oferta
+- Guardar las ofertas para saber si es de un comercio en el futuro
++ Pedir los comercios
++ Guardar la fecha en el que fue guardado el comercio
+- Geolocalizar donde estoy actualmente
+- sacar las 4 farmacias mas cercanas y que sean activas
+

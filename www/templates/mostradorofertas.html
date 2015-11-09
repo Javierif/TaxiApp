@@ -1,0 +1,31 @@
+<ion-view class="overlightblue" view-title="Listado de ofertas">
+  <ion-content>
+    <div class="list seccionoferta">
+        <div class="" ng-repeat="oferta in ofertas">
+            <a class="item lightblue seccionoferta item-text-wrap" ng-click="detalle(oferta)">
+                <div class="relleno"></div>
+                <div class="imgofertamostrador">
+                    <ul rn-carousel rn-carousel-auto-slide class="carrusel">
+                        <li ng-repeat="image in oferta.imagenesProducto">
+                            <div class="carrusel"><img class="carrusel" ng-src="{{image}}"></div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="secciontexto">
+                {{oferta.titulo}}
+                <div class="rojomostrador">
+                        <span class="verticalcenter">{{oferta.descuento}}
+                            <span class="simbolodescuento">{{oferta.simbolo}}</span>
+                            DESCUENTO
+                        </span>
+                        <img src="./img/final_bandera.png">
+                    </div>
+                    <span class="caducidad">
+                        Este descuento caduca el <i class="icon ion-clock">{{oferta.mayorTiempo}}</i>
+                    </span>
+                </div>
+            </a>
+        </div>
+      </div>
+  </ion-content>
+</ion-view>

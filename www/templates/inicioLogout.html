@@ -1,0 +1,21 @@
+<ion-view class="lightblue">
+    <ion-content>
+        <div id="wrapper">
+            <div id="header"></div>
+            <div id="content">
+                <img class="imglogin" src="./img/login.jpg">
+                <div id="iniciologout_contenedor">
+                    <input class="textbox" type="text" placeholder="Email" ng-model="email" ng-click="teclado()">
+                    <button class="button button-calm" ng-click="login(email)">Conectar</button>
+                    <button class="button button-outline button-calm" ng-click="registro()">Registrarse</button>
+                </div>
+            </div>
+            <div id="footer">
+                <div class="condiciones">Pharmaprivé utiliza cookies. Si sigue navegando, se entiende que acepta <a ng-click="condiciones()">las condiciones de uso.</a></div>
+            </div>
+        </div>
+
+
+    </ion-content>
+
+</ion-view>
