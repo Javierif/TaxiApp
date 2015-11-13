@@ -4,7 +4,7 @@ angular.module('starter.servicies_peticiones', [])
   // Might use a resource here that returns a JSON arra
 
     var constantes = {
-        URL : "http://pharmaprive.com",
+        URL : "http://localhost:1337",
         URL_API : "/api/v1",
         URL_INICISIOSESION: "/iniciosesion",
         URL_REGISTRO: "/alta",
@@ -169,6 +169,18 @@ angular.module('starter.servicies_peticiones', [])
         return deferred.promise;
     },
        ///////////OFERTAS/////////
+    getOfertasGenerales: function() {
+        var urls = server_constantes.all();
+        var deferred = $q.defer();
+        $http.get(urls.URL+"/getcupones")
+            .success(function(respuesta){
+                deferred.resolve(respuesta);
+        }).error(function(error){
+               console.log(error);
+        });
+        return deferred.promise;
+    },
+
     ofertas: function(codigo){
         var urls = server_constantes.all();
         var peticionjson = {};

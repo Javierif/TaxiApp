@@ -1,25 +1,15 @@
-<ion-modal-view>
-  <ion-header-bar>
-    <h1 class="title">Login</h1>
-    <div class="buttons">
-      <button class="button button-clear" ng-click="closeLogin()">Close</button>
-    </div>
-  </ion-header-bar>
-  <ion-content>
-    <form ng-submit="doLogin()">
-      <div class="list">
-        <label class="item item-input">
-          <span class="input-label">Username</span>
-          <input type="text" ng-model="loginData.username">
-        </label>
-        <label class="item item-input">
-          <span class="input-label">Password</span>
-          <input type="password" ng-model="loginData.password">
-        </label>
-        <label class="item">
-          <button class="button button-block button-positive" type="submit">Log in</button>
-        </label>
-      </div>
-    </form>
-  </ion-content>
-</ion-modal-view>
+<ion-view class="lightblue">
+    <ion-content>
+        <div id="wrapper">
+            <div id="header"></div>
+            <div id="content">
+                <img class="imglogin" src="./img/login.jpg">
+                <div id="login_contenedor">
+                    <input class="textbox" type="text" placeholder="Email" ng-model="email" ng-click="teclado()">
+                    <button class="button button-calm" ng-click="login(email)">Conectar</button>
+                    <button class="button button-outline button-calm" ng-click="registro()">Registrarse</button>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

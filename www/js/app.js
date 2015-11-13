@@ -29,17 +29,22 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.servicies_pe
     templateUrl: "templates/menu.html",
     controller: 'AppCtrl'
   })
-  .state('app.inicioLogout', {
-    url: "/inicioLogout",
+  .state('inicio', {
+    url: "/inicio",
+    templateUrl: "templates/inicio.html",
+    controller: 'inicioCtrl'
+  })
+  .state('app.login', {
+    url: "/login",
     views: {
         'menuContent': {
-              templateUrl: "templates/inicioLogout.html",
-              controller: 'InicioLogoutCtrl'
+              templateUrl: "templates/login.html",
+              controller: 'loginCtrl'
         }
     }
   })
   .state('app.registro', {
-    url: "/ registro",
+    url: "/registro",
     views: {
         'menuContent': {
             templateUrl: "templates/registro.html",
@@ -75,5 +80,5 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.servicies_pe
       }
     });
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/mostradorofertas');
+  $urlRouterProvider.otherwise('/inicio');
 });
