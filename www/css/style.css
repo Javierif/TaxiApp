@@ -267,19 +267,26 @@
 }
 
 .imgofertamostrador {
-    height: 125px;
+    height: 100%;
     position: absolute;
     margin-right: 0px;
     margin-left: 0px;
     margin-top: 0px;
     top: 0px;
     left: 0px;
-    right: 0px;
-    border: 5px solid #E3E3E3;
+    width: 30%;
     border-radius: 10px;
     -moz-border-radius: 10px;
     -khtml-border-radius: 10px;
     -webkit-border-radius: 10px;
+}
+.secciontexto {
+    float: right;
+    height: 100%;
+    margin-left: 30%;
+    position: absolute;
+    top: 10px;
+    width: 65%;
 }
 
 .carrusel {

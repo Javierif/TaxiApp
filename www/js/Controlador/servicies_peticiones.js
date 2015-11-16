@@ -144,35 +144,27 @@ angular.module('starter.servicies_peticiones', [])
         return deferred.promise;
     },
 
-    comercios: function(codigo) {
-        var urls = server_constantes.all();
-        var peticionjson = {};
-        var deferred = $q.defer();
-        peticionjson[urls.SERVER_CODIGO]= codigo;
-        $http.post(urls.URL+urls.URL_API+urls.URL_COMERCIOS, peticionjson)
-            .success(function(respuesta){
-             //   window.plugins.toast.showLongBottom(respuesta.error_msg, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-                deferred.resolve({
-                    error:false,
-                    resultado:respuesta
-                });
-            alert(respuesta.dominio);
-            }).error(function(error){
-                window.plugins.toast.showLongBottom(error.error_msg,
-                    function(a){
-                        console.log('toast success: ' + a)
-                    },
-                    function(b){
-                        alert('toast error: ' + b)
-                    });
-            });
-        return deferred.promise;
-    },
        ///////////OFERTAS/////////
     getOfertasGenerales: function() {
         var urls = server_constantes.all();
         var deferred = $q.defer();
         $http.get(urls.URL+"/getcupones")
+            .success(function(respuesta){
+                deferred.resolve(respuesta);
+        }).error(function(error){
+               console.log(error);
+        });
+        return deferred.promise;
+    },
+
+    getOfertasEspecificas: function(latitud,longitud) {
+        var urls = server_constantes.all();
+        var peticionjson = {};
+        var deferred = $q.defer();
+        peticionjson[urls.SERVER_LATITUD]= latitud;
+        peticionjson[urls.SERVER_LONGITUD] = longitud;
+        console.log(peticionjson);
+        $http.post(urls.URL+"/getcuponesespecifico",peticionjson)
             .success(function(respuesta){
                 deferred.resolve(respuesta);
         }).error(function(error){

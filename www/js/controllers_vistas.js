@@ -203,6 +203,12 @@ angular.module('starter.controllers', [])
     });
     $scope.ofertas = Ofertas.getofertas();
 
+    window.navigator.geolocation.getCurrentPosition(function (location) {
+        var especificas = Peticiones.getOfertasEspecificas(location.coords.latitude,location.coords.longitude);
+        especificas.then(function(result) {
+            $scope.ofertasEspecificas = result;
+        });
+    });
     $scope.detalle = function (oferta) {
         Ofertas.setViendoOferta(oferta);
         $state.go("app.detalleoferta");
