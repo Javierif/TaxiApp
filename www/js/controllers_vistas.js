@@ -29,7 +29,7 @@ angular.module('starter.controllers', [])
         alert('Location from Phonegap' + location);
     });
     $scope.entrar = function () {
-         $state.go("app.mostradorofertas");
+        $state.go("app.mostradorofertas");
     }
 
 })
@@ -191,21 +191,20 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('MostradorOfertasCtrl', function ($ionicPlatform, $scope, Peticiones, $state, Ofertas,$ionicLoading) {
+.controller('MostradorOfertasCtrl', function ($ionicPlatform, $scope, Peticiones, $state, Ofertas, $ionicLoading) {
     $ionicLoading.show({
         template: '<i class="icon ion-looping"></i>Espere un momento, descargando las ofertas...'
     });
     var ofertasGenerales = Peticiones.getOfertasGenerales();
     ofertasGenerales.then(function (result) {
-        console.log("DENTRO ",result);
         $scope.ofertasGenerales = result;
         $ionicLoading.hide();
     });
     $scope.ofertas = Ofertas.getofertas();
 
     window.navigator.geolocation.getCurrentPosition(function (location) {
-        var especificas = Peticiones.getOfertasEspecificas(location.coords.latitude,location.coords.longitude);
-        especificas.then(function(result) {
+        var especificas = Peticiones.getOfertasEspecificas(location.coords.latitude, location.coords.longitude);
+        especificas.then(function (result) {
             $scope.ofertasEspecificas = result;
         });
     });
@@ -220,99 +219,55 @@ angular.module('starter.controllers', [])
 })
 
 .controller('DetalleOfertaCtrl', function ($scope, $stateParams, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile) {
+    $scope.oferta = Ofertas.getViendoOferta();
+    if ($scope.oferta.asociado) {
+        var farmaciaAsociada = Peticiones.getFarmacia($scope.oferta.asociado);
+        farmaciaAsociada.then(function (result) {
+            $scope.farmacias = result;
+        });
+    } else {
+        window.navigator.geolocation.getCurrentPosition(function (location) {
+            var farmaciasCercanas = Peticiones.getFarmacias()(location.coords.latitude, location.coords.longitude);
+            farmaciasCercanas.then(function (result) {
+                $scope.farmacias = result;
+            });
+        });
+    }
+    var inicializa = function () {
+        var posInicio = new google.maps.LatLng($scope.farmacias[0].latitud, $scope.farmacias[0].longitud);
+        var mapOptions = {
+            streetViewControl: true,
+            center: posInicio,
+            zoom: 18,
+            mapTypeId: google.maps.MapTypeId.TERRAIN
+        };
 
-    var site = new google.maps.LatLng(55.9879314, -4.3042387);
-    var hospital = new google.maps.LatLng(55.8934378, -4.2201905);
+        var map = new google.maps.Map(document.getElementById("map"),
+            mapOptions);
 
-    var mapOptions = {
-        streetViewControl: true,
-        center: site,
-        zoom: 18,
-        mapTypeId: google.maps.MapTypeId.TERRAIN
-    };
-    var map = new google.maps.Map(document.getElementById("map"),
-        mapOptions);
+        for (farmacia in $scope.farmacias) {
+            var posicion = new google.maps.LatLng($scope.farmacias[farmacia].latitud, $scope.farmacias[farmacia].longitud);
+            var farmacia = new google.maps.Marker({
+                position: posicion,
+                map: map
+            });
 
-    //Marker + infowindow + angularjs compiled ng-click
-    var contentString = "<div><a ng-click='clickTest()'>Click me!</a></div>";
-    var compiled = $compile(contentString)($scope);
+            var infowindow = new google.maps.InfoWindow({
+                content: $scope.farmacias[farmacia].direccion
+            });
 
-    var infowindow = new google.maps.InfoWindow({
-        content: compiled[0]
-    });
-
-    var marker = new google.maps.Marker({
-        position: site,
-        map: map,
-        title: 'Strathblane (Job Location)'
-    });
-
-    var hospitalRoute = new google.maps.Marker({
-        position: hospital,
-        map: map,
-        title: 'Hospital (Stobhill)'
-    });
-
-    var infowindow = new google.maps.InfoWindow({
-        content: "Project Location"
-    });
-
-    infowindow.open(map, marker);
-
-    var hospitalwindow = new google.maps.InfoWindow({
-        content: "Nearest Hospital"
-    });
-
-    hospitalwindow.open(map, hospitalRoute);
-
-    google.maps.event.addListener(marker, 'click', function () {
-        infowindow.open(map, marker);
-    });
-
-    $scope.map = map;
-
-    var directionsService = new google.maps.DirectionsService();
-    var directionsDisplay = new google.maps.DirectionsRenderer();
-
-    var request = {
-        origin: site,
-        destination: hospital,
-        travelMode: google.maps.TravelMode.DRIVING
-    };
-    directionsService.route(request, function (response, status) {
-        if (status == google.maps.DirectionsStatus.OK) {
-            directionsDisplay.setDirections(response);
-        }
-    });
-
-    directionsDisplay.setMap(map);
-
-    $scope.centerOnMe = function () {
-        if (!$scope.map) {
-            return;
+            infowindow.open(map, farmacia);
         }
 
-        $scope.loading = $ionicLoading.show({
-            content: 'Getting current location...',
-            showBackdrop: false
-        });
-        navigator.geolocation.getCurrentPosition(function (pos) {
-            $scope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
-            $scope.loading.hide();
-        }, function (error) {
-            alert('Unable to get location: ' + error.message);
-        });
-    };
 
-    $scope.clickTest = function () {
-        alert('Example of infowindow with ng-click')
-    };
 
+        $scope.map = map;
+    }
 
 
     var urls = server_constantes.all();
     $scope.url = urls.URL;
-    $scope.oferta = Ofertas.getViendoOferta();
+
     $scope.descripcionlarga = function () {
         var alertPopup = $ionicPopup.alert({
             cssClass: 'modal',
@@ -397,6 +352,31 @@ angular.module('starter.controllers', [])
         $scope.mapa = "mostrado";
         $scope.info = "oculto";
     }
+
+    /*
+     * if given group is the selected group, deselect it
+     * else, select the given group
+     */
+
+    $scope.opciones = [{
+        show: false
+    }, {
+        show: false
+    }, {
+        show: false
+    }];
+
+    $scope.toggleGroup = function (group) {
+        console.log($scope.opciones[group].show);
+        if ($scope.opciones[group].show)
+            $scope.opciones[group].show = false;
+        else
+            $scope.opciones[group].show = true;
+        console.log("DESPUES ", $scope.opciones[group].show);
+    };
+    $scope.isGroupShown = function (group) {
+        return $scope.opciones[group].show;
+    };
 
 })
 

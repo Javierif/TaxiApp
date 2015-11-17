@@ -1,52 +1,47 @@
 <ion-view class="overlightblue" view-title="Detalle de la oferta">
-  <ion-content>
+    <ion-content>
 
-      <div class="list lightblue seccionoferta">
+        <div class="list lightblue seccionoferta">
 
-        <div class="relleno"></div>
-        <div class="detalleimagenproducto">
-            <ul rn-carousel rn-carousel-auto-slide class="carrusel_detalle">
-                <li ng-repeat="image in oferta.imagenesProducto">
-                    <div class="carrusel_detalle"><img class="carrusel_detalle" ng-src="{{image}}"></div>
-                </li>
-            </ul>
-        </div>
-        <div class="titulodetalle">Detalle del producto</div>
-        <div class="contenedor_detalle" ng-click="descripcionlarga()"><div class="descripcionLarga" ng-bind-html="oferta.descripcionLarga"></div><a class="leermas">Leer más</a></div>
-        <div class="tab_detalle button-bar">
-          <a class="button" ng-click="showinfo()"><i class="icon ion-information-circled"></i></a>
-          <a class="button" ng-click="showmapa()"><i class="icon ion-map"></i></a>
-        </div>
-          <div class="componente" data-tap-disabled="true" ng-hide="mapa"></div>
-        <div class="componente" ng-model="componente">
-
-            <div ng-class="info" class="item lightblue seccionoferta item-text-wrap item-thumbnail-left" ng-repeat="componente in oferta.componentes">
-
-                <img class="componente_img" ng-src="{{componente.imagenDireccion}}">
-                <div class="secciontexto">
-                    {{componente.titulo}}
-                    <div class="rojomostrador">
-                            <span class="verticalcenter">{{componente.descuento}}
-                                <span class="simbolodescuento">{{componente.simbolo}}</span>
-                                DESCUENTO
-                            </span>
-                            <img src="./img/final_bandera.png">
-                        </div>
-                        <span class="caducidad">
-                            Disponibles: {{componente.unidadesDisponi}}
-                            </br>Este descuento caduca el <i class="icon ion-clock">{{oferta.mayorTiempo}}</i>
-                        </span>
-                </div>
-          <hr>
-                <div class="secciondetalle">
-                    <div ng-bind-html="componente.descripcionComponente"></div></br>
-                    <button class="button button-full button-positive" ng-click="cupon(componente)">Obtener cupón</button>
-                </div>
+            <div class="detalleimagenproducto">
+                <ul rn-carousel rn-carousel-auto-slide class="carrusel">
+                    <li ng-repeat="image in oferta.imagenescargar">
+                        <div class="carrusel"><img class="carrusel" ng-src="http://localhost:1337{{image.url}}"></div>
+                        <p class="description">{{oferta.titulo}}</p>
+                    </li>
+                </ul>
             </div>
-        </div>
+            <div class="seccionCupon">
+            </div>
+            <div class="seccionOpciones">
 
-    </div>
-    <div ng-class="mapa" id="map" data-tap-disabled="true"></div>
-  </ion-content>
+                <ion-list>
+                    <ion-item class="item-stable opcionestitle" ng-click="toggleGroup(0)" ng-class="{active: isGroupShown(0)}">
+                        &nbsp; Descripción del descuento
+                        <i class="icon right" ng-class="isGroupShown(0) ? 'ion-chevron-up' : 'ion-chevron-down'"></i>
+                    </ion-item>
+                    <ion-item class="item-accordion opcionesdesc" ng-show="isGroupShown(0)">
+                        {{oferta.descripcion}}
+                    </ion-item>
+
+                    <ion-item class="item-stable opcionestitle" ng-click="toggleGroup(1)" ng-class="{active: isGroupShown(1)}">
+                        <i class="ion-android-share-alt"></i> &nbsp; ¡Comparte este cupón!
+                        <i class="icon right" ng-class="isGroupShown(1) ? 'ion-chevron-up' : 'ion-chevron-down'"></i>
+                    </ion-item>
+                    <ion-item class="item-accordion opcionesdesc" ng-show="isGroupShown(1)">
+                        {{oferta.descripcion}}
+                    </ion-item>
+                    <ion-item class="item-stable opcionestitle" ng-click="toggleGroup(1)" ng-class="{active: isGroupShown(1)}">
+                        <i class="ion-android-share-alt"></i> &nbsp; Mapa de las farmacias donde encontrarlo
+                        <i class="icon right" ng-class="isGroupShown(1) ? 'ion-chevron-up' : 'ion-chevron-down'"></i>
+                    </ion-item>
+                    <ion-item class="item-accordion opcionesdesc" ng-show="isGroupShown(1)">
+                        {{oferta.descripcion}}
+                    </ion-item>
+                </ion-list>
+            </div>
+
+
+    </ion-content>
 
 </ion-view>

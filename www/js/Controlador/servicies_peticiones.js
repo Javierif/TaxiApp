@@ -1,11 +1,11 @@
 angular.module('starter.servicies_peticiones', [])
 
-.factory('server_constantes', function() {
-  // Might use a resource here that returns a JSON arra
+.factory('server_constantes', function () {
+    // Might use a resource here that returns a JSON arra
 
     var constantes = {
-        URL : "http://localhost:1337",
-        URL_API : "/api/v1",
+        URL: "http://localhost:1337",
+        URL_API: "/api/v1",
         URL_INICISIOSESION: "/iniciosesion",
         URL_REGISTRO: "/alta",
         URL_COMERCIOS: "/comercios",
@@ -64,193 +64,238 @@ angular.module('starter.servicies_peticiones', [])
         SERVER_OPERACION: "operacion"
     }
 
-  return {
-    all: function() {
-      return constantes;
-    },
-    get: function(constante) {
-        return constantes[constante];
+    return {
+        all: function () {
+            return constantes;
+        },
+        get: function (constante) {
+            return constantes[constante];
+        }
     }
-  }
 })
 
-.factory('Peticiones', function(server_constantes,$http,$q) {
-   return {
+.factory('Peticiones', function (server_constantes, $http, $q) {
+    return {
 
-    login: function(correo) {
-        var urls = server_constantes.all();
-        var peticionjson = {};
-        peticionjson[urls.SERVER_EMAIL] = correo;
-        var deferred = $q.defer();
-        $http.post(urls.URL+urls.URL_API+urls.URL_INICISIOSESION, peticionjson)
-            .success(function(respuesta){
-             //   window.plugins.toast.showLongBottom(respuesta.error_msg, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-                deferred.resolve({
-                    error: respuesta.error,
-                    error_msg: respuesta.error_msg,
-                    email : respuesta.email,
-                    codigo : respuesta.codigo,
-                    codigoPostal : respuesta.codigoPostal,
-                    sexo : respuesta.sexo,
-                    anoNacimiento : respuesta.anoNacimiento,
-                    telefono : respuesta.telefono,
-                    codigoFarmacia : respuesta.codigoFarmacia
-                });
-            }).error(function(error){
-                window.plugins.toast.showLongBottom(error.error_msg,
-                    function(a){
-                        console.log('toast success: ' + a)
-                    },
-                    function(b){alert(
-                    'toast error: ' + b)
+        login: function (correo) {
+            var urls = server_constantes.all();
+            var peticionjson = {};
+            peticionjson[urls.SERVER_EMAIL] = correo;
+            var deferred = $q.defer();
+            $http.post(urls.URL + urls.URL_API + urls.URL_INICISIOSESION, peticionjson)
+                .success(function (respuesta) {
+                    //   window.plugins.toast.showLongBottom(respuesta.error_msg, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
+                    deferred.resolve({
+                        error: respuesta.error,
+                        error_msg: respuesta.error_msg,
+                        email: respuesta.email,
+                        codigo: respuesta.codigo,
+                        codigoPostal: respuesta.codigoPostal,
+                        sexo: respuesta.sexo,
+                        anoNacimiento: respuesta.anoNacimiento,
+                        telefono: respuesta.telefono,
+                        codigoFarmacia: respuesta.codigoFarmacia
                     });
-            });
-        return deferred.promise;
-    },
-
-    //////////REGISTRAR/////////
-    registrar: function(cp,correo,fnac,sex,telf,codfarma) {
-        var urls = server_constantes.all();
-        var peticionjson = {};
-        var deferred = $q.defer();
-        peticionjson[urls.SERVER_CODPOSTAL]=cp;
-        peticionjson[urls.SERVER_EMAIL]=correo;
-        peticionjson[urls.SERVER_ANONACIMIENTO]=fnac;
-        peticionjson[urls.SERVER_SEXO]=sex;
-        peticionjson[urls.SERVER_TELEFONO]=telf;
-        peticionjson[urls.SERVER_CODFARMACIA]="";
-        peticionjson[urls.SERVER_CODFARMACIA]=codfarma;
-        $http.post(urls.URL+urls.URL_API+urls.URL_REGISTRO, peticionjson)
-            .success(function(result){
-                window.plugins.toast.showLongBottom(result.error_msg,
-                    function(a){
-                        console.log('toast success: ' + a)
-                    },
-                    function(b){
-                    alert('toast error: ' + b)
-                    });
-                 deferred.resolve({
-                    error: result.error,
-                    error_msg: result.error_msg,
-                    codigo : result.codigo
+                }).error(function (error) {
+                    window.plugins.toast.showLongBottom(error.error_msg,
+                        function (a) {
+                            console.log('toast success: ' + a)
+                        },
+                        function (b) {
+                            alert(
+                                'toast error: ' + b)
+                        });
                 });
-            }).error(function(result){
-                window.plugins.toast.showLongBottom(
-                    result.error_msg,
-                    function(a){console.log('toast success: ' + a)},
-                    function(b){alert('toast error: ' + b)});
-
-            });
-        return deferred.promise;
-    },
-
-       ///////////OFERTAS/////////
-    getOfertasGenerales: function() {
-        var urls = server_constantes.all();
-        var deferred = $q.defer();
-        $http.get(urls.URL+"/getcupones")
-            .success(function(respuesta){
-                deferred.resolve(respuesta);
-        }).error(function(error){
-               console.log(error);
-        });
-        return deferred.promise;
-    },
-
-    getOfertasEspecificas: function(latitud,longitud) {
-        var urls = server_constantes.all();
-        var peticionjson = {};
-        var deferred = $q.defer();
-        peticionjson[urls.SERVER_LATITUD]= latitud;
-        peticionjson[urls.SERVER_LONGITUD] = longitud;
-        console.log(peticionjson);
-        $http.post(urls.URL+"/getcuponesespecifico",peticionjson)
-            .success(function(respuesta){
-                deferred.resolve(respuesta);
-        }).error(function(error){
-               console.log(error);
-        });
-        return deferred.promise;
-    },
-
-    ofertas: function(codigo){
-        var urls = server_constantes.all();
-        var peticionjson = {};
-        var deferred = $q.defer();
-        peticionjson[urls.SERVER_CODIGO]= codigo;
-        $http.post(urls.URL+urls.URL_API+urls.URL_DESCARGAOFERTAS,peticionjson)
-        .success(
-            function(result){
-                deferred.resolve({
-                    error:false,
-                    resultado:result
-                });
-            }).error(
-            function(result){
-                window.plugins.toast.showLongBottom(
-                    result.error_msg,
-                    function(a){console.log('toast success: ' + a)},
-                    function(b){alert('toast error: ' + b)}
-                );
-                deferred.resolve({
-                    error:true
-                });
-            });
             return deferred.promise;
-    },
-       /////////////CUPON/////////////////
-    obtenerCupon: function(idcomponente,codigocliente,cantidad) {
-        var urls = server_constantes.all();
-        var peticionjson = {};
-        var deferred = $q.defer();
-        peticionjson[urls.SERVER_CODIGO]=codigocliente;
-        peticionjson[urls.SERVER_COMPONENTEOFERTA]=idcomponente;
-        peticionjson[urls.SERVER_UNIDADES]=cantidad;
-        $http.post(urls.URL+urls.URL_API+urls.URL_COMPRA, peticionjson)
-            .success(function(result){
-                 deferred.resolve({
-                    error: result.error,
-                    error_msg: result.error_msg,
-                    url: result.url
-                });
-            }).error(function(result){
-                window.plugins.toast.showLongBottom(
-                    result.error_msg,
-                    function(a){console.log('toast success: ' + a)},
-                    function(b){alert('toast error: ' + b)});
+        },
 
-            });
-        return deferred.promise;
-    },
+        //////////REGISTRAR/////////
+        registrar: function (cp, correo, fnac, sex, telf, codfarma) {
+            var urls = server_constantes.all();
+            var peticionjson = {};
+            var deferred = $q.defer();
+            peticionjson[urls.SERVER_CODPOSTAL] = cp;
+            peticionjson[urls.SERVER_EMAIL] = correo;
+            peticionjson[urls.SERVER_ANONACIMIENTO] = fnac;
+            peticionjson[urls.SERVER_SEXO] = sex;
+            peticionjson[urls.SERVER_TELEFONO] = telf;
+            peticionjson[urls.SERVER_CODFARMACIA] = "";
+            peticionjson[urls.SERVER_CODFARMACIA] = codfarma;
+            $http.post(urls.URL + urls.URL_API + urls.URL_REGISTRO, peticionjson)
+                .success(function (result) {
+                    window.plugins.toast.showLongBottom(result.error_msg,
+                        function (a) {
+                            console.log('toast success: ' + a)
+                        },
+                        function (b) {
+                            alert('toast error: ' + b)
+                        });
+                    deferred.resolve({
+                        error: result.error,
+                        error_msg: result.error_msg,
+                        codigo: result.codigo
+                    });
+                }).error(function (result) {
+                    window.plugins.toast.showLongBottom(
+                        result.error_msg,
+                        function (a) {
+                            console.log('toast success: ' + a)
+                        },
+                        function (b) {
+                            alert('toast error: ' + b)
+                        });
+
+                });
+            return deferred.promise;
+        },
+
+        ///////////OFERTAS/////////
+        getOfertasGenerales: function () {
+            var urls = server_constantes.all();
+            var deferred = $q.defer();
+            $http.get(urls.URL + "/getcupones")
+                .success(function (respuesta) {
+                    deferred.resolve(respuesta);
+                }).error(function (error) {
+                    console.log(error);
+                });
+            return deferred.promise;
+        },
+
+        getOfertasEspecificas: function (latitud, longitud) {
+            var urls = server_constantes.all();
+            var peticionjson = {};
+            var deferred = $q.defer();
+            peticionjson[urls.SERVER_LATITUD] = latitud;
+            peticionjson[urls.SERVER_LONGITUD] = longitud;
+            console.log(peticionjson);
+            $http.post(urls.URL + "/getcuponesespecifico", peticionjson)
+                .success(function (respuesta) {
+                    deferred.resolve(respuesta);
+                }).error(function (error) {
+                    console.log(error);
+                });
+            return deferred.promise;
+        },
+
+        getFarmacias: function () {
+            var urls = server_constantes.all();
+            var deferred = $q.defer();
+            $http.get(urls.URL + "/getfarmacias")
+                .success(function (respuesta) {
+                    deferred.resolve(respuesta);
+                }).error(function (error) {
+                    console.log(error);
+                });
+            return deferred.promise;
+        },
+
+        getFarmacia: function (idFarmacia) {
+            var urls = server_constantes.all();
+            var deferred = $q.defer();
+            $http.get(urls.URL + "/getfarmacias/" + idFarmacia)
+                .success(function (respuesta) {
+                    deferred.resolve(respuesta);
+                }).error(function (error) {
+                    console.log(error);
+                });
+            return deferred.promise;
+        },
+
+        ofertas: function (codigo) {
+            var urls = server_constantes.all();
+            var peticionjson = {};
+            var deferred = $q.defer();
+            peticionjson[urls.SERVER_CODIGO] = codigo;
+            $http.post(urls.URL + urls.URL_API + urls.URL_DESCARGAOFERTAS, peticionjson)
+                .success(
+                    function (result) {
+                        deferred.resolve({
+                            error: false,
+                            resultado: result
+                        });
+                    }).error(
+                    function (result) {
+                        window.plugins.toast.showLongBottom(
+                            result.error_msg,
+                            function (a) {
+                                console.log('toast success: ' + a)
+                            },
+                            function (b) {
+                                alert('toast error: ' + b)
+                            }
+                        );
+                        deferred.resolve({
+                            error: true
+                        });
+                    });
+            return deferred.promise;
+        },
+        /////////////CUPON/////////////////
+        obtenerCupon: function (idcomponente, codigocliente, cantidad) {
+            var urls = server_constantes.all();
+            var peticionjson = {};
+            var deferred = $q.defer();
+            peticionjson[urls.SERVER_CODIGO] = codigocliente;
+            peticionjson[urls.SERVER_COMPONENTEOFERTA] = idcomponente;
+            peticionjson[urls.SERVER_UNIDADES] = cantidad;
+            $http.post(urls.URL + urls.URL_API + urls.URL_COMPRA, peticionjson)
+                .success(function (result) {
+                    deferred.resolve({
+                        error: result.error,
+                        error_msg: result.error_msg,
+                        url: result.url
+                    });
+                }).error(function (result) {
+                    window.plugins.toast.showLongBottom(
+                        result.error_msg,
+                        function (a) {
+                            console.log('toast success: ' + a)
+                        },
+                        function (b) {
+                            alert('toast error: ' + b)
+                        });
+
+                });
+            return deferred.promise;
+        },
         ////////////PERFIL////////////
-    perfil: function(cp,correo,fnac,sex,telf,codfarma) {
-        var urls = server_constantes.all();
-        var peticionjson = {};
-        var deferred = $q.defer();
-        peticionjson[urls.SERVER_CODPOSTAL]=cp;
-        peticionjson[urls.SERVER_EMAIL]=correo;
-        peticionjson[urls.SERVER_ANONACIMIENTO]=fnac;
-        peticionjson[urls.SERVER_SEXO]=sex;
-        peticionjson[urls.SERVER_TELEFONO]=telf;
-        peticionjson[urls.SERVER_CODFARMACIA]="";
-        peticionjson[urls.SERVER_CODFARMACIA]=codfarma;
-        $http.post(urls.URL+urls.URL_API+urls.URL_GUARDAPERFIL, peticionjson)
-            .success(function(result){
-                window.plugins.toast.showLongBottom(result.error_msg, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-                 deferred.resolve({
-                    error: result.error,
-                    error_msg: result.error_msg,
-                    codigo : result.codigo
+        perfil: function (cp, correo, fnac, sex, telf, codfarma) {
+            var urls = server_constantes.all();
+            var peticionjson = {};
+            var deferred = $q.defer();
+            peticionjson[urls.SERVER_CODPOSTAL] = cp;
+            peticionjson[urls.SERVER_EMAIL] = correo;
+            peticionjson[urls.SERVER_ANONACIMIENTO] = fnac;
+            peticionjson[urls.SERVER_SEXO] = sex;
+            peticionjson[urls.SERVER_TELEFONO] = telf;
+            peticionjson[urls.SERVER_CODFARMACIA] = "";
+            peticionjson[urls.SERVER_CODFARMACIA] = codfarma;
+            $http.post(urls.URL + urls.URL_API + urls.URL_GUARDAPERFIL, peticionjson)
+                .success(function (result) {
+                    window.plugins.toast.showLongBottom(result.error_msg, function (a) {
+                        console.log('toast success: ' + a)
+                    }, function (b) {
+                        alert('toast error: ' + b)
+                    });
+                    deferred.resolve({
+                        error: result.error,
+                        error_msg: result.error_msg,
+                        codigo: result.codigo
+                    });
+                }).error(function (result) {
+                    window.plugins.toast.showLongBottom(
+                        result.error_msg,
+                        function (a) {
+                            console.log('toast success: ' + a)
+                        },
+                        function (b) {
+                            alert('toast error: ' + b)
+                        });
+
                 });
-            }).error(function(result){
-                window.plugins.toast.showLongBottom(
-                    result.error_msg,
-                    function(a){console.log('toast success: ' + a)},
-                    function(b){alert('toast error: ' + b)});
+            return deferred.promise;
+        }
 
-            });
-        return deferred.promise;
     }
-
-   }
 });
