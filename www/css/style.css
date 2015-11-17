@@ -354,6 +354,22 @@
     width: 100%;
 }
 
+.seccionacciones {
+    margin: 10px;
+}
+
+.seccionacciones > .button.button-energized {
+    width: 45%;
+    border-radius: 15px;
+}
+
+.seccionacciones > .button.button-calm {
+    width: 45%;
+    position: absolute;
+    right: 10px;
+    border-radius: 15px;
+}
+
 .right {
     position: absolute;
     right: 15px;
@@ -366,6 +382,16 @@
 
 .item-stable.opcionestitle.item.active {
     color: lightgray !important
+}
+
+.opcionesdesc > button {
+    font-size: 2em;
+    color: white;
+}
+
+.social > button {
+    margin: 2%;
+    width: 20%;
 }
 
 .detalleimagenproducto {

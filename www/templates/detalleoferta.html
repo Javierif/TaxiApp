@@ -23,24 +23,32 @@
                     <ion-item class="item-accordion opcionesdesc" ng-show="isGroupShown(0)">
                         {{oferta.descripcion}}
                     </ion-item>
-
                     <ion-item class="item-stable opcionestitle" ng-click="toggleGroup(1)" ng-class="{active: isGroupShown(1)}">
-                        <i class="ion-android-share-alt"></i> &nbsp; ¡Comparte este cupón!
+                        <i class="ion-android-share-alt"></i> &nbsp; ¿Donde encontrarlo?
                         <i class="icon right" ng-class="isGroupShown(1) ? 'ion-chevron-up' : 'ion-chevron-down'"></i>
                     </ion-item>
                     <ion-item class="item-accordion opcionesdesc" ng-show="isGroupShown(1)">
-                        {{oferta.descripcion}}
+                        <div ng-class="mapa" id="map"></div>
                     </ion-item>
-                    <ion-item class="item-stable opcionestitle" ng-click="toggleGroup(1)" ng-class="{active: isGroupShown(1)}">
-                        <i class="ion-android-share-alt"></i> &nbsp; Mapa de las farmacias donde encontrarlo
-                        <i class="icon right" ng-class="isGroupShown(1) ? 'ion-chevron-up' : 'ion-chevron-down'"></i>
+                    <ion-item class="item-stable opcionestitle" ng-click="toggleGroup(2)" ng-class="{active: isGroupShown(2)}">
+                        <i class="ion-android-share-alt"></i> &nbsp; Compartelo con tus amigos
+                        <i class="icon right" ng-class="isGroupShown(2) ? 'ion-chevron-up' : 'ion-chevron-down'"></i>
                     </ion-item>
-                    <ion-item class="item-accordion opcionesdesc" ng-show="isGroupShown(1)">
-                        {{oferta.descripcion}}
+                    <ion-item class="item-accordion opcionesdesc social" ng-show="isGroupShown(2)">
+                        <button class="button button-positive ion-social-facebook-outline"></button>
+                        <button class="button button-calm ion-social-twitter-outline"></button>
+                        <button class="button button-assertive ion-social-googleplus"></button>
+                        <button class="button button-balanced"><img style="width:30px; height:30px; padding-bottom:5px;" src="./img/whatsappicon.png"></button>
                     </ion-item>
                 </ion-list>
-            </div>
-
+                <div class="seccionacciones">
+                    <button class="button button-energized">
+                        Reservar
+                    </button>
+                    <button class="button button-calm">
+                        Obtener Cupón
+                    </button>
+                </div>
 
     </ion-content>
 
