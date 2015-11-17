@@ -223,22 +223,33 @@ angular.module('starter.controllers', [])
     if ($scope.oferta.asociado) {
         var farmaciaAsociada = Peticiones.getFarmacia($scope.oferta.asociado);
         farmaciaAsociada.then(function (result) {
-            $scope.farmacias = result;
+            console.log("RESUL ", result);
+            $scope.farmacias[0] = result;
+            inicializa();
         });
     } else {
         window.navigator.geolocation.getCurrentPosition(function (location) {
-            var farmaciasCercanas = Peticiones.getFarmacias()(location.coords.latitude, location.coords.longitude);
+            var farmaciasCercanas = Peticiones.getFarmacias(location.coords.latitude, location.coords.longitude);
             farmaciasCercanas.then(function (result) {
+                console.log("RESUL ", result);
+
                 $scope.farmacias = result;
+                inicializa();
             });
         });
     }
     var inicializa = function () {
+        if ($scope.farmacias.lenght > 1) {
+            var zoom = 8;
+        } else {
+            var zoom = 15;
+        }
+
         var posInicio = new google.maps.LatLng($scope.farmacias[0].latitud, $scope.farmacias[0].longitud);
         var mapOptions = {
             streetViewControl: true,
             center: posInicio,
-            zoom: 18,
+            zoom: zoom,
             mapTypeId: google.maps.MapTypeId.TERRAIN
         };
 
@@ -247,23 +258,36 @@ angular.module('starter.controllers', [])
 
         for (farmacia in $scope.farmacias) {
             var posicion = new google.maps.LatLng($scope.farmacias[farmacia].latitud, $scope.farmacias[farmacia].longitud);
-            var farmacia = new google.maps.Marker({
+
+            console.log("farmacias ", $scope.farmacias);
+            console.log("direc ", $scope.farmacias[farmacia].direccion);
+            var contentString = '<strong>Dirección de la farmacia: </strong> ' +
+                $scope.farmacias[farmacia].direccion;
+
+
+            var infowindow = new google.maps.InfoWindow({
+                content: contentString
+            });
+
+            var farmaciaMarker = new google.maps.Marker({
                 position: posicion,
                 map: map
             });
-
-            var infowindow = new google.maps.InfoWindow({
-                content: $scope.farmacias[farmacia].direccion
+            farmaciaMarker.addListener('click', function () {
+                infowindow.open(map, farmaciaMarker);
             });
 
-            infowindow.open(map, farmacia);
+            var farmaciaMarker = new google.maps.Marker({
+                position: posicion,
+                map: map
+            });
+            infowindow.open(map, farmaciaMarker);
         }
 
 
 
         $scope.map = map;
     }
-
 
     var urls = server_constantes.all();
     $scope.url = urls.URL;
@@ -367,12 +391,10 @@ angular.module('starter.controllers', [])
     }];
 
     $scope.toggleGroup = function (group) {
-        console.log($scope.opciones[group].show);
         if ($scope.opciones[group].show)
             $scope.opciones[group].show = false;
         else
             $scope.opciones[group].show = true;
-        console.log("DESPUES ", $scope.opciones[group].show);
     };
     $scope.isGroupShown = function (group) {
         return $scope.opciones[group].show;

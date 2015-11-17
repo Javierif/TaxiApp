@@ -168,7 +168,6 @@ angular.module('starter.servicies_peticiones', [])
             var deferred = $q.defer();
             peticionjson[urls.SERVER_LATITUD] = latitud;
             peticionjson[urls.SERVER_LONGITUD] = longitud;
-            console.log(peticionjson);
             $http.post(urls.URL + "/getcuponesespecifico", peticionjson)
                 .success(function (respuesta) {
                     deferred.resolve(respuesta);
@@ -178,10 +177,13 @@ angular.module('starter.servicies_peticiones', [])
             return deferred.promise;
         },
 
-        getFarmacias: function () {
+        getFarmacias: function (latitud, longitud) {
             var urls = server_constantes.all();
+            var peticionjson = {};
             var deferred = $q.defer();
-            $http.get(urls.URL + "/getfarmacias")
+            peticionjson[urls.SERVER_LATITUD] = latitud;
+            peticionjson[urls.SERVER_LONGITUD] = longitud;
+            $http.post(urls.URL + "/getfarmacias", peticionjson)
                 .success(function (respuesta) {
                     deferred.resolve(respuesta);
                 }).error(function (error) {

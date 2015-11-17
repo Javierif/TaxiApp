@@ -24,11 +24,11 @@
                         {{oferta.descripcion}}
                     </ion-item>
                     <ion-item class="item-stable opcionestitle" ng-click="toggleGroup(1)" ng-class="{active: isGroupShown(1)}">
-                        <i class="ion-android-share-alt"></i> &nbsp; ¿Donde encontrarlo?
+                        <i class="ion-android-share-alt"></i> &nbsp; ¿Dónde encontrarlo?
                         <i class="icon right" ng-class="isGroupShown(1) ? 'ion-chevron-up' : 'ion-chevron-down'"></i>
                     </ion-item>
                     <ion-item class="item-accordion opcionesdesc" ng-show="isGroupShown(1)">
-                        <div ng-class="mapa" id="map"></div>
+                        <div id="map" data-tap-disabled="true"></div>
                     </ion-item>
                     <ion-item class="item-stable opcionestitle" ng-click="toggleGroup(2)" ng-class="{active: isGroupShown(2)}">
                         <i class="ion-android-share-alt"></i> &nbsp; Compartelo con tus amigos
