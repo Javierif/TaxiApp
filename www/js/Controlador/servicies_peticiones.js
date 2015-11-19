@@ -108,7 +108,18 @@ angular.module('starter.servicies_peticiones', [])
                 });
             return deferred.promise;
         },
-
+        creaAnonimo: function () {
+            var urls = server_constantes.all();
+            var peticionjson = {};
+            var deferred = $q.defer();
+            $http.post(urls.URL + "/creaanonimo", peticionjson)
+                .success(function (respuesta) {
+                    deferred.resolve(respuesta);
+                }).error(function (error) {
+                    console.log(error);
+                });
+            return deferred.promise;
+        },
         //////////REGISTRAR/////////
         registrar: function (cp, correo, fnac, sex, telf, codfarma) {
             var urls = server_constantes.all();
@@ -155,7 +166,7 @@ angular.module('starter.servicies_peticiones', [])
             var peticionjson = {};
             var deferred = $q.defer();
             peticionjson['idUsuario'] = idUsuario;
-            $http.post(urls.URL + "/getcupones",peticionjson)
+            $http.post(urls.URL + "/getcupones", peticionjson)
                 .success(function (respuesta) {
                     deferred.resolve(respuesta);
                 }).error(function (error) {
@@ -211,7 +222,7 @@ angular.module('starter.servicies_peticiones', [])
             var urls = server_constantes.all();
             var peticionjson = {};
             var deferred = $q.defer();
-            peticionjson['idOferta'] = idOferta;
+            peticionjson['idCupon'] = idOferta;
             peticionjson['idUsuario'] = usuario;
             $http.post(urls.URL + "/getcupon", peticionjson)
                 .success(function (respuesta) {

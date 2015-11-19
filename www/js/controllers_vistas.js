@@ -23,22 +23,23 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('inicioCtrl', function ($scope, Peticiones, $state, $ionicLoading, Usuario, Comercios, Ofertas, $compile, $cordovaDevice) {
-    $scope.uuid = $cordovaDevice.getUUID();
+.controller('inicioCtrl', function ($scope, Peticiones, $state, $ionicLoading, Usuario, Comercios, Ofertas, $compile) {
     window.navigator.geolocation.getCurrentPosition(function (location) {
         alert('Location from Phonegap' + location);
     });
     $scope.entrar = function () {
         $state.go("app.mostradorofertas");
     }
-
     if (!Usuario.loadusuario()) {
         var usuario = Peticiones.creaAnonimo();
         usuario.then(function (result) {
-            Usuario.set('codigoCliente', result.codigo);
+            Usuario.set('codigoCliente', result.usuario.id);
             Usuario.saveusuario();
         });
+    } else {
+        console.log("FUERA", Usuario.usuario());
     }
+
 })
 
 
@@ -198,11 +199,12 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('MostradorOfertasCtrl', function ($ionicPlatform, $scope, Peticiones, $state, Ofertas, $ionicLoading) {
+.controller('MostradorOfertasCtrl', function ($ionicPlatform, $scope, Peticiones, $state, Ofertas, $ionicLoading, Usuario) {
     $ionicLoading.show({
         template: '<i class="icon ion-looping"></i>Espere un momento, descargando las ofertas...'
     });
-    var ofertasGenerales = Peticiones.getOfertasGenerales();
+    var usuario = Usuario.usuario();
+    var ofertasGenerales = Peticiones.getOfertasGenerales(usuario.codigoCliente);
     ofertasGenerales.then(function (result) {
         $scope.ofertasGenerales = result;
         $ionicLoading.hide();
@@ -227,6 +229,10 @@ angular.module('starter.controllers', [])
 
 .controller('DetalleOfertaCtrl', function ($scope, $stateParams, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout) {
     $scope.oferta = Ofertas.getViendoOferta();
+    var usuario = Usuario.usuario;
+    var map;
+    var posInicio;
+
     if ($scope.oferta.asociado) {
         var farmaciaAsociada = Peticiones.getFarmacia($scope.oferta.asociado);
         farmaciaAsociada.then(function (result) {
@@ -242,8 +248,7 @@ angular.module('starter.controllers', [])
         });
     }
 
-    var map;
-    var posInicio;
+
     var inicializa = function () {
         if (!$scope.farmacias)
             return;
@@ -295,22 +300,103 @@ angular.module('starter.controllers', [])
         reloaded = true;
         $scope.map = map;
     }
-    var obtenDisponibilidad = function () {
-        var disponibilidad = Peticiones.getOferta($scope.oferta.id);
+    $scope.cupon = function () {
+        var disponibilidad = Peticiones.getOferta($scope.oferta.id, usuario.id);
         disponibilidad.then(function (result) {
-            $scope.oferta = result;
+            console.log(" ES RES", result);
+            $scope.oferta.cantidadMaxUser = result[0].cantidadMaxUser;
+            ejecutaCupon();
+        });
+    }
+
+    $scope.reserva = function () {
+        var disponibilidad = Peticiones.getOferta($scope.oferta.id, usuario.id);
+        disponibilidad.then(function (result) {
+            console.log(" ES RES", result);
+            $scope.oferta.reservadas = result[0].reservadas
+            ejecutaReserva();
         });
     }
     var urls = server_constantes.all();
     $scope.url = urls.URL;
 
-    $scope.cupon = function (componente) {
-        $scope.data = {}
-        obtenDisponibilidad();
+    var ejecutaCupon = function () {
+        $scope.data = {};
+        var myPopup = $ionicPopup.show({
+            template: '<input type="number" ng-model="data.cantidadcupon" placeholder= "La cantidad minima es ' + $scope.oferta.cantidadMin + '">',
+            title: 'Introduzca la cantidad de articulos que quiere en su cupón descuento',
+            subTitle: 'Solo quedan disponibles: ' + $scope.oferta.cantidadMaxUser,
+            scope: $scope,
+            buttons: [
+                {
+                    text: 'Cancelar',
+                    type: 'button button-outline button-calm'
+                },
+                {
+                    text: 'Ver cupón',
+                    type: 'button button-calm',
+                    scope: $scope,
+                    onTap: function (e) {
+                        return $scope.data.cantidadcupon
+                    }
+              }
+            ]
+        });
+        myPopup.then(function (res) {
+            if (!(angular.isUndefined(res)) && !(res == null)) {
+                if (res <= 0) {
+                    window.plugins.toast.showShortBottom("Introduzca un numero mayor de 0",
+                        function (a) {},
+                        function (b) {});
+                } else if (res < $scope.oferta.cantidadMin) {
+                    window.plugins.toast.showShortBottom("La cantidad mínima para poder ofrecerte este cupón es " + $scope.oferta.cantidadMin,
+                        function (a) {},
+                        function (b) {});
+                } else if (res > $scope.oferta.cantidadMaxUser) {
+                    window.plugins.toast.showShortBottom("La cantidad maxima disponible para este cupón es " + $scope.oferta.cantidadMaxUser,
+                        function (a) {},
+                        function (b) {});
+                } else {
+                    $ionicLoading.show({
+                        template: '<i class="icon ion-looping"></i> Obteniendo su código de descuento...'
+                    });
+                    var cupon = Peticiones.obtenerCupon($scope.oferta.id, Usuario.get('codigoCliente'), res);
+                    cupon.then(
+                        function (result) {
+                            if (!result.error) {
+                                $scope.urlcupon = result.url;
+                                var myPopup = $ionicPopup.show({
+                                    cssClass: 'modal',
+                                    scope: $scope,
+                                    template: '<img class="cuponimg" ng-src="{{url}}{{urlcupon}}">',
+                                    buttons: [
+                                        {
+                                            text: 'Salir',
+                                            type: 'button-positive'
+                                        }
+                                    ]
+                                });
+                                $ionicLoading.hide();
+                            } else {
+                                $ionicLoading.hide();
+                            }
+                        }
+                    );
+                }
+            }
+        });
+        $timeout(function () {
+            myPopup.close(); //close the popup after 20 seconds for some reason
+        }, 20000);
+    };
+
+    //tengo que hacer que si no esta registrado avisarle que se registre
+    var ejecutaReserva = function () {
+        $scope.data = {};
         var myPopup = $ionicPopup.show({
             template: '<input type="number" ng-model="data.cantidadcupon">',
-            title: 'Introduzca la cantidad de articulos que quiere en su cupón descuento',
-            subTitle: 'Solo quedan disponibles: ' + $scope.oferta.disponibles,
+            title: 'Introduzca la cantidad de articulos que quiere reservar',
+            subTitle: 'Tienes reservadas: ' + $scope.oferta.reservadas,
             scope: $scope,
             buttons: [
                 {
@@ -366,8 +452,8 @@ angular.module('starter.controllers', [])
             }
         });
         $timeout(function () {
-            myPopup.close(); //close the popup after 3 seconds for some reason
-        }, 3000);
+            myPopup.close(); //close the popup after 20 seconds for some reason
+        }, 20000);
     };
     $scope.info = "mostrado";
     $scope.mapa = "oculto";

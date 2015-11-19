@@ -1,5 +1,7 @@
 {
     "jscodehints.detectedExclusions": [
-        "/Users/Mirafarma/aplicaciones/pharmaprive2/www/js/Controlador/servicies_peticiones.js"
+        "/Users/Mirafarma/aplicaciones/pharmaprive2/www/js/Controlador/servicies_peticiones.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive2/www/js/Modelo/servicies_modelos.js",
+        "/Users/Mirafarma/aplicaciones/pharmaprive2/www/js/controllers_vistas.js"
     ]
 }
