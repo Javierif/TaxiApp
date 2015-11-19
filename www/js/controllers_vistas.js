@@ -5,7 +5,7 @@ angular.module('starter.controllers', [])
     $scope.loginData = {};
 
     // Create the login modal that we will use later
-    $ionicModal.fromTemplateUrl('templates/inicioLogout.html', {
+    $ionicModal.fromTemplateUrl('templates/login.html', {
         scope: $scope
     }).then(function (modal) {
         $scope.modal = modal;
@@ -23,8 +23,8 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('inicioCtrl', function ($scope, Peticiones, $state, $ionicLoading, Usuario, Comercios, Ofertas, $compile) {
-
+.controller('inicioCtrl', function ($scope, Peticiones, $state, $ionicLoading, Usuario, Comercios, Ofertas, $compile, $cordovaDevice) {
+    $scope.uuid = $cordovaDevice.getUUID();
     window.navigator.geolocation.getCurrentPosition(function (location) {
         alert('Location from Phonegap' + location);
     });
@@ -32,6 +32,13 @@ angular.module('starter.controllers', [])
         $state.go("app.mostradorofertas");
     }
 
+    if (!Usuario.loadusuario()) {
+        var usuario = Peticiones.creaAnonimo();
+        usuario.then(function (result) {
+            Usuario.set('codigoCliente', result.codigo);
+            Usuario.saveusuario();
+        });
+    }
 })
 
 
@@ -218,34 +225,35 @@ angular.module('starter.controllers', [])
     });
 })
 
-.controller('DetalleOfertaCtrl', function ($scope, $stateParams, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile) {
+.controller('DetalleOfertaCtrl', function ($scope, $stateParams, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout) {
     $scope.oferta = Ofertas.getViendoOferta();
     if ($scope.oferta.asociado) {
         var farmaciaAsociada = Peticiones.getFarmacia($scope.oferta.asociado);
         farmaciaAsociada.then(function (result) {
             console.log("RESUL ", result);
             $scope.farmacias[0] = result;
-            inicializa();
         });
     } else {
         window.navigator.geolocation.getCurrentPosition(function (location) {
             var farmaciasCercanas = Peticiones.getFarmacias(location.coords.latitude, location.coords.longitude);
             farmaciasCercanas.then(function (result) {
-                console.log("RESUL ", result);
-
                 $scope.farmacias = result;
-                inicializa();
             });
         });
     }
+
+    var map;
+    var posInicio;
     var inicializa = function () {
+        if (!$scope.farmacias)
+            return;
         if ($scope.farmacias.lenght > 1) {
             var zoom = 8;
         } else {
             var zoom = 15;
         }
 
-        var posInicio = new google.maps.LatLng($scope.farmacias[0].latitud, $scope.farmacias[0].longitud);
+        posInicio = new google.maps.LatLng($scope.farmacias[0].latitud, $scope.farmacias[0].longitud);
         var mapOptions = {
             streetViewControl: true,
             center: posInicio,
@@ -253,7 +261,7 @@ angular.module('starter.controllers', [])
             mapTypeId: google.maps.MapTypeId.TERRAIN
         };
 
-        var map = new google.maps.Map(document.getElementById("map"),
+        map = new google.maps.Map(document.getElementById("map"),
             mapOptions);
 
         for (farmacia in $scope.farmacias) {
@@ -284,29 +292,25 @@ angular.module('starter.controllers', [])
             infowindow.open(map, farmaciaMarker);
         }
 
-
-
+        reloaded = true;
         $scope.map = map;
     }
-
+    var obtenDisponibilidad = function () {
+        var disponibilidad = Peticiones.getOferta($scope.oferta.id);
+        disponibilidad.then(function (result) {
+            $scope.oferta = result;
+        });
+    }
     var urls = server_constantes.all();
     $scope.url = urls.URL;
 
-    $scope.descripcionlarga = function () {
-        var alertPopup = $ionicPopup.alert({
-            cssClass: 'modal',
-            template: $scope.oferta.descripcionLarga
-        });
-    };
-    $scope.cuponcito = function (cantidad) {
-        alert($scope.data.cantidadcupon);
-    }
     $scope.cupon = function (componente) {
         $scope.data = {}
+        obtenDisponibilidad();
         var myPopup = $ionicPopup.show({
             template: '<input type="number" ng-model="data.cantidadcupon">',
-            title: 'CUPONES DESCUENTO!',
-            subTitle: 'Introduzca la cantidad de artículos que quiere en su cupón descuento',
+            title: 'Introduzca la cantidad de articulos que quiere en su cupón descuento',
+            subTitle: 'Solo quedan disponibles: ' + $scope.oferta.disponibles,
             scope: $scope,
             buttons: [
                 {
@@ -317,7 +321,6 @@ angular.module('starter.controllers', [])
                     type: 'button-positive',
                     scope: $scope,
                     onTap: function (e) {
-
                         return $scope.data.cantidadcupon
                     }
               }
@@ -337,7 +340,7 @@ angular.module('starter.controllers', [])
                     $ionicLoading.show({
                         template: '<i class="icon ion-looping"></i> data.cantidadcupon Obteniendo su código de descuento...'
                     });
-                    var cupon = Peticiones.obtenerCupon(componente.identificador, Usuario.get('codigoCliente'), res);
+                    var cupon = Peticiones.obtenerCupon($scope.oferta.id, Usuario.get('codigoCliente'), res);
                     cupon.then(
                         function (result) {
                             if (!result.error) {
@@ -389,12 +392,15 @@ angular.module('starter.controllers', [])
     }, {
         show: false
     }];
-
+    var reloaded = false;
     $scope.toggleGroup = function (group) {
         if ($scope.opciones[group].show)
             $scope.opciones[group].show = false;
         else
             $scope.opciones[group].show = true;
+        if (!reloaded) {
+            inicializa();
+        }
     };
     $scope.isGroupShown = function (group) {
         return $scope.opciones[group].show;

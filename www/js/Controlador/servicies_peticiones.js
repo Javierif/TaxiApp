@@ -150,10 +150,12 @@ angular.module('starter.servicies_peticiones', [])
         },
 
         ///////////OFERTAS/////////
-        getOfertasGenerales: function () {
+        getOfertasGenerales: function (idUsuario) {
             var urls = server_constantes.all();
+            var peticionjson = {};
             var deferred = $q.defer();
-            $http.get(urls.URL + "/getcupones")
+            peticionjson['idUsuario'] = idUsuario;
+            $http.post(urls.URL + "/getcupones",peticionjson)
                 .success(function (respuesta) {
                     deferred.resolve(respuesta);
                 }).error(function (error) {
@@ -162,12 +164,13 @@ angular.module('starter.servicies_peticiones', [])
             return deferred.promise;
         },
 
-        getOfertasEspecificas: function (latitud, longitud) {
+        getOfertasEspecificas: function (latitud, longitud, idUsuario) {
             var urls = server_constantes.all();
             var peticionjson = {};
             var deferred = $q.defer();
             peticionjson[urls.SERVER_LATITUD] = latitud;
             peticionjson[urls.SERVER_LONGITUD] = longitud;
+            peticionjson['idUsuario'] = idUsuario
             $http.post(urls.URL + "/getcuponesespecifico", peticionjson)
                 .success(function (respuesta) {
                     deferred.resolve(respuesta);
@@ -195,7 +198,7 @@ angular.module('starter.servicies_peticiones', [])
         getFarmacia: function (idFarmacia) {
             var urls = server_constantes.all();
             var deferred = $q.defer();
-            $http.get(urls.URL + "/getfarmacias/" + idFarmacia)
+            $http.get(urls.URL + "/getfarmacia/" + idFarmacia)
                 .success(function (respuesta) {
                     deferred.resolve(respuesta);
                 }).error(function (error) {
@@ -204,33 +207,18 @@ angular.module('starter.servicies_peticiones', [])
             return deferred.promise;
         },
 
-        ofertas: function (codigo) {
+        getOferta: function (idOferta, usuario) {
             var urls = server_constantes.all();
             var peticionjson = {};
             var deferred = $q.defer();
-            peticionjson[urls.SERVER_CODIGO] = codigo;
-            $http.post(urls.URL + urls.URL_API + urls.URL_DESCARGAOFERTAS, peticionjson)
-                .success(
-                    function (result) {
-                        deferred.resolve({
-                            error: false,
-                            resultado: result
-                        });
-                    }).error(
-                    function (result) {
-                        window.plugins.toast.showLongBottom(
-                            result.error_msg,
-                            function (a) {
-                                console.log('toast success: ' + a)
-                            },
-                            function (b) {
-                                alert('toast error: ' + b)
-                            }
-                        );
-                        deferred.resolve({
-                            error: true
-                        });
-                    });
+            peticionjson['idOferta'] = idOferta;
+            peticionjson['idUsuario'] = usuario;
+            $http.post(urls.URL + "/getcupon", peticionjson)
+                .success(function (respuesta) {
+                    deferred.resolve(respuesta);
+                }).error(function (error) {
+                    console.log(error);
+                });
             return deferred.promise;
         },
         /////////////CUPON/////////////////

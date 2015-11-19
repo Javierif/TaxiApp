@@ -28,7 +28,10 @@
                         <i class="icon right" ng-class="isGroupShown(1) ? 'ion-chevron-up' : 'ion-chevron-down'"></i>
                     </ion-item>
                     <ion-item class="item-accordion opcionesdesc" ng-show="isGroupShown(1)">
-                        <div id="map" data-tap-disabled="true"></div>
+                        <div id="contenedormapa">
+                            <div id="map" data-tap-disabled="true"></div>
+                        </div>
+
                     </ion-item>
                     <ion-item class="item-stable opcionestitle" ng-click="toggleGroup(2)" ng-class="{active: isGroupShown(2)}">
                         <i class="ion-android-share-alt"></i> &nbsp; Compartelo con tus amigos
@@ -45,7 +48,7 @@
                     <button class="button button-energized">
                         Reservar
                     </button>
-                    <button class="button button-calm">
+                    <button class="button button-calm" ng-click="cupon()">
                         Obtener Cupón
                     </button>
                 </div>
