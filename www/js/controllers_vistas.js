@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('AppCtrl', function ($scope, $ionicModal, $timeout) {
+.controller('AppCtrl', function ($scope, $ionicModal, $timeout, Usuario, $state) {
     // Form data for the login modal
     $scope.loginData = {};
 
@@ -17,8 +17,24 @@ angular.module('starter.controllers', [])
     };
 
     // Open the login modal
-    $scope.login = function () {
-        $scope.modal.show();
+    $scope.login = function (layout) {
+        var usuario = Usuario.usuario();
+        if (!usuario.email) {
+            console.log("HASTA AQUI")
+            $state.go("app.login")
+        } else {
+            switch (layout) {
+            case 0:
+                $state.go("app.perfil")
+                break;
+            case 1:
+                $state.go("app.mipharmaprive")
+                break;
+            case 2:
+                $state.go("app.reservas")
+            }
+        }
+
     };
 
 })
@@ -229,7 +245,7 @@ angular.module('starter.controllers', [])
 
 .controller('DetalleOfertaCtrl', function ($scope, $stateParams, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout) {
     $scope.oferta = Ofertas.getViendoOferta();
-    var usuario = Usuario.usuario;
+    var usuario = Usuario.usuario();
     var map;
     var posInicio;
 
@@ -301,7 +317,7 @@ angular.module('starter.controllers', [])
         $scope.map = map;
     }
     $scope.cupon = function () {
-        var disponibilidad = Peticiones.getOferta($scope.oferta.id, usuario.id);
+        var disponibilidad = Peticiones.getOferta($scope.oferta.id, usuario.codigoCliente);
         disponibilidad.then(function (result) {
             console.log(" ES RES", result);
             $scope.oferta.cantidadMaxUser = result[0].cantidadMaxUser;
@@ -310,7 +326,7 @@ angular.module('starter.controllers', [])
     }
 
     $scope.reserva = function () {
-        var disponibilidad = Peticiones.getOferta($scope.oferta.id, usuario.id);
+        var disponibilidad = Peticiones.getOferta($scope.oferta.id, usuario.codigoCliente);
         disponibilidad.then(function (result) {
             console.log(" ES RES", result);
             $scope.oferta.reservadas = result[0].reservadas
@@ -360,26 +376,25 @@ angular.module('starter.controllers', [])
                     $ionicLoading.show({
                         template: '<i class="icon ion-looping"></i> Obteniendo su código de descuento...'
                     });
-                    var cupon = Peticiones.obtenerCupon($scope.oferta.id, Usuario.get('codigoCliente'), res);
+                    console.log("EL USUARI ", usuario)
+                    var cupon = Peticiones.obtenerCupon($scope.oferta.id, usuario.codigoCliente, res);
                     cupon.then(
                         function (result) {
-                            if (!result.error) {
-                                $scope.urlcupon = result.url;
-                                var myPopup = $ionicPopup.show({
-                                    cssClass: 'modal',
-                                    scope: $scope,
-                                    template: '<img class="cuponimg" ng-src="{{url}}{{urlcupon}}">',
-                                    buttons: [
-                                        {
-                                            text: 'Salir',
-                                            type: 'button-positive'
+                            $scope.urlcupon = result.url;
+                            $scope.barcodecodigo = result.codigo;
+                            console.log("cupo ", $scope.url, $scope.urlcupon);
+                            var pop = $ionicPopup.show({
+
+                                scope: $scope,
+                                template: '<img class="cuponimg" ng-src="{{urlcupon}}"><br><p class="barcode">{{barcodecodigo}}</p>',
+                                buttons: [
+                                    {
+                                        text: 'Salir',
+                                        type: 'button-positive'
                                         }
                                     ]
-                                });
-                                $ionicLoading.hide();
-                            } else {
-                                $ionicLoading.hide();
-                            }
+                            });
+                            $ionicLoading.hide();
                         }
                     );
                 }
@@ -431,17 +446,7 @@ angular.module('starter.controllers', [])
                         function (result) {
                             if (!result.error) {
                                 $scope.urlcupon = result.url;
-                                var myPopup = $ionicPopup.show({
-                                    cssClass: 'modal',
-                                    scope: $scope,
-                                    template: '<img class="cuponimg" ng-src="{{url}}{{urlcupon}}">',
-                                    buttons: [
-                                        {
-                                            text: 'Salir',
-                                            type: 'button-positive'
-                                        }
-                                    ]
-                                });
+                                console.log($scope.url, $scope.urlcupon)
                                 $ionicLoading.hide();
                             } else {
                                 $ionicLoading.hide();
@@ -495,6 +500,15 @@ angular.module('starter.controllers', [])
 })
 
 .controller('PerfilCtrl', function ($scope, Peticiones, $state, Ofertas, $ionicLoading, Usuario, $ionicNavBarDelegate) {
+    console.log("OSTIA");
+    var usuario = Usuario.usuario();
+
+    if (!usuario.email) {
+
+        $state.go("app.login")
+    } else {
+
+    }
     $scope.perfil = function (cp, email, fnac, sex, telf, codfarma) {
 
         if (angular.isUndefined(cp) || cp == null) {

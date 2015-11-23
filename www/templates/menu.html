@@ -18,19 +18,22 @@
         </ion-header-bar>
         <ion-content class="has-header my-menu">
             <ion-list>
-                <ion-item class="item item-icon-left" nav-clear menu-close href="#/app/perfil">
-                    <i class="icon ion-person"></i> Perfil
-                </ion-item>
                 <ion-item class="item item-icon-left" nav-clear menu-close ng-href="#/app/mostradorofertas">
                     <i class="icon ion-pricetags"></i> Ofertas
                 </ion-item>
-                <ion-item class="item item-icon-left" nav-clear menu-close ng-click="login()">
+                <ion-item class="item item-icon-left" nav-clear menu-close ng-click="login(2)">
+                    <i class="icon ion-star"></i> Mis Reservas
+                </ion-item>
+                <ion-item class="item item-icon-left" nav-clear menu-close ng-click="login(1)">
                     <i class="icon ion-location"></i> Mi Farmacia PharmaPrive
                 </ion-item>
-                <ion-item class="item item-icon-left" nav-clear menu-close ng-click="login()">
-                    <i class="icon ion-gear-b"></i> Opciones
+                <ion-item class="item item-icon-left" nav-clear menu-close ng-click="login(1)">
+                    <i class="icon ion-document-text"></i> Historial de cupones
                 </ion-item>
-                <ion-item class="item item-icon-left" nav-clear menu-close ng-href="#/inicioLogout">
+                <ion-item class="item item-icon-left" nav-clear menu-close ng-click="login(0)">
+                    <i class="icon ion-person"></i> Perfil
+                </ion-item>
+                <ion-item class="item item-icon-left" nav-clear menu-close ng-href="#/app/login">
                     <i class="icon ion-power"></i> Desconectar
                 </ion-item>
             </ion-list>

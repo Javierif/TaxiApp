@@ -16,7 +16,7 @@ angular.module('starter.servicies_peticiones', [])
         URL_COMPRA: "/compra",
         URL_MISRESERVAS: "/cliente/reservas",
 
-        SERVER_CODIGO: "codigo",
+        SERVER_CODIGO: "codigoCliente",
         SERVER_EMAIL: "email",
         SERVER_TELEFONO: "telefono",
         SERVER_CODPOSTAL: "codigoPostal",
@@ -233,29 +233,20 @@ angular.module('starter.servicies_peticiones', [])
             return deferred.promise;
         },
         /////////////CUPON/////////////////
-        obtenerCupon: function (idcomponente, codigocliente, cantidad) {
+        obtenerCupon: function (idCupon, codigocliente, cantidad) {
             var urls = server_constantes.all();
             var peticionjson = {};
             var deferred = $q.defer();
+            peticionjson['idCupon'] = idCupon;
             peticionjson[urls.SERVER_CODIGO] = codigocliente;
-            peticionjson[urls.SERVER_COMPONENTEOFERTA] = idcomponente;
             peticionjson[urls.SERVER_UNIDADES] = cantidad;
-            $http.post(urls.URL + urls.URL_API + urls.URL_COMPRA, peticionjson)
+            $http.post(urls.URL + "/codigocupon", peticionjson)
                 .success(function (result) {
                     deferred.resolve({
-                        error: result.error,
-                        error_msg: result.error_msg,
-                        url: result.url
+                        url: result.img,
+                        codigo: result.codigo
                     });
                 }).error(function (result) {
-                    window.plugins.toast.showLongBottom(
-                        result.error_msg,
-                        function (a) {
-                            console.log('toast success: ' + a)
-                        },
-                        function (b) {
-                            alert('toast error: ' + b)
-                        });
 
                 });
             return deferred.promise;
