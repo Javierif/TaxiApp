@@ -70,6 +70,33 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.servicies_pe
                 }
             }
         })
+        .state('app.reservas', {
+            url: "/reservas",
+            views: {
+                'menuContent': {
+                    templateUrl: "templates/reservas.html",
+                    controller: 'ReservaCtrl'
+                }
+            }
+        })
+        .state('app.mifarmacia', {
+            url: "/mifarmacia",
+            views: {
+                'menuContent': {
+                    templateUrl: "templates/mipharmaprive.html",
+                    controller: 'MiFarmaCtrl'
+                }
+            }
+        })
+        .state('app.historial', {
+            url: "/historial",
+            views: {
+                'menuContent': {
+                    templateUrl: "templates/historialcupones.html",
+                    controller: 'MiFarmaCtrl'
+                }
+            }
+        })
         .state('app.perfil', {
             url: "/perfil",
             views: {
@@ -79,6 +106,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.servicies_pe
                 }
             }
         });
+
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/inicio');
 });

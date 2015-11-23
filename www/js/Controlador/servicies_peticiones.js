@@ -82,30 +82,10 @@ angular.module('starter.servicies_peticiones', [])
             var peticionjson = {};
             peticionjson[urls.SERVER_EMAIL] = correo;
             var deferred = $q.defer();
-            $http.post(urls.URL + urls.URL_API + urls.URL_INICISIOSESION, peticionjson)
+            $http.post(urls.URL + "/loginapp", peticionjson)
                 .success(function (respuesta) {
-                    //   window.plugins.toast.showLongBottom(respuesta.error_msg, function(a){console.log('toast success: ' + a)}, function(b){alert('toast error: ' + b)});
-                    deferred.resolve({
-                        error: respuesta.error,
-                        error_msg: respuesta.error_msg,
-                        email: respuesta.email,
-                        codigo: respuesta.codigo,
-                        codigoPostal: respuesta.codigoPostal,
-                        sexo: respuesta.sexo,
-                        anoNacimiento: respuesta.anoNacimiento,
-                        telefono: respuesta.telefono,
-                        codigoFarmacia: respuesta.codigoFarmacia
-                    });
-                }).error(function (error) {
-                    window.plugins.toast.showLongBottom(error.error_msg,
-                        function (a) {
-                            console.log('toast success: ' + a)
-                        },
-                        function (b) {
-                            alert(
-                                'toast error: ' + b)
-                        });
-                });
+                    deferred.resolve(respuesta);
+                }).error(function (error) {});
             return deferred.promise;
         },
         creaAnonimo: function () {
@@ -121,10 +101,11 @@ angular.module('starter.servicies_peticiones', [])
             return deferred.promise;
         },
         //////////REGISTRAR/////////
-        registrar: function (cp, correo, fnac, sex, telf, codfarma) {
+        registrar: function (usuario, cp, correo, fnac, sex, telf, codfarma) {
             var urls = server_constantes.all();
             var peticionjson = {};
             var deferred = $q.defer();
+            peticionjson['usuario'] = usuario;
             peticionjson[urls.SERVER_CODPOSTAL] = cp;
             peticionjson[urls.SERVER_EMAIL] = correo;
             peticionjson[urls.SERVER_ANONACIMIENTO] = fnac;
@@ -132,7 +113,7 @@ angular.module('starter.servicies_peticiones', [])
             peticionjson[urls.SERVER_TELEFONO] = telf;
             peticionjson[urls.SERVER_CODFARMACIA] = "";
             peticionjson[urls.SERVER_CODFARMACIA] = codfarma;
-            $http.post(urls.URL + urls.URL_API + urls.URL_REGISTRO, peticionjson)
+            $http.post(urls.URL + "/registroapp", peticionjson)
                 .success(function (result) {
                     window.plugins.toast.showLongBottom(result.error_msg,
                         function (a) {
@@ -160,6 +141,20 @@ angular.module('starter.servicies_peticiones', [])
             return deferred.promise;
         },
 
+
+        getReservas: function (idUsuario) {
+            var urls = server_constantes.all();
+            var peticionjson = {};
+            var deferred = $q.defer();
+            peticionjson['idUsuario'] = idUsuario;
+            $http.post(urls.URL + "/getreservasapp", peticionjson)
+                .success(function (respuesta) {
+                    deferred.resolve(respuesta);
+                }).error(function (error) {
+                    console.log(error);
+                });
+            return deferred.promise;
+        },
         ///////////OFERTAS/////////
         getOfertasGenerales: function (idUsuario) {
             var urls = server_constantes.all();

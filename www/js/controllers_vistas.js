@@ -40,9 +40,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('inicioCtrl', function ($scope, Peticiones, $state, $ionicLoading, Usuario, Comercios, Ofertas, $compile) {
-    window.navigator.geolocation.getCurrentPosition(function (location) {
-        alert('Location from Phonegap' + location);
-    });
+    $scope.manolo = " MANOLO ";
     $scope.entrar = function () {
         $state.go("app.mostradorofertas");
     }
@@ -52,37 +50,16 @@ angular.module('starter.controllers', [])
             Usuario.set('codigoCliente', result.usuario.id);
             Usuario.saveusuario();
         });
-    } else {
-        console.log("FUERA", Usuario.usuario());
     }
 
 })
 
 
 .controller('loginCtrl', function ($scope, Peticiones, $state, $ionicLoading, Usuario, Comercios, Ofertas, $compile) {
-    var compruebacomercios = function (idcliente) {
-        if (Comercios.loadcomercios()) {
-            var comercios = Peticiones.comercios(idcliente);
-            comercios.then(
-                function (result) {
-                    Comercios.decompilajson(result.resultado);
-                });
-        }
-    }
 
-    window.navigator.geolocation.getCurrentPosition(function (location) {
-        alert('Location from Phonegap' + location);
-    });
     $scope.registro = function () {
         $state.go("registro");
     }
-
-    $scope.descripcionlarga = function () {
-        var alertPopup = $ionicPopup.alert({
-            cssClass: 'modal',
-            template: $scope.oferta.descripcionLarga
-        });
-    };
 
     $scope.login = function (email) {
         $ionicLoading.show({
@@ -91,11 +68,8 @@ angular.module('starter.controllers', [])
         var respuesta = Peticiones.login(email);
         respuesta.then(
             function (result) {
-                window.plugins.toast.showLongBottom(result.error_msg, function (a) {
-                    console.log('toast success: ' + a)
-                }, function (b) {
-                    alert('toast error: ' + b)
-                });
+                result = result[0];
+                // window.plugins.toast.showLongBottom(result.error_msg, function (a) {}, function (b) {});
                 if (!result.error) {
                     $ionicLoading.hide();
                     Usuario.set('email', result.email);
@@ -106,38 +80,13 @@ angular.module('starter.controllers', [])
                     Usuario.set('genero', result.sexo);
                     Usuario.set('codigoFarmacia', result.codigoFarmacia);
                     Usuario.saveusuario();
-                    $ionicLoading.show({
-                        template: '<i class="icon ion-looping"></i>Espere un momento, descargando las ofertas...'
-                    });
-                    compruebacomercios(result.codigo);
-                    var ofertas = Peticiones.ofertas(Usuario.get('codigoCliente'));
-                    ofertas.then(
-                        function (result) {
-                            Ofertas.decompilajson(result.resultado);
-                            $state.go("app.mostradorofertas");
-                            $ionicLoading.hide();
-                        });
-
+                    console.log(Usuario.usuario());
+                    $state.go("app.mostradorofertas");
                 } else {
                     $ionicLoading.hide();
                 }
             },
-            function (errorPlayload) {
-                alert("error");
-            });
-    }
-    if (Usuario.loadusuario()) {
-        compruebacomercios(Usuario.get("codigoCliente"));
-        $ionicLoading.show({
-            template: '<i class="icon ion-looping"></i>Espere un momento, descargando las ofertas...'
-        });
-        var ofertas = Peticiones.ofertas(Usuario.get('codigoCliente'));
-        ofertas.then(
-            function (result) {
-                Ofertas.decompilajson(result.resultado);
-                $state.go("app.mostradorofertas");
-                $ionicLoading.hide();
-            });
+            function (errorPlayload) {});
     }
 
 })
@@ -152,23 +101,15 @@ angular.module('starter.controllers', [])
         if (angular.isUndefined(cp) || cp == null) {
             window.plugins.toast.showLongBottom(
                 "Introduzca correctamente su codigo postal",
-                function (a) {
-                    console.log('toast success: ' + a)
-                },
-                function (b) {
-                    alert('toast error: ' + b)
-                }
+                function (a) {},
+                function (b) {}
             );
         }
         if (angular.isUndefined(email) || email == null) {
             window.plugins.toast.showLongBottom(
                 "Introduzca correctamente su email",
-                function (a) {
-                    console.log('toast success: ' + a)
-                },
-                function (b) {
-                    alert('toast error: ' + b)
-                }
+                function (a) {},
+                function (b) {}
             );
         } else {
 
@@ -192,16 +133,7 @@ angular.module('starter.controllers', [])
                         if (!(angular.isUndefined(codfarma)) && !(codfarma == null)) {
                             Usuario.set('codigoFarmacia', codfarma);
                         }
-                        $ionicLoading.show({
-                            template: '<i class="icon ion-looping"></i>Espere un momento, descargando las ofertas...'
-                        });
-                        var ofertas = Peticiones.ofertas(Usuario.get('codigoCliente'));
-                        ofertas.then(
-                            function (result) {
-                                Ofertas.decompilajson(result.resultado);
-                                $state.go("app.mostradorofertas");
-                                $ionicLoading.hide();
-                            });
+                        $state.go("app.mostradorofertas");
 
                     } else {
                         $ionicLoading.hide();
@@ -565,4 +497,25 @@ angular.module('starter.controllers', [])
                 });
         }
     }
+})
+
+.controller('ReservaCtrl', function ($ionicPlatform, $scope, Peticiones, $state, Ofertas, $ionicLoading, Usuario) {
+    $ionicLoading.show({
+        template: '<i class="icon ion-looping"></i>Espere un momento, descargando las reservas...'
+    });
+    var usuario = Usuario.usuario();
+    var ofertasGenerales = Peticiones.getReservas(usuario.codigoCliente);
+    ofertasGenerales.then(function (result) {
+        $scope.reservas = result;
+        $ionicLoading.hide();
+    });
+
+    $scope.detalle = function (oferta) {
+        Ofertas.setViendoOferta(oferta);
+        $state.go("app.detalleoferta");
+    }
+    $ionicPlatform.onHardwareBackButton(function () {
+        event.preventDefault();
+        event.stopPropagation();
+    });
 });
