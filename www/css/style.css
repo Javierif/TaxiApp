@@ -337,6 +337,15 @@
     width: 100%;
 }
 
+.tabsdisponi {
+    background: #11c1f3;
+    color: white;
+}
+
+.seccionOpciones {
+    margin-bottom: 80px;
+}
+
 .seccionacciones {
     margin: 10px;
 }
@@ -410,7 +419,7 @@
 .contenedor_detalle {
     width: 95%;
     margin-top: 5px;
-    margin-bottom: 5px;
+    margin-bottom: 85px;
     margin-left: auto;
     margin-right: auto;
     padding-left: 1%;
@@ -464,6 +473,7 @@
 @media (min-height:630px) {
     #inicio_contenedor {
         margin-top: 6em;
+        margin-bottom: 85px;
         margin-left: auto;
         margin-right: auto;
         padding-left: 2%;
@@ -472,6 +482,9 @@
         background: #FFFFFF;
         -moz-border-radius: 15px;
         border-radius: 35px;
+    }
+    #contenedor:hover {
+        background: red;
     }
     #inicio_contenedor button {
         height: 2em;

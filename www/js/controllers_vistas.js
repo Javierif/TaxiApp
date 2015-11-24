@@ -40,7 +40,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('inicioCtrl', function ($scope, Peticiones, $state, $ionicLoading, Usuario, Comercios, Ofertas, $compile) {
-    $scope.manolo = " MANOLO ";
+
     $scope.entrar = function () {
         $state.go("app.mostradorofertas");
     }
@@ -176,11 +176,12 @@ angular.module('starter.controllers', [])
 })
 
 .controller('DetalleOfertaCtrl', function ($scope, $stateParams, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout) {
+
     $scope.oferta = Ofertas.getViendoOferta();
     var usuario = Usuario.usuario();
     var map;
     var posInicio;
-
+    console.log("oferta ", $scope.oferta);
     if ($scope.oferta.asociado) {
         var farmaciaAsociada = Peticiones.getFarmacia($scope.oferta.asociado);
         farmaciaAsociada.then(function (result) {
