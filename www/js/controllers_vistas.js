@@ -32,7 +32,7 @@ angular.module('starter.controllers', [])
                 $state.go("app.perfil")
                 break;
             case 1:
-                $state.go("app.mipharmaprive")
+                $state.go("app.mifarmacia")
                 break;
             case 2:
                 $state.go("app.reservas")
@@ -253,10 +253,6 @@ angular.module('starter.controllers', [])
                 infowindow.open(map, farmaciaMarker);
             });
 
-            var farmaciaMarker = new google.maps.Marker({
-                position: posicion,
-                map: map
-            });
             infowindow.open(map, farmaciaMarker);
         }
 
@@ -383,7 +379,7 @@ angular.module('starter.controllers', [])
         });
         myPopup.then(function (res) {
             if (!usuario.farmacia) {
-                $state.go('app.mipharmaprive');
+                $state.go('app.mifarmacia');
             } else if (usuario.email) {
                 if (!(angular.isUndefined(res)) && !(res == null)) {
                     if (res <= 0) {
@@ -562,9 +558,9 @@ angular.module('starter.controllers', [])
         event.preventDefault();
         event.stopPropagation();
     });
-});
+})
 
-.controller('MiPharmaPrive', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout) {
+.controller('MiFarmaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout) {
 
     $scope.oferta = Ofertas.getViendoOferta();
     var usuario = Usuario.usuario();
@@ -600,13 +596,13 @@ angular.module('starter.controllers', [])
         var mapOptions = {
             streetViewControl: true,
             center: posInicio,
-            zoom: 18,
+            zoom: 12,
             mapTypeId: google.maps.MapTypeId.TERRAIN
         };
 
-        map = new google.maps.Map(document.getElementById("map"),
+        map = new google.maps.Map(document.getElementById("mapa"),
             mapOptions);
-
+        console.log("INIZIALIZANDO");
         if (usuario.codigoFarmacia) {
 
             var contentString = '<strong>Dirección de la farmacia: </strong> ' +
@@ -622,14 +618,11 @@ angular.module('starter.controllers', [])
                 map: map
             });
             farmaciaMarker.addListener('click', function () {
+                console.log("LO CLICKEASTE");
                 $scope.farmaciaSeleccionada = $scope.farmacia.id;
                 infowindow.open(map, farmaciaMarker);
             });
 
-            var farmaciaMarker = new google.maps.Marker({
-                position: posicion,
-                map: map
-            });
             infowindow.open(map, farmaciaMarker);
         }
 
@@ -649,14 +642,11 @@ angular.module('starter.controllers', [])
                 map: map
             });
             farmaciaMarker.addListener('click', function () {
+                console.log("LO CLICKEASTE");
                 $scope.farmaciaSeleccionada = $scope.farmacias[farmacia].id;
                 infowindow.open(map, farmaciaMarker);
             });
 
-            var farmaciaMarker = new google.maps.Marker({
-                position: posicion,
-                map: map
-            });
             infowindow.open(map, farmaciaMarker);
         }
 
@@ -664,4 +654,4 @@ angular.module('starter.controllers', [])
         $scope.map = map;
     }
 
-})
+});

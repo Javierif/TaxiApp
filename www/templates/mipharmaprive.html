@@ -1,9 +1,14 @@
 <ion-view class="overlightblue" view-title="Listado de ofertas">
     <ion-content>
-        <h1 style="text-aling:center">Mi farmacia PharmaPrivé</h1>
-        <p>Selecciona en el mapa o preguntale a tu farmacia de confianza cual es su codigo de PharmaPrivé para poder desbloquear contenidos adicionales, como por ejemplo poder reservar cupones antes de que se agoten.</p>
-        <p>Selecciona</p>
-        <input type="number" placeholder="Introduce el codigo o selecciona en el mapa tu farmacia de confianza">
+        <div id="mifarma_contenedor">
+            <h1 style="text-aling:center">Mi farmacia PharmaPrivé</h1>
+            <p>Selecciona en el mapa o preguntale a tu farmacia de confianza cual es su codigo de PharmaPrivé para poder desbloquear contenidos adicionales, como por ejemplo poder reservar cupones antes de que se agoten.</p>
+            <p>Selecciona</p>
+            <input type="number" ng-model="farmaciaSeleccionada" placeholder="Introduce el codigo o selecciona en el mapa tu farmacia de confianza">
+            <button class="button button-full button-calm" ng-click="registrarse(cp,email,fnac,sex,telf,codfarma)">
+                Asignar
+            </button>
+        </div>
         <div id="mapa"></div>
     </ion-content>
 </ion-view>
