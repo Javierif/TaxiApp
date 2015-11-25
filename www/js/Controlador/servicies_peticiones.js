@@ -101,41 +101,22 @@ angular.module('starter.servicies_peticiones', [])
             return deferred.promise;
         },
         //////////REGISTRAR/////////
-        registrar: function (usuario, cp, correo, fnac, sex, telf, codfarma) {
+        registrar: function (id, cp, email, fnac, sex, telf, codfarma, nombre) {
             var urls = server_constantes.all();
             var peticionjson = {};
             var deferred = $q.defer();
-            peticionjson['usuario'] = usuario;
+            peticionjson['usuario'] = id;
             peticionjson[urls.SERVER_CODPOSTAL] = cp;
-            peticionjson[urls.SERVER_EMAIL] = correo;
+            peticionjson[urls.SERVER_EMAIL] = email;
             peticionjson[urls.SERVER_ANONACIMIENTO] = fnac;
             peticionjson[urls.SERVER_SEXO] = sex;
             peticionjson[urls.SERVER_TELEFONO] = telf;
-            peticionjson[urls.SERVER_CODFARMACIA] = "";
             peticionjson[urls.SERVER_CODFARMACIA] = codfarma;
+            peticionjson['nombre'] = nombre
             $http.post(urls.URL + "/registroapp", peticionjson)
                 .success(function (result) {
-                    window.plugins.toast.showLongBottom(result.error_msg,
-                        function (a) {
-                            console.log('toast success: ' + a)
-                        },
-                        function (b) {
-                            alert('toast error: ' + b)
-                        });
-                    deferred.resolve({
-                        error: result.error,
-                        error_msg: result.error_msg,
-                        codigo: result.codigo
-                    });
+                    deferred.resolve(result);
                 }).error(function (result) {
-                    window.plugins.toast.showLongBottom(
-                        result.error_msg,
-                        function (a) {
-                            console.log('toast success: ' + a)
-                        },
-                        function (b) {
-                            alert('toast error: ' + b)
-                        });
 
                 });
             return deferred.promise;
@@ -152,6 +133,22 @@ angular.module('starter.servicies_peticiones', [])
                     deferred.resolve(respuesta);
                 }).error(function (error) {
                     console.log(error);
+                });
+            return deferred.promise;
+        },
+
+        reservar: function (idCupon, codigoCliente, cantidad) {
+            var urls = server_constantes.all();
+            var peticionjson = {};
+            var deferred = $q.defer();
+            peticionjson['usuario'] = codigoCliente;
+            peticionjson['cantidad'] = cantidad;
+            peticionjson['idCupon'] = idCupon;
+            $http.post(urls.URL + "/registroapp", peticionjson)
+                .success(function (result) {
+                    deferred.resolve(result);
+                }).error(function (result) {
+
                 });
             return deferred.promise;
         },

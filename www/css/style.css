@@ -202,7 +202,6 @@
     margin-right: auto;
     padding: 5%;
     padding-bottom: 10%;
-    height: 100%;
     background: #FFFFFF;
     -moz-border-radius: 15px;
     border-radius: 15px;
@@ -483,15 +482,17 @@
         -moz-border-radius: 15px;
         border-radius: 35px;
     }
-    #contenedor:hover {
-        background: red;
-    }
     #inicio_contenedor button {
         height: 2em;
         top: 1em;
         font-size: 2em;
         -moz-border-radius: 5px;
         border-radius: 35px;
+    }
+    .mid {
+        background: red;
+        color: orange;
+        width: 30%;
     }
     /* inicio*/
     /* login */
