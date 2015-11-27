@@ -285,8 +285,9 @@ angular.module('starter.servicies_peticiones', [])
             var urls = server_constantes.all();
             var peticionjson = {};
             var deferred = $q.defer();
+            peticionjson['usuario'] = usuario;
             peticionjson[urls.SERVER_CODFARMACIA] = codfarma;
-            $http.put(urls.URL + "/actualizaPerfil", peticionjson)
+            $http.put(urls.URL + "/actualizarFarmacia", peticionjson)
                 .success(function (result) {
                     window.plugins.toast.showLongBottom(result.error_msg, function (a) {
                         console.log('toast success: ' + a)

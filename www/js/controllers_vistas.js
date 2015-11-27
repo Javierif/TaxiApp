@@ -89,7 +89,8 @@ angular.module('starter.controllers', [])
                     Usuario.set('codigoPostal', result.codigoPostal);
                     Usuario.set('fechaNacimiento', result.anoNacimiento);
                     Usuario.set('genero', result.sexo);
-                    Usuario.set('codigoFarmacia', result.codigoFarmacia);
+                    Usuario.set('nombre', result.nombre);
+                    Usuario.set('codigoFarmacia', result.farmacia);
                     Usuario.saveusuario();
                     console.log(Usuario.usuario());
                     $state.go("app.mostradorofertas");
@@ -146,6 +147,7 @@ angular.module('starter.controllers', [])
                         if (!(angular.isUndefined(codfarma)) && !(codfarma == null)) {
                             Usuario.set('codigoFarmacia', codfarma);
                         }
+                        Usuario.saveusuario();
                         $state.go("app.mostradorofertas");
                     } else {
                         window.plugins.toast.showShortBottom(result.msg,
@@ -470,11 +472,18 @@ angular.module('starter.controllers', [])
 
 .controller('PerfilCtrl', function ($scope, Peticiones, $state, Ofertas, $ionicLoading, Usuario, $ionicNavBarDelegate) {
     var usuario = Usuario.usuario();
+    console.log("USUARIO ES ", usuario);
+    $scope.cp = usuario.codigoPostal;
+    $scope.email = usuario.email;
+    $scope.fnac = usuario.fechaNacimiento;
+    $scope.telf = usuario.telefono;
+    $scope.nombre = usuario.nombre;
+    $scope.codfarma = usuario.codigoFarmacia;
 
     if (!usuario.email) {
         $state.go("app.login")
     }
-    $scope.perfil = function (cp, email, fnac, sex, telf, codfarma, nombre) {
+    $scope.actualizar = function (cp, email, fnac, sex, telf, codfarma, nombre) {
 
         if (angular.isUndefined(cp) || cp == null) {
             window.plugins.toast.showLongBottom(
@@ -504,13 +513,15 @@ angular.module('starter.controllers', [])
                         Usuario.set('codigoPostal', cp);
                         Usuario.set('fechaNacimiento', fnac);
                         Usuario.set('genero', sex);
+                        Usuario.set('nombre', nombre);
                         if (!(angular.isUndefined(telf)) && !(telf == null)) {
                             Usuario.set('telefono', telf);
                         }
                         if (!(angular.isUndefined(codfarma)) && !(codfarma == null)) {
                             Usuario.set('codigoFarmacia', codfarma);
                         }
-                        s
+                        Usuario.saveusuario();
+
                     } else {
                         $ionicLoading.hide();
                     }
@@ -552,26 +563,36 @@ angular.module('starter.controllers', [])
     $scope.farmaciaSeleccionada = {};
     $scope.oferta = Ofertas.getViendoOferta();
     var usuario = Usuario.usuario();
+    $scope.farmacias = [];
+    $scope.farmaciaSeleccionada.text = usuario.codigoFarmacia;
     var map;
     var posInicio;
     if (usuario.codigoFarmacia) {
         var farmaciaAsociada = Peticiones.getFarmacia(usuario.codigoFarmacia);
         farmaciaAsociada.then(function (result) {
-            $scope.farmacia = result;
+            $scope.farmacias.push(result[0]);
+            window.navigator.geolocation.getCurrentPosition(function (location) {
+                var farmaciasCercanas = Peticiones.getFarmacias(location.coords.latitude, location.coords.longitude);
+                farmaciasCercanas.then(function (result2) {
+                    for (farmacia in result2)
+                        $scope.farmacias.push(result2[farmacia]);
+                    inicializa();
+                });
+            });
             inicializa();
         });
-    }
+    } else {
+        window.navigator.geolocation.getCurrentPosition(function (location) {
+            var farmaciasCercanas = Peticiones.getFarmacias(location.coords.latitude, location.coords.longitude);
+            farmaciasCercanas.then(function (result) {
+                $scope.farmacias = result;
+                if (!usuario.codigoFarmacia) {
+                    inicializa();
+                }
 
-    window.navigator.geolocation.getCurrentPosition(function (location) {
-        var farmaciasCercanas = Peticiones.getFarmacias(location.coords.latitude, location.coords.longitude);
-        farmaciasCercanas.then(function (result) {
-            $scope.farmacias = result;
-            if (!usuario.codigoFarmacia) {
-                inicializa();
-            }
-
+            });
         });
-    });
+    }
 
     $scope.actualiza = function (farmaciaSeleccionada) {
         var peticion = Peticiones.actualizaFarmacia(usuario.codigoCliente, farmaciaSeleccionada.text);
@@ -580,6 +601,7 @@ angular.module('starter.controllers', [])
                 if (!result.error) {
                     $ionicLoading.hide();
                     Usuario.set('codigoFarmacia', codfarma);
+                    Usuario.saveusuario();
                 } else {
                     $ionicLoading.hide();
                 }
@@ -591,11 +613,8 @@ angular.module('starter.controllers', [])
     }
 
     var inicializa = function () {
-        if (usuario.codigoFarmacia) {
-            posInicio = new google.maps.LatLng($scope.farmacia.latitud, $scope.farmacia.longitud);
-        } else {
-            posInicio = new google.maps.LatLng($scope.farmacias[0].latitud, $scope.farmacias[0].longitud);
-        }
+
+        posInicio = new google.maps.LatLng($scope.farmacias[0].latitud, $scope.farmacias[0].longitud);
 
         var mapOptions = {
             streetViewControl: true,
@@ -606,27 +625,6 @@ angular.module('starter.controllers', [])
 
         map = new google.maps.Map(document.getElementById("mapa"),
             mapOptions);
-        if (usuario.codigoFarmacia) {
-
-            var contentString = '<strong>Dirección de la farmacia: </strong> ' +
-                $scope.farmacia.direccion;
-
-
-            var infowindow = new google.maps.InfoWindow({
-                content: contentString
-            });
-
-            var farmaciaMarker = new google.maps.Marker({
-                position: posicion,
-                map: map
-            });
-            farmaciaMarker.addListener('click', function () {
-                $scope.farmaciaSeleccionada.text = $scope.farmacia.id;
-                infowindow.open(map, farmaciaMarker);
-            });
-
-            infowindow.open(map, farmaciaMarker);
-        }
 
         for (farmacia in $scope.farmacias) {
             console.log("FARMA ", $scope.farmacias[farmacia]);
@@ -655,8 +653,6 @@ angular.module('starter.controllers', [])
 
             infowindow.open(map, farmaciaMarker);
         }
-
-        reloaded = true;
         $scope.map = map;
     }
 
