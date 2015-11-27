@@ -474,36 +474,27 @@ angular.module('starter.controllers', [])
     if (!usuario.email) {
         $state.go("app.login")
     }
-    $scope.perfil = function (cp, email, fnac, sex, telf, codfarma) {
+    $scope.perfil = function (cp, email, fnac, sex, telf, codfarma, nombre) {
 
         if (angular.isUndefined(cp) || cp == null) {
             window.plugins.toast.showLongBottom(
                 "Introduzca correctamente su codigo postal",
-                function (a) {
-                    console.log('toast success: ' + a)
-                },
-                function (b) {
-                    alert('toast error: ' + b)
-                }
+                function (a) {},
+                function (b) {}
             );
         }
         if (angular.isUndefined(email) || email == null) {
             window.plugins.toast.showLongBottom(
                 "Introduzca correctamente su email",
-                function (a) {
-                    console.log('toast success: ' + a)
-                },
-                function (b) {
-                    alert('toast error: ' + b)
-                }
+                function (a) {},
+                function (b) {}
             );
         } else {
-
             $ionicLoading.show({
                 template: '<i class="icon ion-looping"></i> actualizando usuario...'
             });
 
-            var respuesta = Peticiones.perfil(cp, email, fnac, sex, telf, codfarma);
+            var respuesta = Peticiones.perfil(usuario.codigoCliente, cp, email, fnac, sex, telf, codfarma, nombre);
             respuesta.then(
                 function (result) {
                     if (!result.error) {
@@ -558,7 +549,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('MiFarmaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout) {
-
+    $scope.farmaciaSeleccionada = {};
     $scope.oferta = Ofertas.getViendoOferta();
     var usuario = Usuario.usuario();
     var map;
@@ -583,7 +574,7 @@ angular.module('starter.controllers', [])
     });
 
     $scope.actualiza = function (farmaciaSeleccionada) {
-        var peticion = Peticiones.actualizaFarmacia(farmaciaSeleccionada);
+        var peticion = Peticiones.actualizaFarmacia(usuario.codigoCliente, farmaciaSeleccionada.text);
         peticion.then(
             function (result) {
                 if (!result.error) {
@@ -615,7 +606,6 @@ angular.module('starter.controllers', [])
 
         map = new google.maps.Map(document.getElementById("mapa"),
             mapOptions);
-        console.log("INIZIALIZANDO");
         if (usuario.codigoFarmacia) {
 
             var contentString = '<strong>Dirección de la farmacia: </strong> ' +
@@ -631,8 +621,7 @@ angular.module('starter.controllers', [])
                 map: map
             });
             farmaciaMarker.addListener('click', function () {
-                console.log("LO CLICKEASTE");
-                $scope.farmaciaSeleccionada = $scope.farmacia.id;
+                $scope.farmaciaSeleccionada.text = $scope.farmacia.id;
                 infowindow.open(map, farmaciaMarker);
             });
 
@@ -640,6 +629,7 @@ angular.module('starter.controllers', [])
         }
 
         for (farmacia in $scope.farmacias) {
+            console.log("FARMA ", $scope.farmacias[farmacia]);
             var posicion = new google.maps.LatLng($scope.farmacias[farmacia].latitud, $scope.farmacias[farmacia].longitud);
 
             var contentString = '<strong>Dirección de la farmacia: </strong> ' +
@@ -654,9 +644,12 @@ angular.module('starter.controllers', [])
                 position: posicion,
                 map: map
             });
-            farmaciaMarker.addListener('click', function () {
-                console.log("LO CLICKEASTE");
-                $scope.farmaciaSeleccionada = $scope.farmacias[farmacia].id;
+            farmaciaMarker.addListener('click', function (marker) {
+                for (farmacia in $scope.farmacias) {
+                    if (parseFloat($scope.farmacias[farmacia].latitud).toFixed(4) == marker.latLng.lat().toFixed(4) && parseFloat($scope.farmacias[farmacia].longitud).toFixed(4) == marker.latLng.lng().toFixed(4)) {
+                        $scope.farmaciaSeleccionada.text = $scope.farmacias[farmacia].id;
+                    }
+                }
                 infowindow.open(map, farmaciaMarker);
             });
 

@@ -244,18 +244,49 @@ angular.module('starter.servicies_peticiones', [])
             return deferred.promise;
         },
         ////////////PERFIL////////////
-        perfil: function (cp, correo, fnac, sex, telf, codfarma) {
+        perfil: function (id, cp, email, fnac, sex, telf, codfarma, nombre) {
             var urls = server_constantes.all();
             var peticionjson = {};
             var deferred = $q.defer();
+            peticionjson['usuario'] = id;
             peticionjson[urls.SERVER_CODPOSTAL] = cp;
-            peticionjson[urls.SERVER_EMAIL] = correo;
+            peticionjson[urls.SERVER_EMAIL] = email;
             peticionjson[urls.SERVER_ANONACIMIENTO] = fnac;
             peticionjson[urls.SERVER_SEXO] = sex;
             peticionjson[urls.SERVER_TELEFONO] = telf;
-            peticionjson[urls.SERVER_CODFARMACIA] = "";
             peticionjson[urls.SERVER_CODFARMACIA] = codfarma;
-            $http.post(urls.URL + urls.URL_API + urls.URL_GUARDAPERFIL, peticionjson)
+            peticionjson['nombre'] = nombre
+            $http.put(urls.URL + "/actualizaPerfil", peticionjson)
+                .success(function (result) {
+                    window.plugins.toast.showLongBottom(result.error_msg, function (a) {
+                        console.log('toast success: ' + a)
+                    }, function (b) {
+                        alert('toast error: ' + b)
+                    });
+                    deferred.resolve({
+                        error: result.error,
+                        error_msg: result.error_msg,
+                        codigo: result.codigo
+                    });
+                }).error(function (result) {
+                    window.plugins.toast.showLongBottom(
+                        result.error_msg,
+                        function (a) {
+                            console.log('toast success: ' + a)
+                        },
+                        function (b) {
+                            alert('toast error: ' + b)
+                        });
+
+                });
+            return deferred.promise;
+        },
+        actualizaFarmacia: function (usuario, codfarma) {
+            var urls = server_constantes.all();
+            var peticionjson = {};
+            var deferred = $q.defer();
+            peticionjson[urls.SERVER_CODFARMACIA] = codfarma;
+            $http.put(urls.URL + "/actualizaPerfil", peticionjson)
                 .success(function (result) {
                     window.plugins.toast.showLongBottom(result.error_msg, function (a) {
                         console.log('toast success: ' + a)
