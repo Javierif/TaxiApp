@@ -1,54 +1,7 @@
 <ion-view class="overlightblue" view-title="Listado de ofertas">
     <ion-content>
         <div class="list seccionoferta">
-            <div class="" ng-repeat="oferta in ofertasGenerales">
-                <a class="item lightblue seccionoferta item-text-wrap" ng-click="detalle(oferta)">
-                    <div class="relleno"></div>
-                    <div class="imgofertamostrador">
-                        <ul rn-carousel rn-carousel-auto-slide class="carrusel">
-                            <li ng-repeat="image in oferta.imagenescargar">
-                                <div class="carrusel"><img class="carrusel" ng-src="http://localhost:1337{{image.url}}"></div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="secciontexto">
-                        <span ng-bind="oferta.titulo"></span>
-                        <div class="rojomostrador">
-                            <span class="verticalcenter"><span ng-bind="oferta.descuento"></span>
-                            <span class="simbolodescuento">€</span> DESCUENTO
-                            </span>
-                            <img src="./img/final_bandera.png">
-                        </div>
-                        <span class="caducidad">
-                        Este descuento caduca el <i class="icon ion-clock"><span ng-bind="oferta.fechaCaducidad | date:'dd/MM/yyyy'"></span></i>
-                        </span>
-                    </div>
-                </a>
-            </div>
-            <div class="" ng-repeat="oferta in ofertasEspecificas">
-                <a class="item lightblue seccionoferta item-text-wrap" ng-click="detalle(oferta)">
-                    <div class="relleno"></div>
-                    <div class="imgofertamostrador">
-                        <ul rn-carousel rn-carousel-auto-slide class="carrusel">
-                            <li ng-repeat="image in oferta.imagenescargar">
-                                <div class="carrusel"><img class="carrusel" ng-src="http://localhost:1337{{image.url}}"></div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="secciontexto">
-                        <span ng-bind="oferta.titulo"></span>
-                        <div class="rojomostrador">
-                            <span class="verticalcenter"><span ng-bind="oferta.descuento"></span>
-                            <span class="simbolodescuento">€</span> DESCUENTO
-                            </span>
-                            <img src="./img/final_bandera.png">
-                        </div>
-                        <span class="caducidad">
-                        Este descuento caduca el <i class="icon ion-clock"><span ng-bind="oferta.fechaCaducidad | date:'dd/MM/yyyy'"></span></i>
-                        </span>
-                    </div>
-                </a>
-            </div>
+
         </div>
     </ion-content>
 </ion-view>

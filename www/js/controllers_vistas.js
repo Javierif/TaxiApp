@@ -235,8 +235,6 @@ angular.module('starter.controllers', [])
         for (farmacia in $scope.farmacias) {
             var posicion = new google.maps.LatLng($scope.farmacias[farmacia].latitud, $scope.farmacias[farmacia].longitud);
 
-            console.log("farmacias ", $scope.farmacias);
-            console.log("direc ", $scope.farmacias[farmacia].direccion);
             var contentString = '<strong>Dirección de la farmacia: </strong> ' +
                 $scope.farmacias[farmacia].direccion;
 
@@ -281,7 +279,7 @@ angular.module('starter.controllers', [])
     var ejecutaCupon = function () {
         $scope.data = {};
         var myPopup = $ionicPopup.show({
-            template: '<input type="number" ng-model="data.cantidadcupon" placeholder= "La cantidad minima es ' + $scope.oferta.cantidadMin + '">',
+            template: '<input type="number"  ng-model="data.cantidadcupon" placeholder= "La cantidad minima es ' + $scope.oferta.cantidadMin + '">',
             title: 'Introduzca la cantidad de articulos que quiere en su cupón descuento',
             subTitle: 'Solo quedan disponibles: ' + $scope.oferta.cantidadMaxUser,
             scope: $scope,
@@ -348,18 +346,21 @@ angular.module('starter.controllers', [])
     //tengo que hacer que si no esta registrado avisarle que se registre
     var ejecutaReserva = function () {
         $scope.data = {};
+        $scope.disabled = false;
         var boton;
         var texto = "Introduzca la cantidad de articulos que quiere reservar";
         if (!usuario.email) {
+            $scope.disabled = true;
             boton = "Iniciar sesión";
         } else if (!usuario.farmacia) {
+            $scope.disabled = true;
             boton = "Ver Farmacias PharmaPrivé";
             texto = "No tienes farmacia asignada, para poder reservar necesitas tener una farmacia PharmaPrivé.";
         } else  {
             boton = "Reservar";
         }
         var myPopup = $ionicPopup.show({
-            template: '<input type="number" ng-model="data.cantidadcupon">',
+            template: '<input type="number"  ng-disabled="disabled" ng-model="data.cantidadcupon">',
             title: texto,
             subTitle: 'Tienes reservadas: ' + $scope.oferta.reservadas,
             scope: $scope,
@@ -378,9 +379,11 @@ angular.module('starter.controllers', [])
             ]
         });
         myPopup.then(function (res) {
-            if (!usuario.farmacia) {
+            if (!usuario.email) {
+                $state.go("app.login");
+            } else if (!usuario.farmacia) {
                 $state.go('app.mifarmacia');
-            } else if (usuario.email) {
+            } else {
                 if (!(angular.isUndefined(res)) && !(res == null)) {
                     if (res <= 0) {
                         window.plugins.toast.showShortBottom("Introduzca un numero mayor de 0",
@@ -420,8 +423,6 @@ angular.module('starter.controllers', [])
                         }
                     }
                 }
-            } else {
-                $state.go("app.login");
             }
         });
         $timeout(function () {
@@ -468,14 +469,10 @@ angular.module('starter.controllers', [])
 })
 
 .controller('PerfilCtrl', function ($scope, Peticiones, $state, Ofertas, $ionicLoading, Usuario, $ionicNavBarDelegate) {
-    console.log("OSTIA");
     var usuario = Usuario.usuario();
 
     if (!usuario.email) {
-
         $state.go("app.login")
-    } else {
-
     }
     $scope.perfil = function (cp, email, fnac, sex, telf, codfarma) {
 
@@ -573,6 +570,7 @@ angular.module('starter.controllers', [])
             inicializa();
         });
     }
+
     window.navigator.geolocation.getCurrentPosition(function (location) {
         var farmaciasCercanas = Peticiones.getFarmacias(location.coords.latitude, location.coords.longitude);
         farmaciasCercanas.then(function (result) {
@@ -584,7 +582,22 @@ angular.module('starter.controllers', [])
         });
     });
 
-
+    $scope.actualiza = function (farmaciaSeleccionada) {
+        var peticion = Peticiones.actualizaFarmacia(farmaciaSeleccionada);
+        peticion.then(
+            function (result) {
+                if (!result.error) {
+                    $ionicLoading.hide();
+                    Usuario.set('codigoFarmacia', codfarma);
+                } else {
+                    $ionicLoading.hide();
+                }
+            },
+            function (errorPlayload) {
+                $ionicLoading.hide();
+                alert("error");
+            });
+    }
 
     var inicializa = function () {
         if (usuario.codigoFarmacia) {
