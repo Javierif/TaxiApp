@@ -43,6 +43,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.servicies_pe
                 }
             }
         })
+        .state('app.mapaTaxista', {
+            url: "/mapaTaxista",
+            views: {
+                'menuContent': {
+                    templateUrl: "templates/mapaTaxista.html",
+                    controller: 'MapaTaxistaCtrl'
+                }
+            }
+        })
         .state('app.mostradorofertas', {
             url: "/mostradorofertas",
             views: {
@@ -67,15 +76,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.servicies_pe
                 'menuContent': {
                     templateUrl: "templates/reservas.html",
                     controller: 'ReservaCtrl'
-                }
-            }
-        })
-        .state('app.mifarmacia', {
-            url: "/mifarmacia",
-            views: {
-                'menuContent': {
-                    templateUrl: "templates/mipharmaprive.html",
-                    controller: 'MiFarmaCtrl'
                 }
             }
         })

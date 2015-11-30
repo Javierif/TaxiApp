@@ -24,7 +24,6 @@ angular.module('starter.controllers', [])
     $scope.login = function (layout) {
         var usuario = Usuario.usuario();
         if (!usuario.email) {
-            console.log("HASTA AQUI")
             $state.go("app.login")
         } else {
             switch (layout) {
@@ -43,38 +42,21 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('inicioCtrl', function ($scope, Peticiones, $state, $ionicLoading, Usuario, Comercios, Ofertas, $compile) {
-
-    $scope.entrar = function () {
-        $state.go("app.mostradorofertas");
-    }
-    Usuario.loadusuario()
-    var usuario = Usuario.usuario();
-    $scope.id = usuario.codigoCliente;
-    if (!usuario.codigoCliente) {
-        var usuario = Peticiones.creaAnonimo();
-        usuario.then(function (result) {
-            Usuario.set('codigoCliente', result.usuario.id);
-            Usuario.borrarusuario();
-            Usuario.saveusuario();
-            $scope.id2 = usuario.codigoCliente
-        });
-    }
-
-})
-
 
 .controller('loginCtrl', function ($scope, Peticiones, $state, $ionicLoading, Usuario, Comercios, Ofertas, $compile) {
+
+    Usuario.loadusuario()
+    var usuario = Usuario.usuario();
 
     $scope.registro = function () {
         $state.go("app.registro");
     }
 
-    $scope.login = function (email) {
+    $scope.login = function (email, password) {
         $ionicLoading.show({
             template: '<i class="icon ion-looping"></i> Conectando con el servidor...'
         });
-        var respuesta = Peticiones.login(email);
+        var respuesta = Peticiones.login(email, password);
         respuesta.then(
             function (result) {
                 if (result[0])
@@ -162,6 +144,102 @@ angular.module('starter.controllers', [])
                 });
         }
     }
+})
+
+.controller('MiFarmaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout) {
+    var usuario = Usuario.usuario();
+
+    var map;
+    var posInicio;
+    if (usuario.codigoFarmacia) {
+        var farmaciaAsociada = Peticiones.getFarmacia(usuario.codigoFarmacia);
+        farmaciaAsociada.then(function (result) {
+            $scope.farmacias.push(result[0]);
+            window.navigator.geolocation.getCurrentPosition(function (location) {
+                var farmaciasCercanas = Peticiones.getFarmacias(location.coords.latitude, location.coords.longitude);
+                farmaciasCercanas.then(function (result2) {
+                    for (farmacia in result2)
+                        $scope.farmacias.push(result2[farmacia]);
+                    inicializa();
+                });
+            });
+            inicializa();
+        });
+    } else {
+        window.navigator.geolocation.getCurrentPosition(function (location) {
+            var farmaciasCercanas = Peticiones.getFarmacias(location.coords.latitude, location.coords.longitude);
+            farmaciasCercanas.then(function (result) {
+                $scope.farmacias = result;
+                if (!usuario.codigoFarmacia) {
+                    inicializa();
+                }
+
+            });
+        });
+    }
+
+    $scope.actualiza = function (farmaciaSeleccionada) {
+        var peticion = Peticiones.actualizaFarmacia(usuario.codigoCliente, farmaciaSeleccionada.text);
+        peticion.then(
+            function (result) {
+                if (!result.error) {
+                    $ionicLoading.hide();
+                    Usuario.set('codigoFarmacia', codfarma);
+                    Usuario.saveusuario();
+                } else {
+                    $ionicLoading.hide();
+                }
+            },
+            function (errorPlayload) {
+                $ionicLoading.hide();
+                alert("error");
+            });
+    }
+
+    var inicializa = function () {
+
+        posInicio = new google.maps.LatLng($scope.farmacias[0].latitud, $scope.farmacias[0].longitud);
+
+        var mapOptions = {
+            streetViewControl: true,
+            center: posInicio,
+            zoom: 12,
+            mapTypeId: google.maps.MapTypeId.TERRAIN
+        };
+
+        map = new google.maps.Map(document.getElementById("mapa"),
+            mapOptions);
+
+        for (farmacia in $scope.farmacias) {
+            console.log("FARMA ", $scope.farmacias[farmacia]);
+            var posicion = new google.maps.LatLng($scope.farmacias[farmacia].latitud, $scope.farmacias[farmacia].longitud);
+
+            var contentString = '<strong>Dirección de la farmacia: </strong> ' +
+                $scope.farmacias[farmacia].direccion;
+
+
+            var infowindow = new google.maps.InfoWindow({
+                content: contentString
+            });
+
+            var farmaciaMarker = new google.maps.Marker({
+                position: posicion,
+                map: map
+            });
+            farmaciaMarker.addListener('click', function (marker) {
+                for (farmacia in $scope.farmacias) {
+                    if (parseFloat($scope.farmacias[farmacia].latitud).toFixed(4) == marker.latLng.lat().toFixed(4) && parseFloat($scope.farmacias[farmacia].longitud).toFixed(4) == marker.latLng.lng().toFixed(4)) {
+                        $scope.farmaciaSeleccionada.text = $scope.farmacias[farmacia].id;
+                    }
+                }
+                infowindow.open(map, farmaciaMarker);
+            });
+
+            infowindow.open(map, farmaciaMarker);
+        }
+        $scope.map = map;
+    }
+
 })
 
 .controller('MostradorOfertasCtrl', function ($ionicPlatform, $scope, Peticiones, $state, Ofertas, $ionicLoading, Usuario) {
@@ -557,103 +635,4 @@ angular.module('starter.controllers', [])
         event.preventDefault();
         event.stopPropagation();
     });
-})
-
-.controller('MiFarmaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout) {
-    $scope.farmaciaSeleccionada = {};
-    $scope.oferta = Ofertas.getViendoOferta();
-    var usuario = Usuario.usuario();
-    $scope.farmacias = [];
-    $scope.farmaciaSeleccionada.text = usuario.codigoFarmacia;
-    var map;
-    var posInicio;
-    if (usuario.codigoFarmacia) {
-        var farmaciaAsociada = Peticiones.getFarmacia(usuario.codigoFarmacia);
-        farmaciaAsociada.then(function (result) {
-            $scope.farmacias.push(result[0]);
-            window.navigator.geolocation.getCurrentPosition(function (location) {
-                var farmaciasCercanas = Peticiones.getFarmacias(location.coords.latitude, location.coords.longitude);
-                farmaciasCercanas.then(function (result2) {
-                    for (farmacia in result2)
-                        $scope.farmacias.push(result2[farmacia]);
-                    inicializa();
-                });
-            });
-            inicializa();
-        });
-    } else {
-        window.navigator.geolocation.getCurrentPosition(function (location) {
-            var farmaciasCercanas = Peticiones.getFarmacias(location.coords.latitude, location.coords.longitude);
-            farmaciasCercanas.then(function (result) {
-                $scope.farmacias = result;
-                if (!usuario.codigoFarmacia) {
-                    inicializa();
-                }
-
-            });
-        });
-    }
-
-    $scope.actualiza = function (farmaciaSeleccionada) {
-        var peticion = Peticiones.actualizaFarmacia(usuario.codigoCliente, farmaciaSeleccionada.text);
-        peticion.then(
-            function (result) {
-                if (!result.error) {
-                    $ionicLoading.hide();
-                    Usuario.set('codigoFarmacia', codfarma);
-                    Usuario.saveusuario();
-                } else {
-                    $ionicLoading.hide();
-                }
-            },
-            function (errorPlayload) {
-                $ionicLoading.hide();
-                alert("error");
-            });
-    }
-
-    var inicializa = function () {
-
-        posInicio = new google.maps.LatLng($scope.farmacias[0].latitud, $scope.farmacias[0].longitud);
-
-        var mapOptions = {
-            streetViewControl: true,
-            center: posInicio,
-            zoom: 12,
-            mapTypeId: google.maps.MapTypeId.TERRAIN
-        };
-
-        map = new google.maps.Map(document.getElementById("mapa"),
-            mapOptions);
-
-        for (farmacia in $scope.farmacias) {
-            console.log("FARMA ", $scope.farmacias[farmacia]);
-            var posicion = new google.maps.LatLng($scope.farmacias[farmacia].latitud, $scope.farmacias[farmacia].longitud);
-
-            var contentString = '<strong>Dirección de la farmacia: </strong> ' +
-                $scope.farmacias[farmacia].direccion;
-
-
-            var infowindow = new google.maps.InfoWindow({
-                content: contentString
-            });
-
-            var farmaciaMarker = new google.maps.Marker({
-                position: posicion,
-                map: map
-            });
-            farmaciaMarker.addListener('click', function (marker) {
-                for (farmacia in $scope.farmacias) {
-                    if (parseFloat($scope.farmacias[farmacia].latitud).toFixed(4) == marker.latLng.lat().toFixed(4) && parseFloat($scope.farmacias[farmacia].longitud).toFixed(4) == marker.latLng.lng().toFixed(4)) {
-                        $scope.farmaciaSeleccionada.text = $scope.farmacias[farmacia].id;
-                    }
-                }
-                infowindow.open(map, farmaciaMarker);
-            });
-
-            infowindow.open(map, farmaciaMarker);
-        }
-        $scope.map = map;
-    }
-
 });

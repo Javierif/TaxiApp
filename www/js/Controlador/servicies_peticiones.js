@@ -77,12 +77,13 @@ angular.module('starter.servicies_peticiones', [])
 .factory('Peticiones', function (server_constantes, $http, $q) {
     return {
 
-        login: function (correo) {
+        login: function (correo, password) {
             var urls = server_constantes.all();
             var peticionjson = {};
             peticionjson[urls.SERVER_EMAIL] = correo;
+            peticionjson['password'] = password;
             var deferred = $q.defer();
-            $http.post(urls.URL + "/loginapp", peticionjson)
+            $http.post(urls.URL + "/login", peticionjson)
                 .success(function (respuesta) {
                     deferred.resolve(respuesta);
                 }).error(function (error) {});
