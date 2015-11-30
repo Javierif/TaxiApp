@@ -354,7 +354,7 @@ angular.module('starter.controllers', [])
         if (!usuario.email) {
             $scope.disabled = true;
             boton = "Iniciar sesión";
-        } else if (!usuario.farmacia) {
+        } else if (!usuario.codigoFarmacia) {
             $scope.disabled = true;
             boton = "Ver Farmacias PharmaPrivé";
             texto = "No tienes farmacia asignada, para poder reservar necesitas tener una farmacia PharmaPrivé.";
@@ -383,7 +383,7 @@ angular.module('starter.controllers', [])
         myPopup.then(function (res) {
             if (!usuario.email) {
                 $state.go("app.login");
-            } else if (!usuario.farmacia) {
+            } else if (!usuario.codigoFarmacia) {
                 $state.go('app.mifarmacia');
             } else {
                 if (!(angular.isUndefined(res)) && !(res == null)) {
@@ -406,17 +406,17 @@ angular.module('starter.controllers', [])
                                 function (b) {});
                         } else {
                             $ionicLoading.show({
-                                template: '<i class="icon ion-looping"></i> data.cantidadcupon Obteniendo su código de descuento...'
+                                template: '<i class="icon ion-looping"></i> Creando su reserva, espere un momento...'
                             });
-                            var cupon = Peticiones.reserva($scope.oferta.id, Usuario.get('codigoCliente'), res);
+                            var cupon = Peticiones.reservar($scope.oferta.id, Usuario.get('codigoCliente'), res, usuario.codigoFarmacia);
                             cupon.then(
                                 function (result) {
                                     if (!result.error) {
+                                        $ionicLoading.hide();
+                                        $scope.oferta.reservadas += res;
                                         window.plugins.toast.showShortBottom("Reservado correctamente",
                                             function (a) {},
                                             function (b) {});
-                                        $scope.oferta.reservadas += res;
-                                        $ionicLoading.hide();
                                     } else {
                                         $ionicLoading.hide();
                                     }

@@ -137,14 +137,15 @@ angular.module('starter.servicies_peticiones', [])
             return deferred.promise;
         },
 
-        reservar: function (idCupon, codigoCliente, cantidad) {
+        reservar: function (idCupon, codigoCliente, cantidad, farmacia) {
             var urls = server_constantes.all();
             var peticionjson = {};
             var deferred = $q.defer();
             peticionjson['usuario'] = codigoCliente;
             peticionjson['cantidad'] = cantidad;
             peticionjson['idCupon'] = idCupon;
-            $http.post(urls.URL + "/registroapp", peticionjson)
+            peticionjson['farmacia'] = farmacia
+            $http.post(urls.URL + "/reservar", peticionjson)
                 .success(function (result) {
                     deferred.resolve(result);
                 }).error(function (result) {
