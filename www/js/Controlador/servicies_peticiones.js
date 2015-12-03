@@ -89,11 +89,11 @@ angular.module('starter.servicies_peticiones', [])
                 }).error(function (error) {});
             return deferred.promise;
         },
-        creaAnonimo: function () {
+
+        getSocios: function (grupo) {
             var urls = server_constantes.all();
-            var peticionjson = {};
             var deferred = $q.defer();
-            $http.post(urls.URL + "/creaanonimo", peticionjson)
+            $http.get(urls.URL + "/taxista/getSocios/" + grupo)
                 .success(function (respuesta) {
                     deferred.resolve(respuesta);
                 }).error(function (error) {

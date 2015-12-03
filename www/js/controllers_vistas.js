@@ -61,8 +61,10 @@ angular.module('starter.controllers', [])
             function (result) {
                 // window.plugins.toast.showLongBottom(result.error_msg, function (a) {}, function (b) {});
                 if (result.user) {
+                    result = result.user;
                     $ionicLoading.hide();
                     Usuario.borrarusuario();
+                    Usuario.set('id', result.id);
                     Usuario.set('email', result.email);
                     Usuario.set('codigoCliente', result.id);
                     Usuario.set('telefono', result.telefono);
@@ -71,6 +73,7 @@ angular.module('starter.controllers', [])
                     Usuario.set('genero', result.sexo);
                     Usuario.set('nombre', result.nombre);
                     Usuario.set('codigoFarmacia', result.farmacia);
+                    Usuario.set('grupo', result.grupo);
                     Usuario.saveusuario();
                     console.log(Usuario.usuario());
                     $state.go("app.mapaTaxista");
@@ -146,36 +149,33 @@ angular.module('starter.controllers', [])
 
 .controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails) {
     var usuario = Usuario.usuario();
+
     $ionicLoading.show({
         template: '<i class="icon ion-looping"></i> Cargando tu posicion...'
     });
 
     $sails.get("/taxista/conectarse")
         .then(function (resp) {
+            console.log("RECIBI ", resp);
+            for (socio in $scope.socios) {
+                if ($scope.socios[socio].id == resp.data.user) {
+                    var posicion = new google.maps.LatLng(resp.data.latitud, resp.data.longitud);
+                    $scope.socios[socio].marcador.setPosition(posicion);
+                    break;
+                }
+            }
             $scope.bars = resp.data;
-            console.log("ACTUALIZADO ", $scope.bars)
         }, function (resp) {
             alert('Houston, we got a problem!');
         });
 
 
 
-    console.log("POR AQUI");
-
     /*$scope.$on('$destroy', function (event) {
         socket.removeAllListeners();
     });*/
 
-    window.navigator.geolocation.getCurrentPosition(function (location) {
-        var farmaciasCercanas = Peticiones.getSocios(
-            location.coords.latitude,
-            location.coords.longitude);
-        farmaciasCercanas.then(function (result2) {
-            for (farmacia in result2)
-                $scope.farmacias.push(result2[farmacia]);
-            //inicializa();
-        });
-    });
+
     window.navigator.geolocation.watchPosition(function (location, error, options) {
         $sails.post('/taxista/moviendose', {
             user: usuario.id,
@@ -183,6 +183,15 @@ angular.module('starter.controllers', [])
             longitud: location.coords.longitude
         });
     });
+
+    window.navigator.geolocation.getCurrentPosition(function (location) {
+        var socios = Peticiones.getSocios(usuario.grupo);
+        socios.then(function (result) {
+            $scope.socios = result;
+            inicializa(location.coords.latitude, location.coords.longitude);
+        });
+    });
+
 
     $scope.actualiza = function (farmaciaSeleccionada) {
         var peticion = Peticiones.actualizaFarmacia(usuario.codigoCliente, farmaciaSeleccionada.text);
@@ -202,9 +211,9 @@ angular.module('starter.controllers', [])
             });
     }
 
-    var inicializa = function () {
+    var inicializa = function (latitude, longitude) {
 
-        posInicio = new google.maps.LatLng($scope.farmacias[0].latitud, $scope.farmacias[0].longitud);
+        posInicio = new google.maps.LatLng(latitude, longitude);
 
         var mapOptions = {
             streetViewControl: true,
@@ -216,34 +225,30 @@ angular.module('starter.controllers', [])
         map = new google.maps.Map(document.getElementById("mapa"),
             mapOptions);
 
-        for (farmacia in $scope.farmacias) {
-            console.log("FARMA ", $scope.farmacias[farmacia]);
-            var posicion = new google.maps.LatLng($scope.farmacias[farmacia].latitud, $scope.farmacias[farmacia].longitud);
+        for (socio in $scope.socios) {
+            var posicion = new google.maps.LatLng($scope.socios[socio].latitud, $scope.socios[socio].longitud);
 
-            var contentString = '<strong>Dirección de la farmacia: </strong> ' +
-                $scope.farmacias[farmacia].direccion;
+            var contentString = '<strong>Taxi nº: </strong> ' +
+                $scope.socios[socio].numerotaxi;
 
 
             var infowindow = new google.maps.InfoWindow({
                 content: contentString
             });
 
-            var farmaciaMarker = new google.maps.Marker({
+            var marcador = new google.maps.Marker({
                 position: posicion,
                 map: map
             });
-            farmaciaMarker.addListener('click', function (marker) {
-                for (farmacia in $scope.farmacias) {
-                    if (parseFloat($scope.farmacias[farmacia].latitud).toFixed(4) == marker.latLng.lat().toFixed(4) && parseFloat($scope.farmacias[farmacia].longitud).toFixed(4) == marker.latLng.lng().toFixed(4)) {
-                        $scope.farmaciaSeleccionada.text = $scope.farmacias[farmacia].id;
-                    }
-                }
-                infowindow.open(map, farmaciaMarker);
+            $scope.socios[socio].marcador = marcador;
+            marcador.addListener('click', function (marker) {
+                infowindow.open(map, $scope.socios[socio].marcador);
             });
 
-            infowindow.open(map, farmaciaMarker);
+            infowindow.open(map, marcador);
         }
         $scope.map = map;
+        $ionicLoading.hide();
     }
 
 })
