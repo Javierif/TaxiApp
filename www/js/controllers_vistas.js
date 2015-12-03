@@ -146,37 +146,43 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('MiFarmaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout) {
+.controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout) {
     var usuario = Usuario.usuario();
 
-    var map;
-    var posInicio;
-    if (usuario.codigoFarmacia) {
-        var farmaciaAsociada = Peticiones.getFarmacia(usuario.codigoFarmacia);
-        farmaciaAsociada.then(function (result) {
-            $scope.farmacias.push(result[0]);
-            window.navigator.geolocation.getCurrentPosition(function (location) {
-                var farmaciasCercanas = Peticiones.getFarmacias(location.coords.latitude, location.coords.longitude);
-                farmaciasCercanas.then(function (result2) {
-                    for (farmacia in result2)
-                        $scope.farmacias.push(result2[farmacia]);
-                    inicializa();
-                });
-            });
-            inicializa();
-        });
-    } else {
-        window.navigator.geolocation.getCurrentPosition(function (location) {
-            var farmaciasCercanas = Peticiones.getFarmacias(location.coords.latitude, location.coords.longitude);
-            farmaciasCercanas.then(function (result) {
-                $scope.farmacias = result;
-                if (!usuario.codigoFarmacia) {
-                    inicializa();
-                }
+    $ionicLoading.show({
+        template: '<i class="icon ion-looping"></i> Cargando tu posicion...'
+    });
 
-            });
+    io.socket.get('/taxista/conectarse', function (resData, jwres) {
+        console.log(resData);
+    });
+
+    io.socket.on('web_usuario', function (obj) {
+        console.log('chat event is ' + JSON.stringify(obj));
+    });
+
+
+    /*$scope.$on('$destroy', function (event) {
+        socket.removeAllListeners();
+    });*/
+
+    window.navigator.geolocation.getCurrentPosition(function (location) {
+        var farmaciasCercanas = Peticiones.getSocios(
+            location.coords.latitude,
+            location.coords.longitude);
+        farmaciasCercanas.then(function (result2) {
+            for (farmacia in result2)
+                $scope.farmacias.push(result2[farmacia]);
+            //inicializa();
         });
-    }
+    });
+    window.navigator.geolocation.watchPosition(function (location, error, options) {
+        io.socket.post('/taxista/moviendose', {
+            user: usuario.id,
+            latitud: location.coords.latitude,
+            longitud: location.coords.longitude
+        });
+    });
 
     $scope.actualiza = function (farmaciaSeleccionada) {
         var peticion = Peticiones.actualizaFarmacia(usuario.codigoCliente, farmaciaSeleccionada.text);
