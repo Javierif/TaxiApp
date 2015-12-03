@@ -59,10 +59,8 @@ angular.module('starter.controllers', [])
         var respuesta = Peticiones.login(email, password);
         respuesta.then(
             function (result) {
-                if (result[0])
-                    result = result[0];
                 // window.plugins.toast.showLongBottom(result.error_msg, function (a) {}, function (b) {});
-                if (!result.error) {
+                if (result.user) {
                     $ionicLoading.hide();
                     Usuario.borrarusuario();
                     Usuario.set('email', result.email);
@@ -75,9 +73,9 @@ angular.module('starter.controllers', [])
                     Usuario.set('codigoFarmacia', result.farmacia);
                     Usuario.saveusuario();
                     console.log(Usuario.usuario());
-                    $state.go("app.mostradorofertas");
+                    $state.go("app.mapaTaxista");
                 } else {
-                    window.plugins.toast.showShortBottom(result.msg,
+                    window.plugins.toast.showShortBottom(result.message,
                         function (a) {},
                         function (b) {});
                     $ionicLoading.hide();
@@ -146,21 +144,23 @@ angular.module('starter.controllers', [])
     }
 })
 
-.controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout) {
+.controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails) {
     var usuario = Usuario.usuario();
-
     $ionicLoading.show({
         template: '<i class="icon ion-looping"></i> Cargando tu posicion...'
     });
 
-    io.socket.get('/taxista/conectarse', function (resData, jwres) {
-        console.log(resData);
-    });
+    $sails.get("/taxista/conectarse")
+        .then(function (resp) {
+            $scope.bars = resp.data;
+            console.log("ACTUALIZADO ", $scope.bars)
+        }, function (resp) {
+            alert('Houston, we got a problem!');
+        });
 
-    io.socket.on('web_usuario', function (obj) {
-        console.log('chat event is ' + JSON.stringify(obj));
-    });
 
+
+    console.log("POR AQUI");
 
     /*$scope.$on('$destroy', function (event) {
         socket.removeAllListeners();
@@ -177,7 +177,7 @@ angular.module('starter.controllers', [])
         });
     });
     window.navigator.geolocation.watchPosition(function (location, error, options) {
-        io.socket.post('/taxista/moviendose', {
+        $sails.post('/taxista/moviendose', {
             user: usuario.id,
             latitud: location.coords.latitude,
             longitud: location.coords.longitude
