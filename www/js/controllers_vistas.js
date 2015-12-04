@@ -89,7 +89,6 @@ angular.module('starter.controllers', [])
 
 })
 
-
 .controller('RegistroCtrl', function ($scope, Peticiones, $state, Ofertas, $ionicLoading, Usuario, $ionicNavBarDelegate) {
     var usuario = Usuario.usuario();
     $scope.registrarse = function (cp, email, fnac, sex, telf, codfarma, nombre) {
@@ -154,31 +153,52 @@ angular.module('starter.controllers', [])
         template: '<i class="icon ion-looping"></i> Cargando tu posicion...'
     });
 
-    $sails.get("/taxista/conectarse")
-        .then(function (resp) {
-            console.log("RECIBI ", resp);
-            for (socio in $scope.socios) {
-                if ($scope.socios[socio].id == resp.data.user) {
-                    var posicion = new google.maps.LatLng(resp.data.latitud, resp.data.longitud);
-                    $scope.socios[socio].marcador.setPosition(posicion);
-                    break;
-                }
+    $sails.get("/taxista/conectarse/" + usuario.id + "/" + usuario.grupo);
+
+    $sails.on("Web_Usuario", function (resp) {
+        console.log("RECIBI ", resp);
+        for (socio in $scope.socios) {
+            if ($scope.socios[socio].id == resp.data.user) {
+                var posicion = new google.maps.LatLng(resp.data.latitud, resp.data.longitud);
+                $scope.socios[socio].marcador.setPosition(posicion);
+                break;
             }
-            $scope.bars = resp.data;
-        }, function (resp) {
-            alert('Houston, we got a problem!');
-        });
+        }
+        $scope.bars = resp.data;
+    });
 
+    $sails.on('conexion', function (resp) {
+        console.log("SE CONECTO ALGUIEN");
+        for (socio in $scope.socios) {
+            if (resp.id == $scope.socios[socio].id) {
+                $scope.socios[socio].conectado = resp.conectado;
+                if (resp.conectado) $scope.socios[socio].marcador.setIcon('http://maps.google.com/mapfiles/kml/paddle/grn-circle-lv.png');
+                else $scope.socios[socio].marcador.setIcon('http://maps.google.com/mapfiles/kml/paddle/wht-circle-lv.png');
+            }
+        }
+    })
 
+    $sails.on('movmiento', function (resp) {
+        console.log("RECIBI ", resp);
+        for (socio in $scope.socios) {
+            if ($scope.socios[socio].id == resp.user) {
+                var posicion = new google.maps.LatLng(resp.latitud, resp.longitud);
+                $scope.socios[socio].marcador.setPosition(posicion);
+                break;
+            }
+        }
+    })
 
-    /*$scope.$on('$destroy', function (event) {
-        socket.removeAllListeners();
-    });*/
+    $sails.on('$destroy', function (event) {
+        Peticiones.getSocios(usuario.grupo);
+    });
 
 
     window.navigator.geolocation.watchPosition(function (location, error, options) {
+        console.log("ENCIO");
         $sails.post('/taxista/moviendose', {
             user: usuario.id,
+            grupo: usuario.grupo,
             latitud: location.coords.latitude,
             longitud: location.coords.longitude
         });
@@ -218,7 +238,7 @@ angular.module('starter.controllers', [])
         var mapOptions = {
             streetViewControl: true,
             center: posInicio,
-            zoom: 12,
+            zoom: 18,
             mapTypeId: google.maps.MapTypeId.TERRAIN
         };
 
@@ -235,9 +255,14 @@ angular.module('starter.controllers', [])
             var infowindow = new google.maps.InfoWindow({
                 content: contentString
             });
-
+            var icon;
+            if ($scope.socios[socio].conectado)
+                icon = 'http://maps.google.com/mapfiles/kml/paddle/grn-circle-lv.png'
+            else
+                icon = 'http://maps.google.com/mapfiles/kml/paddle/wht-circle-lv.png'
             var marcador = new google.maps.Marker({
                 position: posicion,
+                icon: icon,
                 map: map
             });
             $scope.socios[socio].marcador = marcador;
