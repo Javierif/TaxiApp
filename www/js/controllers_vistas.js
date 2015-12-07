@@ -148,7 +148,9 @@ angular.module('starter.controllers', [])
 
 .controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails) {
     var usuario = Usuario.usuario();
-
+    $scope.$on('$ionicView.beforeEnter', function () {
+        screen.lockOrientation('landscape');
+    });
     $ionicLoading.show({
         template: '<i class="icon ion-looping"></i> Cargando tu posicion...'
     });
@@ -178,7 +180,7 @@ angular.module('starter.controllers', [])
         }
     })
 
-    $sails.on('movmiento', function (resp) {
+    $sails.on('movimiento', function (resp) {
         console.log("RECIBI ", resp);
         for (socio in $scope.socios) {
             if ($scope.socios[socio].id == resp.user) {

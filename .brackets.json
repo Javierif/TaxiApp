@@ -6,6 +6,8 @@
         "/Users/Mirafarma/aplicaciones/v2/TaxApp/platforms/ios/build/emulator/TaxiAlcantarilla.app/www/lib/ionic/js/ionic.js",
         "/Users/Mirafarma/aplicaciones/v2/TaxApp/platforms/ios/build/emulator/TaxiAlcantarilla.app/www/lib/ionic/js/ionic.min.js",
         "/Users/Mirafarma/aplicaciones/v2/TaxApp/platforms/ios/build/emulator/TaxiAlcantarilla.app/www/lib/lodash.js",
-        "/Users/Mirafarma/aplicaciones/v2/TaxApp/www/js/servicios/socket.js"
+        "/Users/Mirafarma/aplicaciones/v2/TaxApp/www/js/servicios/socket.js",
+        "/Users/Mirafarma/aplicaciones/v2/TaxApp/platforms/ios/build/emulator/TaxiAlcantarilla.app/www/plugins/nl.x-services.plugins.toast/test/tests.js",
+        "/Users/Mirafarma/aplicaciones/v2/TaxApp/platforms/ios/build/emulator/TaxiAlcantarilla.app/www/plugins/nl.x-services.plugins.toast/www/Toast.js"
     ]
 }

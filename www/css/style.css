@@ -201,7 +201,22 @@
 
 #mapa {
     height: 100%;
-    width: 100%;
+    width: 80%;
+    position: absolute;
+    right: 0px;
+}
+
+#lateral {
+    width: 20%;
+    height: 100%;
+    position: absolute;
+    background-color: darkgray;
+}
+
+.titulo {
+    color: white;
+    background: #444;
+    text-align: center;
 }
 
 #mifarma_contenedor {
