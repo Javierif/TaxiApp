@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.servicies_peticiones', 'starter.servicies_modelos', 'angular-carousel', 'ngSails'])
+angular.module('starter', ['ionic', 'starter.controllers', 'starter.controllers.taxista','starter.servicies_peticiones', 'starter.servicies_modelos', 'angular-carousel', 'ngSails'])
 
 .config(['$sailsProvider', function ($sailsProvider) {
         $sailsProvider.url = 'http://localhost:1337';
