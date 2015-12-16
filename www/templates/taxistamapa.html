@@ -1,7 +1,20 @@
 <ion-view class="overlightblue" view-title="Listado de ofertas">
     <ion-content>
+
         <div id="lateral">
-            <h2 class="titulo">Global</h2>
+            <h3 class="titulo">Global</h3>
+            <ul class="listadomapa">
+                <li ng-repeat="socio in socios | orderBy:'puestoglobal':false"><i class="ion-model-s"></i> Taxi {{socio.numerotaxi}}</li>
+            </ul>
+            <div ng-repeat="parada in paradas">
+                <h3 class="titulo">{{parada.nombre}}</h3>
+                <ul class="listadomapa">
+                    <li ng-repeat="socio in parada.socios | orderBy:'puestolocal':true"><i class="ion-model-s"></i> Taxi {{socio.numerotaxi}}</li>
+                </ul>
+            </div>
+            <button class="button button-block button-dark" ng-disabled="true">
+                Ubicar
+            </button>
         </div>
         <div id="mapa"></div>
 

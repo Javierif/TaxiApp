@@ -16,7 +16,13 @@
   },
   "cordovaPlugins": [
     "https://github.com/katzer/cordova-plugin-hidden-statusbar-overlay.git",
+    "https://github.com/apache/cordova-plugin-media",
     "nl.x-services.plugins.toast",
-    "net.yoik.cordova.plugins.screenorientation"
+    "net.yoik.cordova.plugins.screenorientation",
+    "https://github.com/apache/cordova-plugin-file",
+    "https://github.com/apache/cordova-plugin-media-capture"
+  ],
+  "cordovaPlatforms": [
+    "ios"
   ]
 }

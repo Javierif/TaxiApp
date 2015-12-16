@@ -52,3 +52,10 @@
     border-radius: 0px $button-border-radius $button-border-radius 0px;
   }
 }
+
+.button-bar > .button-small {
+  &:before,
+  .icon:before {
+    line-height: 28px;
+  }
+}

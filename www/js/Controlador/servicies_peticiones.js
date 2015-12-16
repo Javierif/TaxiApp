@@ -101,6 +101,18 @@ angular.module('starter.servicies_peticiones', [])
                 });
             return deferred.promise;
         },
+
+        getParadas: function (grupo) {
+            var urls = server_constantes.all();
+            var deferred = $q.defer();
+            $http.get(urls.URL + "/taxista/getParadas/" + grupo)
+                .success(function (respuesta) {
+                    deferred.resolve(respuesta);
+                }).error(function (error) {
+                    console.log(error);
+                });
+            return deferred.promise;
+        },
         //////////REGISTRAR/////////
         registrar: function (id, cp, email, fnac, sex, telf, codfarma, nombre) {
             var urls = server_constantes.all();

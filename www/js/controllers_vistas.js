@@ -1,4 +1,4 @@
-angular.module('starter.controllers', [])
+angular.module('starter.controllers', [Taxista])
 
 .controller('AppCtrl', function ($scope, $ionicModal, $timeout, Usuario, $state) {
     // Form data for the login modal
@@ -148,12 +148,21 @@ angular.module('starter.controllers', [])
 
 .controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails) {
     var usuario = Usuario.usuario();
-    $scope.$on('$ionicView.beforeEnter', function () {
-        screen.lockOrientation('landscape');
-    });
+    var paradas = Peticiones.getParadas(usuario.grupo);
+    paradas.then(function (result) {
+        $scope.paradas = result;
+    })
     $ionicLoading.show({
         template: '<i class="icon ion-looping"></i> Cargando tu posicion...'
     });
+
+    $scope.record = function () {
+        window.plugins.audiorecorder.record(function (msg) {
+            alert('ok: ' + msg)
+        }, function (msg) {
+            alert('ko: ' + msg)
+        })
+    }
 
     $sails.get("/taxista/conectarse/" + usuario.id + "/" + usuario.grupo);
 
@@ -174,8 +183,15 @@ angular.module('starter.controllers', [])
         for (socio in $scope.socios) {
             if (resp.id == $scope.socios[socio].id) {
                 $scope.socios[socio].conectado = resp.conectado;
-                if (resp.conectado) $scope.socios[socio].marcador.setIcon('http://maps.google.com/mapfiles/kml/paddle/grn-circle-lv.png');
-                else $scope.socios[socio].marcador.setIcon('http://maps.google.com/mapfiles/kml/paddle/wht-circle-lv.png');
+                if (resp.conectado) {
+                    $scope.socios[socio].puestoglobal = resp.puestoglobal;
+                    $scope.socios[socio].marcador.setIcon('http://maps.google.com/mapfiles/kml/paddle/grn-circle-lv.png');
+                } else {
+                    $scope.socios[socio].puestoglobal = null;
+                    $scope.socios[socio].puestolocal = null;
+                    $scope.socios[socio].paralocal = null;
+                    $scope.socios[socio].marcador.setIcon('http://maps.google.com/mapfiles/kml/paddle/wht-circle-lv.png');
+                }
             }
         }
     })
@@ -190,11 +206,6 @@ angular.module('starter.controllers', [])
             }
         }
     })
-
-    $sails.on('$destroy', function (event) {
-        Peticiones.getSocios(usuario.grupo);
-    });
-
 
     window.navigator.geolocation.watchPosition(function (location, error, options) {
         console.log("ENCIO");

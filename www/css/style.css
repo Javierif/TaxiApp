@@ -210,13 +210,24 @@
     width: 20%;
     height: 100%;
     position: absolute;
-    background-color: darkgray;
+    background-color: #ffc900;
+}
+
+.listadomapa li {
+    padding: 5px;
+    border-bottom: 1px solid white;
+    color: #444;
 }
 
 .titulo {
-    color: white;
-    background: #444;
+    color: #444;
+    background: white;
+    padding: 5px;
     text-align: center;
+}
+
+.lateral>ul>li {
+    border-bottom: 1px solid;
 }
 
 #mifarma_contenedor {
