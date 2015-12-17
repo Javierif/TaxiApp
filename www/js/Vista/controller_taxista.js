@@ -70,6 +70,7 @@ angular.module('starter.controllers.taxista', [])
             if ($scope.socios[socio].id == usuario.id) {
                 var posicion = new google.maps.LatLng(resp.latitud, resp.longitud);
                 $scope.socios[socio].marcador.setPosition(posicion);
+                $scope.mapa.setCenter(posicion);
                 break;
             }
         }
