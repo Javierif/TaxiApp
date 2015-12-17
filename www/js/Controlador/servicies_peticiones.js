@@ -64,12 +64,20 @@ angular.module('starter.servicies_peticiones', [])
         SERVER_OPERACION: "operacion"
     }
 
+    var constantesTaxistas = {
+        URL: "http://localhost:1337",
+        GRUPO: 'grupo',
+        PARADA: 'parada'
+    }
     return {
         all: function () {
             return constantes;
         },
         get: function (constante) {
             return constantes[constante];
+        },
+        allTaxista: function () {
+            return constantesTaxistas;
         }
     }
 })
@@ -105,6 +113,7 @@ angular.module('starter.servicies_peticiones', [])
         getParadas: function (grupo) {
             var urls = server_constantes.all();
             var deferred = $q.defer();
+
             $http.get(urls.URL + "/taxista/getParadas/" + grupo)
                 .success(function (respuesta) {
                     deferred.resolve(respuesta);
@@ -113,7 +122,21 @@ angular.module('starter.servicies_peticiones', [])
                 });
             return deferred.promise;
         },
-        //////////REGISTRAR/////////
+        ubicar: function (idParada, grupo) {
+                var contastes = server_constantes.allTaxista();
+                var peticionjson = {};
+                peticionjson[contastes.PARADA] = idParada;
+                peticionjson[contastes.GRUPO] = grupo;
+
+                var deferred = $q.defer();
+                $http.post(urls.URL + "/taxista/ubicar", peticionjson)
+                    .success(function (respuesta) {
+                        deferred.resolve(respuesta);
+                    }).error(function (error) {});
+                return deferred.promise;
+
+            }
+            //////////REGISTRAR/////////
         registrar: function (id, cp, email, fnac, sex, telf, codfarma, nombre) {
             var urls = server_constantes.all();
             var peticionjson = {};

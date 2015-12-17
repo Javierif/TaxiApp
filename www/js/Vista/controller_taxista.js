@@ -3,6 +3,7 @@ angular.module('starter.controllers.taxista', [])
 .controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails) {
     var usuario = Usuario.usuario();
     var paradas = Peticiones.getParadas(usuario.grupo);
+    $scope.ubicarDisponible = {};
 
     paradas.then(function (result) {
         $scope.paradas = result;
@@ -63,7 +64,14 @@ angular.module('starter.controllers.taxista', [])
         }
     })
 
-
+    $scope.ubicar = function () {
+        if ($scope.ubicarDisponible.disponible) {
+            var ubicame = Peticiones.ubicar($scope.ubicarDisponible.id, usuario.grupo);
+            ubicame.then(function (result) {
+                console.log("UBICACION ", result)
+            });
+        }
+    }
 
     window.navigator.geolocation.watchPosition(function (location, error, options) {
         for (socio in $scope.socios) {
@@ -71,9 +79,14 @@ angular.module('starter.controllers.taxista', [])
                 var posicion = new google.maps.LatLng(resp.latitud, resp.longitud);
                 $scope.socios[socio].marcador.setPosition(posicion);
                 $scope.mapa.setCenter(posicion);
+                for (parada in $scope.paradas) {
+                    var distancia = calculaDistancia(location.coords.latitude, location.coords.longitude, $scope.socios[socio].latitud, $scope.socios[socio].longitude);
+                    console.log(" PARADA DISTANCIA: " + distancia + "NOMBRE: " + $scope.paradas[parada].nombre);
+                }
                 break;
             }
         }
+
         $sails.post('/taxista/moviendose', {
             user: usuario.id,
             grupo: usuario.grupo,
@@ -142,4 +155,18 @@ angular.module('starter.controllers.taxista', [])
         $ionicLoading.hide();
     }
 
+    var calculaDistancia = function (lat1, lon1, lat2, lon2) {
+        var radlat1 = Math.PI * lat1 / 180
+        var radlat2 = Math.PI * lat2 / 180
+        var radlon1 = Math.PI * lon1 / 180
+        var radlon2 = Math.PI * lon2 / 180
+        var theta = lon1 - lon2
+        var radtheta = Math.PI * theta / 180
+        var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+        dist = Math.acos(dist)
+        dist = dist * 180 / Math.PI
+        dist = dist * 60 * 1.1515
+        dist = dist * 1.609344
+        return dist
+    }
 })
