@@ -97,7 +97,6 @@ angular.module('starter.servicies_peticiones', [])
                 }).error(function (error) {});
             return deferred.promise;
         },
-
         getSocios: function (grupo) {
             var urls = server_constantes.all();
             var deferred = $q.defer();
@@ -109,7 +108,6 @@ angular.module('starter.servicies_peticiones', [])
                 });
             return deferred.promise;
         },
-
         getParadas: function (grupo) {
             var urls = server_constantes.all();
             var deferred = $q.defer();
@@ -123,20 +121,20 @@ angular.module('starter.servicies_peticiones', [])
             return deferred.promise;
         },
         ubicar: function (idParada, grupo) {
-                var contastes = server_constantes.allTaxista();
-                var peticionjson = {};
-                peticionjson[contastes.PARADA] = idParada;
-                peticionjson[contastes.GRUPO] = grupo;
+            var contastes = server_constantes.allTaxista();
+            var peticionjson = {};
+            peticionjson[contastes.PARADA] = idParada;
+            peticionjson[contastes.GRUPO] = grupo;
 
-                var deferred = $q.defer();
-                $http.post(urls.URL + "/taxista/ubicar", peticionjson)
-                    .success(function (respuesta) {
-                        deferred.resolve(respuesta);
-                    }).error(function (error) {});
-                return deferred.promise;
+            var deferred = $q.defer();
+            $http.post(urls.URL + "/taxista/ubicar", peticionjson)
+                .success(function (respuesta) {
+                    deferred.resolve(respuesta);
+                }).error(function (error) {});
+            return deferred.promise;
 
-            }
-            //////////REGISTRAR/////////
+        },
+        //////////REGISTRAR/////////
         registrar: function (id, cp, email, fnac, sex, telf, codfarma, nombre) {
             var urls = server_constantes.all();
             var peticionjson = {};

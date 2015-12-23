@@ -15,6 +15,24 @@
             <button class="button button-block button-dark" ng-disabled="true">
                 Ubicar
             </button>
+            <ng-audio-recorder id='audioInput' audio-model='recordedInput'>
+                <!-- Start controls, exposed via recorder-->
+                <div ng-if="recorder.isAvailable">
+                    <button ng-click="recorder.startRecord()" type="button" ng-disabled="recorder.status.isRecording">
+                        Start Record
+                    </button>
+                    <button ng-click="recorder.stopRecord()" type="button" ng-disabled="recorder.status.isRecording === false">
+                        Stop Record
+                    </button>
+                    <button ng-click="recorder.playbackRecording()" type="button" ng-disabled="recorder.status.isRecording || !recorder.audioModel">
+                        Play Back
+                    </button>
+                </div>
+
+                <div ng-if="!recorder.isAvailable">
+                    Message for users when recording is not possible.
+                </div>
+                <!-- End controls-->
         </div>
         <div id="mapa"></div>
 
