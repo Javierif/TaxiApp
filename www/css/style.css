@@ -37,8 +37,24 @@
     background-size: cover;
 }
 
+.nav-bar-tabs-top {
+    display: none;
+}
+
+#mic {
+    position: absolute;
+    bottom: 10px;
+    right: 0px;
+    left: 0px;
+}
+
 #contenedormapa {
     height: 300px;
+}
+
+.tabs-top > .tabs,
+.tabs.tabs-top {
+    top: 0;
 }
 
 #wrapper {
