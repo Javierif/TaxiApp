@@ -52,6 +52,20 @@ angular.module('starter.controllers', [])
         $state.go("app.registro");
     }
 
+    var myMedia;
+    $scope.record = function () {
+        myMedia = new Media("record.wav");
+        myMedia.startRecord();
+    };
+
+    $scope.play = function () {
+        myMedia.play();
+    };
+
+    $scope.stop = function () {
+        myMedia.stopRecord();
+    }
+
     $scope.login = function (email, password) {
         $ionicLoading.show({
             template: '<i class="icon ion-looping"></i> Conectando con el servidor...'

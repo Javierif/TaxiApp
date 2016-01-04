@@ -22,85 +22,90 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.controllers.
             }
         });
     })
+    .config(function (recorderServiceProvider) {
+        recorderServiceProvider
+            .forceSwf(false)
+            //.setSwfUrl('/lib/recorder.swf')
+            .withMp3Conversion(true);
+    })
+    .config(function ($stateProvider, $urlRouterProvider) {
+        $stateProvider
 
-.config(function ($stateProvider, $urlRouterProvider) {
-    $stateProvider
+            .state('app', {
+                url: "/app",
+                abstract: true,
+                templateUrl: "templates/menu.html",
+                controller: 'AppCtrl'
+            })
+            .state('inicio', {
+                url: "/inicio",
+                templateUrl: "templates/inicio.html",
+                controller: 'loginCtrl'
+            })
+            .state('app.registro', {
+                url: "/registro",
+                views: {
+                    'menuContent': {
+                        templateUrl: "templates/registro.html",
+                        controller: 'RegistroCtrl'
+                    }
+                }
+            })
+            .state('app.mapaTaxista', {
+                url: "/mapaTaxista",
+                views: {
+                    'menuContent': {
+                        templateUrl: "templates/taxistamapa.html",
+                        controller: 'MapaTaxistaCtrl'
+                    }
+                }
+            })
+            .state('app.mostradorofertas', {
+                url: "/mostradorofertas",
+                views: {
+                    'menuContent': {
+                        templateUrl: "templates/mostradorofertas.html",
+                        controller: 'MostradorOfertasCtrl'
+                    }
+                }
+            })
+            .state('app.detalleoferta', {
+                url: "/detalleoferta",
+                views: {
+                    'menuContent': {
+                        templateUrl: "templates/detalleoferta.html",
+                        controller: 'DetalleOfertaCtrl'
+                    }
+                }
+            })
+            .state('app.reservas', {
+                url: "/reservas",
+                views: {
+                    'menuContent': {
+                        templateUrl: "templates/reservas.html",
+                        controller: 'ReservaCtrl'
+                    }
+                }
+            })
+            .state('app.historial', {
+                url: "/historial",
+                views: {
+                    'menuContent': {
+                        templateUrl: "templates/historialcupones.html",
+                        controller: 'MiFarmaCtrl'
+                    }
+                }
+            })
+            .state('app.perfil', {
+                url: "/perfil",
+                views: {
+                    'menuContent': {
+                        templateUrl: "templates/perfil.html",
+                        controller: 'PerfilCtrl'
+                    }
+                }
+            });
 
-        .state('app', {
-            url: "/app",
-            abstract: true,
-            templateUrl: "templates/menu.html",
-            controller: 'AppCtrl'
-        })
-        .state('inicio', {
-            url: "/inicio",
-            templateUrl: "templates/inicio.html",
-            controller: 'loginCtrl'
-        })
-        .state('app.registro', {
-            url: "/registro",
-            views: {
-                'menuContent': {
-                    templateUrl: "templates/registro.html",
-                    controller: 'RegistroCtrl'
-                }
-            }
-        })
-        .state('app.mapaTaxista', {
-            url: "/mapaTaxista",
-            views: {
-                'menuContent': {
-                    templateUrl: "templates/taxistamapa.html",
-                    controller: 'MapaTaxistaCtrl'
-                }
-            }
-        })
-        .state('app.mostradorofertas', {
-            url: "/mostradorofertas",
-            views: {
-                'menuContent': {
-                    templateUrl: "templates/mostradorofertas.html",
-                    controller: 'MostradorOfertasCtrl'
-                }
-            }
-        })
-        .state('app.detalleoferta', {
-            url: "/detalleoferta",
-            views: {
-                'menuContent': {
-                    templateUrl: "templates/detalleoferta.html",
-                    controller: 'DetalleOfertaCtrl'
-                }
-            }
-        })
-        .state('app.reservas', {
-            url: "/reservas",
-            views: {
-                'menuContent': {
-                    templateUrl: "templates/reservas.html",
-                    controller: 'ReservaCtrl'
-                }
-            }
-        })
-        .state('app.historial', {
-            url: "/historial",
-            views: {
-                'menuContent': {
-                    templateUrl: "templates/historialcupones.html",
-                    controller: 'MiFarmaCtrl'
-                }
-            }
-        })
-        .state('app.perfil', {
-            url: "/perfil",
-            views: {
-                'menuContent': {
-                    templateUrl: "templates/perfil.html",
-                    controller: 'PerfilCtrl'
-                }
-            }
-        });
-
-    // if none of the above states are matched, use this as the fallback
-    $urlRouterProvider.otherwise('/inicio');
-});
+        // if none of the above states are matched, use this as the fallback
+        $urlRouterProvider.otherwise('/inicio');
+    });
