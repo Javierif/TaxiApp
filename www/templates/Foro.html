@@ -2,29 +2,19 @@
     <ion-content>
 
         <ion-list>
-            <ion-item class="item-stable opcionestitle" ng-click="toggleGroup(0)" ng-class="{active: isGroupShown(0)}">
-                &nbsp; Descripción del descuento
-                <i class="icon right" ng-class="isGroupShown(0) ? 'ion-chevron-up' : 'ion-chevron-down'"></i>
-            </ion-item>
-            <ion-item class="item-accordion opcionesdesc" ng-show="isGroupShown(0)">
-                {{oferta.descripcion}}
-            </ion-item>
+            <div ng-repeat="noticia in noticias" class="list card">
+                <ion-item class="item item-avatar" ng-click="toggleGroup(0)" ng-class="{active: isGroupShown(0)}">
+                    <img ng-src="noticia.avatar">
+                    <h2>{{noticia.nombre}}</h2>
+                    <p>{{noticia.date}}</p>
+                    <i class="icon right" ng-class="isGroupShown(0) ? 'ion-chevron-up' : 'ion-chevron-down'"></i>
+                </ion-item>
+                <ion-item class="item item-body" ng-show="isGroupShown(0)">
+                    <img class="full-image" ng-src="noticia.imagen">
+                    <p><span ng-bind="noticia.texto | date:'dd/MM/yyyy'"></p>
+                </ion-item>
+            </div>
         </ion-list>
-        <div ng-repeat="noticia in noticias" class="list card">
-            <div class="item item-avatar">
-                <img src="mcfly.jpg">
-                <h2>{{noticia.nombre}}</h2>
-                <p>{{noticia.date}}</p>
-            </div>
-
-            <div class="item item-body">
-                <img class="full-image" ng-src="noticia.imagen">
-                <p>
-                    <span ng-bind="noticia.texto | date:'dd/MM/yyyy'">
-
-                </p>
-            </div>
-        </div>
 
     </ion-content>
 </ion-view>
