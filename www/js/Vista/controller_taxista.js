@@ -4,7 +4,9 @@ angular.module('starter.controllers.taxista', [])
     var usuario = Usuario.usuario();
     var paradas = Peticiones.getParadas(usuario.grupo);
     $scope.ubicarDisponible = {};
+    $scope.ubicarDisponible.disabled = true;
     var myMedia;
+    $scope.recordImg = "./img/record.png"
     paradas.then(function (result) {
         $scope.paradas = result;
     })
@@ -14,11 +16,13 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $scope.record = function () {
+        $scope.recordImg = "./img/recording.png"
         myMedia = new Media("record.wav");
         myMedia.startRecord();
     };
 
     $scope.stopRecord = function () {
+        $scope.recordImg = "./img/record.png"
         myMedia.stopRecord();
     }
 
@@ -42,12 +46,12 @@ angular.module('starter.controllers.taxista', [])
                 $scope.socios[socio].conectado = resp.conectado;
                 if (resp.conectado) {
                     $scope.socios[socio].puestoglobal = resp.puestoglobal;
-                    $scope.socios[socio].marcador.setIcon('http://maps.google.com/mapfiles/kml/paddle/grn-circle-lv.png');
+                    $scope.socios[socio].marcador.setIcon('./img/activoicon.png');
                 } else {
                     $scope.socios[socio].puestoglobal = null;
                     $scope.socios[socio].puestolocal = null;
                     $scope.socios[socio].paralocal = null;
-                    $scope.socios[socio].marcador.setIcon('http://maps.google.com/mapfiles/kml/paddle/wht-circle-lv.png');
+                    $scope.socios[socio].marcador.setIcon('./img/desconectadoicon.png');
                 }
             }
         }
@@ -64,57 +68,91 @@ angular.module('starter.controllers.taxista', [])
         }
     })
 
-    $scope.ubicar = function () {
-        if ($scope.ubicarDisponible.disponible) {
-            var ubicame = Peticiones.ubicar($scope.ubicarDisponible.id, usuario.grupo);
-            ubicame.then(function (result) {
-                console.log("UBICACION ", result)
-            });
-        }
-    }
+    $sails.on('ubicado', function (resp) {
 
-    window.navigator.geolocation.watchPosition(function (location, error, options) {
-        if (location.coords.accuracy < 250) {
-            for (socio in $scope.socios) {
-                if ($scope.socios[socio].id == usuario.id) {
-                    var posicion = new google.maps.LatLng(resp.latitud, resp.longitud);
-                    $scope.socios[socio].marcador.setPosition(posicion);
-                    $scope.mapa.setCenter(posicion);
-                    for (parada in $scope.paradas) {
-                        var distancia = calculaDistancia(location.coords.latitude, location.coords.longitude, $scope.socios[socio].latitud, $scope.socios[socio].longitude);
-                        console.log(" PARADA DISTANCIA: " + distancia + "NOMBRE: " + $scope.paradas[parada].nombre);
+        for (parada in $scope.paradas) {
+            if ($scope.paradas[parada].id == resp.parada) {
+                for (socio in $scope.socios) {
+                    if ($scope.socios[socio].id == resp.socio) {
+                        $scope.socios[socio].puestolocal = resp.puesto;
+                        $scope.paradas[parada].ubicados.push($scope.socios[socio]);
                     }
-                    break;
                 }
             }
-
-            $sails.post('/taxista/moviendose', {
-                user: usuario.id,
-                grupo: usuario.grupo,
-                latitud: location.coords.latitude,
-                longitud: location.coords.longitude
-            });
+            $scope.paradas[parada].ubicados.push(usuario);
         }
-    }, function error(msg) {
-        alert('Active la opción de GPS.');
 
-    }, {
-        maximumAge: 600000,
-        timeout: 5000,
-        enableHighAccuracy: true
-    });
+    })
+    $scope.ubicar = function () {
+        if (!$scope.ubicarDisponible.disabled) {
+            var ubicame = Peticiones.ubicar($scope.ubicarDisponible.id, usuario.grupo, usuario.latitud, usuario.longitud);
+            ubicame.then(function (result) {});
+        }
+    }
+    window.navigator.geolocation.watchPosition(function (location, error, options) {
+            if (location.coords.accuracy < 250) {
+                $sails.post('/taxista/moviendose', {
+                    user: usuario.id,
+                    grupo: usuario.grupo,
+                    latitud: location.coords.latitude,
+                    longitud: location.coords.longitude
+                });
+                for (socio in $scope.socios) {
+                    if ($scope.socios[socio].id == usuario.id) {
+                        usuario.latitud = location.coords.latitud;
+                        usuario.longitud = location.coords.longitude;
+
+                        var posicion = new google.maps.LatLng(location.coords.latitud, location.coords.longitude);
+                        $scope.socios[socio].marcador.setPosition(posicion);
+                        $scope.mapa.setCenter(posicion);
+                        for (parada in $scope.paradas) {
+                            var distancia = calculaDistancia(location.coords.latitude, location.coords.longitude, $scope.socios[socio].latitud, $scope.socios[socio].longitude);
+                            console.log(" PARADA DISTANCIA: " + distancia + "NOMBRE: " + $scope.paradas[parada].nombre);
+                            if (distancia < 0.3) {
+                                $scope.ubicarDisponible.id = $scope.paradas.id;
+                                $scope.ubicarDisponible.disabled = false;
+                                break;
+                            } else {
+                                $scope.ubicarDisponible.disabled = true;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        },
+        function error(msg) {
+            alert('Active la opción de GPS.');
+
+        }, {
+            maximumAge: 600000,
+            timeout: 5000,
+            enableHighAccuracy: true
+        });
 
     var getCurrentPosition = function () {
         window.navigator.geolocation.getCurrentPosition(function (location) {
             console.log("Accuracy " + location.coords.accuracy);
             if (location.coords.accuracy < 250) {
+                $sails.post('/taxista/moviendose', {
+                    user: usuario.id,
+                    grupo: usuario.grupo,
+                    latitud: location.coords.latitude,
+                    longitud: location.coords.longitude
+                });
                 var socios = Peticiones.getSocios(usuario.grupo);
                 socios.then(function (result) {
                     for (socio in result) {
+                        if (socio.puestolocal != null) {
+                            for (parada in $scope.paradas) {
+                                $scope.paradas[parada].ubicados.push(result[socio]);
+                            }
+                        }
                         if (result[socio].id == usuario.id) {
+                            usuario.latitud = location.coords.latitud;
+                            usuario.longitud = location.coords.longitude;
                             result[socio].latitud = location.coords.latitude;
                             result[socio].longitud = location.coords.longitude;
-                            break;
                         }
                     }
                     $scope.socios = result;
@@ -159,9 +197,9 @@ angular.module('starter.controllers.taxista', [])
             });
             var icon;
             if ($scope.socios[socio].conectado || $scope.socios[socio].id == usuario.id) {
-                icon = 'http://maps.google.com/mapfiles/kml/paddle/grn-circle-lv.png'
+                icon = './img/activoicon.png'
             } else {
-                icon = 'http://maps.google.com/mapfiles/kml/paddle/wht-circle-lv.png'
+                icon = './img/desconectadoicon.png'
             }
             var marcador = new google.maps.Marker({
                 position: posicion,
@@ -191,6 +229,7 @@ angular.module('starter.controllers.taxista', [])
         dist = dist * 180 / Math.PI
         dist = dist * 60 * 1.1515
         dist = dist * 1.609344
+            //devuelve en kilometros
         return dist
     }
 })

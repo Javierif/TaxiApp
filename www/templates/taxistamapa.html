@@ -7,19 +7,19 @@
                 <li ng-repeat="socio in socios | orderBy:'puestoglobal':false"><i class="ion-model-s"></i> Taxi {{socio.numerotaxi}}</li>
             </ul>
             <div ng-repeat="parada in paradas">
-                <h3 class="titulo">{{parada.nombre}}</h3>
+                <h3 class="titulo">{{parada.parada}}</h3>
                 <ul class="listadomapa">
-                    <li ng-repeat="socio in parada.socios | orderBy:'puestolocal':true"><i class="ion-model-s"></i> Taxi {{socio.numerotaxi}}</li>
+                    <li ng-repeat="socio in parada.ubicados | orderBy:'puestolocal':true"><i class="ion-model-s"></i> Taxi {{socio.numerotaxi}}</li>
                 </ul>
             </div>
-            <button class="button button-block button-dark" ng-disabled="true">
+            <button class="button button-block button-dark" ng-click="ubicar()" ng-disabled="{{ubicarDisponible.disabled}}">
                 Ubicar
             </button>
         </div>
         <!-- End controls-->
         <div id="mapa"></div>
         <div id="mic">
-            <button class="button button-assertive" on-release="stopRecord()" on-hold="record()"><i class="ion-mic-c"></i></button>
+            <a on-release="stopRecord()" on-hold="record()"><img ng-src="{{recordImg}}"></a>
         </div>
 
     </ion-content>

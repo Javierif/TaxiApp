@@ -459,6 +459,18 @@
     color: white;
 }
 
+#mic {
+    bottom: 10px;
+    position: absolute;
+    width: 80%;
+    left: 20%;
+    text-align: center;
+}
+
+#mic a>img {
+    width: 70px;
+}
+
 .social > button {
     margin: 2%;
     width: 20%;

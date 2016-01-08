@@ -67,7 +67,9 @@ angular.module('starter.servicies_peticiones', [])
     var constantesTaxistas = {
         URL: "http://localhost:1337",
         GRUPO: 'grupo',
-        PARADA: 'parada'
+        PARADA: 'parada',
+        LATITUD: 'latitud',
+        LONGITUD: 'longitud'
     }
     return {
         all: function () {
@@ -84,6 +86,9 @@ angular.module('starter.servicies_peticiones', [])
 
 .factory('Peticiones', function (server_constantes, $http, $q) {
     return {
+
+        'get /taxista/conectarse/:idUsuario/:grupo': 'TaxistaMapaController.conectarseMapa',
+        'post /taxista/moviendose': 'TaxistaMapaController.actualizarPosicion',
 
         login: function (correo, password) {
             var urls = server_constantes.all();
@@ -120,11 +125,13 @@ angular.module('starter.servicies_peticiones', [])
                 });
             return deferred.promise;
         },
-        ubicar: function (idParada, grupo) {
-            var contastes = server_constantes.allTaxista();
+        ubicar: function (idParada, grupo, latitud, longitud) {
+            var constantes = server_constantes.allTaxista();
             var peticionjson = {};
-            peticionjson[contastes.PARADA] = idParada;
-            peticionjson[contastes.GRUPO] = grupo;
+            peticionjson[constantes.PARADA] = idParada;
+            peticionjson[constantes.GRUPO] = grupo;
+            peticionjson[constantes.LATITUD] = latitud;
+            peticionjson[constantes.LONGITUD] = longitud;
 
             var deferred = $q.defer();
             $http.post(urls.URL + "/taxista/ubicar", peticionjson)
