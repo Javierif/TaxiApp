@@ -20,7 +20,8 @@
     "nl.x-services.plugins.toast",
     "net.yoik.cordova.plugins.screenorientation",
     "https://github.com/apache/cordova-plugin-file",
-    "https://github.com/apache/cordova-plugin-media-capture"
+    "https://github.com/apache/cordova-plugin-media-capture",
+    "https://github.com/cogitor/PhoneGap-OrientationLock.git"
   ],
   "cordovaPlatforms": [
     "ios"

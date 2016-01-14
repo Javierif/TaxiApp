@@ -4,7 +4,7 @@ angular.module('starter.servicies_peticiones', [])
     // Might use a resource here that returns a JSON arra
 
     var constantes = {
-        URL: "http://localhost:1337",
+        URL: "http://taxialcantarilla.es",
         URL_API: "/api/v1",
         URL_INICISIOSESION: "/iniciosesion",
         URL_REGISTRO: "/alta",
@@ -65,7 +65,7 @@ angular.module('starter.servicies_peticiones', [])
     }
 
     var constantesTaxistas = {
-        URL: "http://localhost:1337",
+        URL: "http://taxialcantarilla.es",
         GRUPO: 'grupo',
         PARADA: 'parada',
         LATITUD: 'latitud',

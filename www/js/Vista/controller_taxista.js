@@ -1,6 +1,7 @@
 angular.module('starter.controllers.taxista', [])
 
 .controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails) {
+    screen.lockOrientation('landscape');
     var usuario = Usuario.usuario();
     var paradas = Peticiones.getParadas(usuario.grupo);
     $scope.ubicarDisponible = {};
@@ -24,6 +25,15 @@ angular.module('starter.controllers.taxista', [])
     $scope.stopRecord = function () {
         $scope.recordImg = "./img/record.png"
         myMedia.stopRecord();
+    }
+
+    $scope.prueba = function () {
+        for (socio in $scope.socios) {
+            if ($scope.socios[socio].id == usuario.id) {
+                var posicion = new google.maps.LatLng(37.9710623, -1.216041);
+                $scope.socios[socio].marcador.setPosition(posicion);
+            }
+        }
     }
 
     $sails.get("/taxista/conectarse/" + usuario.id + "/" + usuario.grupo);
@@ -90,6 +100,7 @@ angular.module('starter.controllers.taxista', [])
         }
     }
     window.navigator.geolocation.watchPosition(function (location, error, options) {
+
             if (location.coords.accuracy < 250) {
                 $sails.post('/taxista/moviendose', {
                     user: usuario.id,
@@ -99,12 +110,13 @@ angular.module('starter.controllers.taxista', [])
                 });
                 for (socio in $scope.socios) {
                     if ($scope.socios[socio].id == usuario.id) {
-                        usuario.latitud = location.coords.latitud;
+                        usuario.latitud = location.coords.latitude;
                         usuario.longitud = location.coords.longitude;
 
-                        var posicion = new google.maps.LatLng(location.coords.latitud, location.coords.longitude);
+                        var posicion = new google.maps.LatLng(location.coords.latitude, location.coords.longitude);
                         $scope.socios[socio].marcador.setPosition(posicion);
-                        $scope.mapa.setCenter(posicion);
+                        alert("MOVIENDO " + location.coords.latitude + " Y LONG " + location.coords.longitude)
+                            //$scope.map.setCenter(posicion);
                         for (parada in $scope.paradas) {
                             var distancia = calculaDistancia(location.coords.latitude, location.coords.longitude, $scope.socios[socio].latitud, $scope.socios[socio].longitude);
                             console.log(" PARADA DISTANCIA: " + distancia + "NOMBRE: " + $scope.paradas[parada].nombre);
@@ -121,10 +133,7 @@ angular.module('starter.controllers.taxista', [])
                 }
             }
         },
-        function error(msg) {
-            alert('Active la opción de GPS.');
-
-        }, {
+        function error(msg) {}, {
             maximumAge: 600000,
             timeout: 5000,
             enableHighAccuracy: true
@@ -149,7 +158,7 @@ angular.module('starter.controllers.taxista', [])
                             }
                         }
                         if (result[socio].id == usuario.id) {
-                            usuario.latitud = location.coords.latitud;
+                            usuario.latitud = location.coords.latitude;
                             usuario.longitud = location.coords.longitude;
                             result[socio].latitud = location.coords.latitude;
                             result[socio].longitud = location.coords.longitude;
@@ -162,8 +171,8 @@ angular.module('starter.controllers.taxista', [])
                 getCurrentPosition();
             }
         }, function error(msg) {
-            alert('Active la opción de GPS.');
-
+            alert('error al obtener geo local error ' + msg);
+            getCurrentPosition();
         }, {
             maximumAge: 600000,
             timeout: 5000,
@@ -172,17 +181,20 @@ angular.module('starter.controllers.taxista', [])
     }
     getCurrentPosition();
     var inicializa = function (latitude, longitude) {
+        $ionicLoading.hide();
         posInicio = new google.maps.LatLng(latitude, longitude);
 
         var mapOptions = {
             streetViewControl: true,
             center: posInicio,
-            zoom: 18,
+            zoom: 13,
             mapTypeId: google.maps.MapTypeId.TERRAIN
         };
 
         map = new google.maps.Map(document.getElementById("mapa"),
             mapOptions);
+        console.log("POS INICIO ", posInicio);
+        map.setCenter(posInicio);
 
         for (socio in $scope.socios) {
             console.log("SOCIO ", $scope.socios[socio].latitud, $scope.socios[socio].longitud)
@@ -213,8 +225,10 @@ angular.module('starter.controllers.taxista', [])
 
             infowindow.open(map, marcador);
         }
+        console.log("EL CENTRO ES1  ", map);
+        map.setCenter(posInicio);
         $scope.map = map;
-        $ionicLoading.hide();
+
     }
 
     var calculaDistancia = function (lat1, lon1, lat2, lon2) {

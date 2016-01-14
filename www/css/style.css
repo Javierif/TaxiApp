@@ -54,7 +54,7 @@
 
 .tabs-top > .tabs,
 .tabs.tabs-top {
-    top: 0;
+    top: 0px !important;
 }
 
 #wrapper {
@@ -108,8 +108,18 @@
     background-color: #444444;
 }
 
-.overlightblue {
-    background-color: #83D1F2;
+.navbarheader {
+    top: 50px;
+    height: -o-calc(100% - 50px);
+    /* opera */
+    height: -webkit-calc(100% - 50px);
+    /* google, safari */
+    height: -moz-calc(100% - 50px);
+    /* firefox */
+}
+
+.bar-assertive.bar-land {
+    display: none;
 }
 
 .textbox {

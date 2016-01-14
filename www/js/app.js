@@ -7,9 +7,16 @@
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.controllers.taxista', 'starter.servicies_peticiones', 'starter.servicies_modelos', 'angular-carousel', 'ngSails', 'angularAudioRecorder'])
 
 .config(['$sailsProvider', function ($sailsProvider) {
-        $sailsProvider.url = 'http://localhost:1337';
+        $sailsProvider.url = 'http://taxialcantarilla.es:80';
+        io.sails.url = 'http://taxialcantarilla.es:80';
 }])
-    .run(function ($ionicPlatform) {
+    .config(['$httpProvider', function ($httpProvider) {
+            $httpProvider.defaults.useXDomain = true;
+            delete $httpProvider.defaults.headers.common['X-Requested-With'];
+}
+])
+
+.run(function ($ionicPlatform) {
         $ionicPlatform.ready(function () {
             // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
             // for form inputs)
