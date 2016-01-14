@@ -115,8 +115,8 @@ angular.module('starter.controllers.taxista', [])
 
                         var posicion = new google.maps.LatLng(location.coords.latitude, location.coords.longitude);
                         $scope.socios[socio].marcador.setPosition(posicion);
-                        alert("MOVIENDO " + location.coords.latitude + " Y LONG " + location.coords.longitude)
-                            //$scope.map.setCenter(posicion);
+                        //alert("MOVIENDO " + location.coords.latitude + " Y LONG " + location.coords.longitude)
+                        $scope.map.panTo(posicion);
                         for (parada in $scope.paradas) {
                             var distancia = calculaDistancia(location.coords.latitude, location.coords.longitude, $scope.socios[socio].latitud, $scope.socios[socio].longitude);
                             console.log(" PARADA DISTANCIA: " + distancia + "NOMBRE: " + $scope.paradas[parada].nombre);
@@ -152,9 +152,12 @@ angular.module('starter.controllers.taxista', [])
                 var socios = Peticiones.getSocios(usuario.grupo);
                 socios.then(function (result) {
                     for (socio in result) {
-                        if (socio.puestolocal != null) {
+                        if (result[socio].puestolocal != null) {
                             for (parada in $scope.paradas) {
-                                $scope.paradas[parada].ubicados.push(result[socio]);
+                                if ($scope.paradas[parada].id == result[socio].paralocal) {
+                                    $scope.paradas[parada].ubicados.push(result[socio]);
+                                }
+
                             }
                         }
                         if (result[socio].id == usuario.id) {
@@ -187,7 +190,7 @@ angular.module('starter.controllers.taxista', [])
         var mapOptions = {
             streetViewControl: true,
             center: posInicio,
-            zoom: 13,
+            zoom: 15,
             mapTypeId: google.maps.MapTypeId.TERRAIN
         };
 
