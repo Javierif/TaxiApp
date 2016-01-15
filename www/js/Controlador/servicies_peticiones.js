@@ -67,6 +67,8 @@ angular.module('starter.servicies_peticiones', [])
     var constantesTaxistas = {
         URL: "http://taxialcantarilla.es",
         GRUPO: 'grupo',
+        EMAIL: "email",
+        PASSWORD: "password",
         PARADA: 'parada',
         LATITUD: 'latitud',
         LONGITUD: 'longitud'
@@ -91,10 +93,10 @@ angular.module('starter.servicies_peticiones', [])
         'post /taxista/moviendose': 'TaxistaMapaController.actualizarPosicion',
 
         login: function (correo, password) {
-            var urls = server_constantes.all();
+            var urls = server_constantes.allTaxista();;
             var peticionjson = {};
-            peticionjson[urls.SERVER_EMAIL] = correo;
-            peticionjson['password'] = password;
+            peticionjson[urls.EMAIL] = correo;
+            peticionjson[urls.PASSWORD] = password;
             var deferred = $q.defer();
             $http.post(urls.URL + "/login", peticionjson)
                 .success(function (respuesta) {
@@ -103,7 +105,7 @@ angular.module('starter.servicies_peticiones', [])
             return deferred.promise;
         },
         getSocios: function (grupo) {
-            var urls = server_constantes.all();
+            var urls = server_constantes.allTaxista();
             var deferred = $q.defer();
             $http.get(urls.URL + "/taxista/getSocios/" + grupo)
                 .success(function (respuesta) {
@@ -114,7 +116,7 @@ angular.module('starter.servicies_peticiones', [])
             return deferred.promise;
         },
         getParadas: function (grupo) {
-            var urls = server_constantes.all();
+            var urls = server_constantes.allTaxista();
             var deferred = $q.defer();
 
             $http.get(urls.URL + "/taxista/getParadas/" + grupo)
@@ -134,7 +136,7 @@ angular.module('starter.servicies_peticiones', [])
             peticionjson[constantes.LONGITUD] = longitud;
 
             var deferred = $q.defer();
-            $http.post(urls.URL + "/taxista/ubicar", peticionjson)
+            $http.post(constantes.URL + "/taxista/ubicar", peticionjson)
                 .success(function (respuesta) {
                     deferred.resolve(respuesta);
                 }).error(function (error) {});

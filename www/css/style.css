@@ -122,6 +122,12 @@
     display: none;
 }
 
+.deshabilitado {
+    opacity: .4;
+    pointer-events: none;
+    cursor: default !important;
+}
+
 .textbox {
     position: relative;
     top: 30px;

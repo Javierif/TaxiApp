@@ -1,11 +1,11 @@
 angular.module('starter.controllers.taxista', [])
 
 .controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails) {
-    screen.lockOrientation('landscape');
+    // screen.lockOrientation('landscape');
     var usuario = Usuario.usuario();
     var paradas = Peticiones.getParadas(usuario.grupo);
     $scope.ubicarDisponible = {};
-    $scope.ubicarDisponible.disabled = true;
+    $scope.ubicarDisponible.disabled = "deshabilitado";
     var myMedia;
     $scope.recordImg = "./img/record.png"
     paradas.then(function (result) {
@@ -94,14 +94,15 @@ angular.module('starter.controllers.taxista', [])
 
     })
     $scope.ubicar = function () {
-        if (!$scope.ubicarDisponible.disabled) {
-            var ubicame = Peticiones.ubicar($scope.ubicarDisponible.id, usuario.grupo, usuario.latitud, usuario.longitud);
-            ubicame.then(function (result) {});
-        }
+        var ubicame = Peticiones.ubicar($scope.ubicarDisponible.id, usuario.grupo, usuario.latitud, usuario.longitud);
+        ubicame.then(function (result) {
+
+
+        });
     }
     window.navigator.geolocation.watchPosition(function (location, error, options) {
-
-            if (location.coords.accuracy < 250) {
+            alert("Watch ACCUARY " + location.coords.accuracy);
+            if (location.coords.accuracy < 150) {
                 $sails.post('/taxista/moviendose', {
                     user: usuario.id,
                     grupo: usuario.grupo,
@@ -118,14 +119,16 @@ angular.module('starter.controllers.taxista', [])
                         //alert("MOVIENDO " + location.coords.latitude + " Y LONG " + location.coords.longitude)
                         $scope.map.panTo(posicion);
                         for (parada in $scope.paradas) {
-                            var distancia = calculaDistancia(location.coords.latitude, location.coords.longitude, $scope.socios[socio].latitud, $scope.socios[socio].longitude);
+                            var distancia = calculaDistancia(location.coords.latitude, location.coords.longitude, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
                             console.log(" PARADA DISTANCIA: " + distancia + "NOMBRE: " + $scope.paradas[parada].nombre);
-                            if (distancia < 0.3) {
-                                $scope.ubicarDisponible.id = $scope.paradas.id;
-                                $scope.ubicarDisponible.disabled = false;
+                            if (distancia < 0.1) {
+
+                                $scope.ubicarDisponible.id = $scope.paradas[parada].id;
+                                $scope.ubicarDisponible.disabled = "";
+                                alert("DENTRO  " + $scope.ubicarDisponible.disabled + " ID " + $scope.ubicarDisponible.id);
                                 break;
                             } else {
-                                $scope.ubicarDisponible.disabled = true;
+                                $scope.ubicarDisponible.disabled = "deshabilitado";
                             }
                         }
                         break;
@@ -141,8 +144,10 @@ angular.module('starter.controllers.taxista', [])
 
     var getCurrentPosition = function () {
         window.navigator.geolocation.getCurrentPosition(function (location) {
-            console.log("Accuracy " + location.coords.accuracy);
-            if (location.coords.accuracy < 250) {
+            alert("CURRENT ACCUARY " + location.coords.accuracy);
+            console.log("Accuracy current" + location.coords.accuracy);
+            if (location.coords.accuracy < 150) {
+
                 $sails.post('/taxista/moviendose', {
                     user: usuario.id,
                     grupo: usuario.grupo,
@@ -198,6 +203,31 @@ angular.module('starter.controllers.taxista', [])
             mapOptions);
         console.log("POS INICIO ", posInicio);
         map.setCenter(posInicio);
+
+        for (parada in $scope.paradas) {
+            alert("PARADA " + $scope.paradas[parada].nombre);
+            var posicion = new google.maps.LatLng($scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
+            var cityCircle = new google.maps.Circle({
+                strokeColor: '#2E9AFE',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: '#2E9AFE',
+                fillOpacity: 0.35,
+                map: map,
+                center: posicion,
+                radius: 100
+            });
+
+            var distancia = calculaDistancia(latitude, longitude, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
+            if (distancia < 0.1) {
+                $scope.ubicarDisponible.id = $scope.paradas[parada].id;
+                $scope.ubicarDisponible.disabled = "";
+                alert("DENTRO  " + $scope.ubicarDisponible.disabled + " ID " + $scope.ubicarDisponible.id)
+            } else {
+                $scope.ubicarDisponible.disabled = "deshabilitado";
+            }
+
+        }
 
         for (socio in $scope.socios) {
             console.log("SOCIO ", $scope.socios[socio].latitud, $scope.socios[socio].longitud)

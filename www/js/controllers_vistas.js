@@ -44,7 +44,7 @@ angular.module('starter.controllers', [])
 
 
 .controller('loginCtrl', function ($scope, Peticiones, $state, $ionicLoading, Usuario, Comercios, Ofertas, $compile) {
-    screen.lockOrientation('portrait');
+    //screen.lockOrientation('portrait');
     Usuario.loadusuario()
     var usuario = Usuario.usuario();
 
