@@ -2,18 +2,14 @@
     <ion-content scroll="false">
 
         <div id="lateral">
-            <h3 class="titulo">Global</h3>
-            <ul class="listadomapa">
-                <li ng-repeat="socio in socios | orderBy:'puestoglobal':false"><i class="ion-model-s"></i> Taxi {{socio.numerotaxi}}</li>
-            </ul>
-            <div ng-repeat="parada in paradas">
+            <div ng-repeat="parada in paradas | orderBy:'id'">
                 <h3 class="titulo">{{parada.parada}}</h3>
                 <ul class="listadomapa">
-                    <li ng-repeat="socio in parada.ubicados | orderBy:'puestolocal':true"><i class="ion-model-s"></i> Taxi {{socio.numerotaxi}}</li>
+                    <li ng-repeat="socio in parada.ubicados"><i class="ion-model-s"></i> Taxi {{socio.numerotaxi}}</li>
                 </ul>
             </div>
-            <button class="button button-block button-dark" ng-click="ubicar()" ng-class="{{ubicarDisponible.disabled}}">
-                Ubicar
+            <button class="button button-block button-dark" ng-click="ubicar()" ng-class="{'deshabilitado' : ubicarDisponible.disabled, 'desubicar' : ubicadoText == 'Desubicar'}">
+                {{ubicadoText}}
             </button>
             <button class="button button-block button-dark" ng-click="prueba()">
                 Prueba

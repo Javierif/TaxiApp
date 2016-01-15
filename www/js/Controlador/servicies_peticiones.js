@@ -71,7 +71,8 @@ angular.module('starter.servicies_peticiones', [])
         PASSWORD: "password",
         PARADA: 'parada',
         LATITUD: 'latitud',
-        LONGITUD: 'longitud'
+        LONGITUD: 'longitud',
+        TAXISTA: 'taxista'
     }
     return {
         all: function () {
@@ -127,13 +128,14 @@ angular.module('starter.servicies_peticiones', [])
                 });
             return deferred.promise;
         },
-        ubicar: function (idParada, grupo, latitud, longitud) {
+        ubicar: function (idParada, grupo, latitud, longitud, idTaxista) {
             var constantes = server_constantes.allTaxista();
             var peticionjson = {};
             peticionjson[constantes.PARADA] = idParada;
             peticionjson[constantes.GRUPO] = grupo;
             peticionjson[constantes.LATITUD] = latitud;
             peticionjson[constantes.LONGITUD] = longitud;
+            peticionjson[constantes.TAXISTA] = idTaxista;
 
             var deferred = $q.defer();
             $http.post(constantes.URL + "/taxista/ubicar", peticionjson)

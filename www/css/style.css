@@ -142,6 +142,10 @@
     display: none;
 }
 
+.desubicar {
+    background-color: crimson !important;
+}
+
 .show {
     display: block;
 }

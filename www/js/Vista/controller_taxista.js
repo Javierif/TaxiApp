@@ -1,15 +1,30 @@
 angular.module('starter.controllers.taxista', [])
 
 .controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails) {
-    // screen.lockOrientation('landscape');
+    //screen.lockOrientation('landscape');
     var usuario = Usuario.usuario();
     var paradas = Peticiones.getParadas(usuario.grupo);
     $scope.ubicarDisponible = {};
-    $scope.ubicarDisponible.disabled = "deshabilitado";
+    $scope.ubicarDisponible.disabled = true;
     var myMedia;
-    $scope.recordImg = "./img/record.png"
+    $scope.recordImg = "./img/record.png";
+    $scope.ubicadoText = "Ubicar";
     paradas.then(function (result) {
-        $scope.paradas = result;
+        $scope.paradas = result.paradas;
+        var ubicados = result.ubicados;
+        for (parada in $scope.paradas) {
+            if (!$scope.paradas[parada].ubicados) {
+                $scope.paradas[parada].ubicados = [];
+            }
+            for (ubicado in ubicados) {
+                if ($scope.paradas[parada].id == ubicados[ubicado].parada) {
+                    $scope.paradas[parada].ubicados.push(ubicados[ubicado].taxista);
+                    if (ubicados[ubicado].taxista.id == usuario.id) {
+                        $scope.ubicadoText = "Desubicar";
+                    }
+                }
+            }
+        }
     })
 
     $ionicLoading.show({
@@ -30,13 +45,40 @@ angular.module('starter.controllers.taxista', [])
     $scope.prueba = function () {
         for (socio in $scope.socios) {
             if ($scope.socios[socio].id == usuario.id) {
-                var posicion = new google.maps.LatLng(37.9710623, -1.216041);
+                var posicion = new google.maps.LatLng(37.5710623, -1.236041);
                 $scope.socios[socio].marcador.setPosition(posicion);
             }
         }
     }
 
+    var borraUbicacion = function (paradaRecibida, socioRecibido) {
+        for (parada in $scope.paradas) {
+            if ($scope.paradas[parada].id == paradaRecibida) {
+                for (ubicado in $scope.paradas[parada].ubicados) {
+                    if ($scope.paradas[parada].ubicados[ubicado].id == socioRecibido) {
+                        $scope.paradas[parada].ubicados.splice(ubicado, 1);
+                    }
+                }
+
+            }
+        }
+    }
+
+    var ubica = function (paradaRecibida, socioRecibido) {
+        for (parada in $scope.paradas) {
+            console.log(" UBICA PARa " + $scope.paradas[parada].id + " Y OTRO " + paradaRecibida);
+            if ($scope.paradas[parada].id == paradaRecibida) {
+                for (socio in $scope.socios) {
+                    if ($scope.socios[socio].id == socioRecibido) {
+                        $scope.paradas[parada].ubicados.push($scope.socios[socio]);
+                    }
+                }
+            }
+        }
+    }
+
     $sails.get("/taxista/conectarse/" + usuario.id + "/" + usuario.grupo);
+
     $sails.on("Web_Usuario", function (resp) {
         console.log("RECIBI ", resp);
         for (socio in $scope.socios) {
@@ -55,17 +97,22 @@ angular.module('starter.controllers.taxista', [])
             if (resp.id == $scope.socios[socio].id) {
                 $scope.socios[socio].conectado = resp.conectado;
                 if (resp.conectado) {
-                    $scope.socios[socio].puestoglobal = resp.puestoglobal;
+                    borraUbicacion(1, resp.id);
+                    ubica(1, resp.id);
                     $scope.socios[socio].marcador.setIcon('./img/activoicon.png');
+                    window.plugins.toast.showShortBottom("Se ha conectado el taxi nº" + resp.id,
+                        function (a) {},
+                        function (b) {});
                 } else {
-                    $scope.socios[socio].puestoglobal = null;
-                    $scope.socios[socio].puestolocal = null;
-                    $scope.socios[socio].paralocal = null;
+                    borraUbicacion(1, resp.id);
                     $scope.socios[socio].marcador.setIcon('./img/desconectadoicon.png');
+                    window.plugins.toast.showShortBottom("Se ha desconectado el taxi nº" + resp.id,
+                        function (a) {},
+                        function (b) {});
                 }
             }
         }
-    })
+    });
 
     $sails.on('movimiento', function (resp) {
         console.log("RECIBI ", resp);
@@ -76,32 +123,75 @@ angular.module('starter.controllers.taxista', [])
                 break;
             }
         }
-    })
+    });
 
     $sails.on('ubicado', function (resp) {
+        console.log("SE UBICO " + JSON.stringify(resp));
+        ubica(resp.parada, resp.socio);
+    });
 
-        for (parada in $scope.paradas) {
-            if ($scope.paradas[parada].id == resp.parada) {
-                for (socio in $scope.socios) {
-                    if ($scope.socios[socio].id == resp.socio) {
-                        $scope.socios[socio].puestolocal = resp.puesto;
-                        $scope.paradas[parada].ubicados.push($scope.socios[socio]);
+    $sails.on('desubicar', function (resp) {
+        console.log("DESUBICANDO A " + JSON.stringify(resp));
+        borraUbicacion(resp.parada, resp.socio);
+    });
+
+    $scope.ubicar = function () {
+        if ($scope.ubicadoText == "Ubicar") {
+            $sails.post('/taxista/ubicar', {
+                parada: $scope.ubicarDisponible.id,
+                grupo: usuario.grupo,
+                latitud: usuario.latitud,
+                longitud: usuario.longitud,
+                taxista: usuario.id
+            });
+
+            for (parada in $scope.paradas) {
+                if ($scope.paradas[parada].id == $scope.ubicarDisponible.id) {
+                    for (socio in $scope.socios) {
+                        if ($scope.socios[socio].id == usuario.id) {
+                            $scope.paradas[parada].ubicados.push($scope.socios[socio]);
+                        }
                     }
                 }
             }
-            $scope.paradas[parada].ubicados.push(usuario);
+            $scope.ubicadoText = "Desubicar";
+
+        } else {
+            $sails.post('/taxista/desubicar', {
+                parada: $scope.ubicarDisponible.id,
+                taxista: usuario.id,
+                grupo: usuario.grupo
+            });
+
+            for (parada in $scope.paradas) {
+                if ($scope.paradas[parada].id == $scope.ubicarDisponible.id) {
+                    for (ubicado in $scope.paradas[parada].ubicados) {
+                        if ($scope.paradas[parada].ubicados[ubicado].id == usuario.id) {
+                            $scope.paradas[parada].ubicados.splice(ubicado, 1);
+                        }
+                    }
+                }
+            }
+            $scope.ubicadoText = "Ubicar";
+            valorarUbicacion(usuario.latitud, usuario.longitud);
         }
-
-    })
-    $scope.ubicar = function () {
-        var ubicame = Peticiones.ubicar($scope.ubicarDisponible.id, usuario.grupo, usuario.latitud, usuario.longitud);
-        ubicame.then(function (result) {
-
-
-        });
     }
+
+    var valorarUbicacion = function (latitud, longitud) {
+        for (parada in $scope.paradas) {
+            var distancia = calculaDistancia(latitud, longitud, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
+            console.log(" PARADA DISTANCIA: " + distancia + "NOMBRE: " + $scope.paradas[parada].nombre);
+            if (distancia < 0.1) {
+                $scope.ubicarDisponible.id = $scope.paradas[parada].id;
+                $scope.ubicarDisponible.disabled = false;
+                break;
+            } else {
+                $scope.ubicarDisponible.disabled = true;
+            }
+        }
+    }
+
     window.navigator.geolocation.watchPosition(function (location, error, options) {
-            alert("Watch ACCUARY " + location.coords.accuracy);
             if (location.coords.accuracy < 150) {
                 $sails.post('/taxista/moviendose', {
                     user: usuario.id,
@@ -118,19 +208,8 @@ angular.module('starter.controllers.taxista', [])
                         $scope.socios[socio].marcador.setPosition(posicion);
                         //alert("MOVIENDO " + location.coords.latitude + " Y LONG " + location.coords.longitude)
                         $scope.map.panTo(posicion);
-                        for (parada in $scope.paradas) {
-                            var distancia = calculaDistancia(location.coords.latitude, location.coords.longitude, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
-                            console.log(" PARADA DISTANCIA: " + distancia + "NOMBRE: " + $scope.paradas[parada].nombre);
-                            if (distancia < 0.1) {
+                        valorarUbicacion(location.coords.latitude, location.coords.longitude);
 
-                                $scope.ubicarDisponible.id = $scope.paradas[parada].id;
-                                $scope.ubicarDisponible.disabled = "";
-                                alert("DENTRO  " + $scope.ubicarDisponible.disabled + " ID " + $scope.ubicarDisponible.id);
-                                break;
-                            } else {
-                                $scope.ubicarDisponible.disabled = "deshabilitado";
-                            }
-                        }
                         break;
                     }
                 }
@@ -144,8 +223,8 @@ angular.module('starter.controllers.taxista', [])
 
     var getCurrentPosition = function () {
         window.navigator.geolocation.getCurrentPosition(function (location) {
-            alert("CURRENT ACCUARY " + location.coords.accuracy);
             console.log("Accuracy current" + location.coords.accuracy);
+            //bajarlo a 150
             if (location.coords.accuracy < 150) {
 
                 $sails.post('/taxista/moviendose', {
@@ -160,7 +239,10 @@ angular.module('starter.controllers.taxista', [])
                         if (result[socio].puestolocal != null) {
                             for (parada in $scope.paradas) {
                                 if ($scope.paradas[parada].id == result[socio].paralocal) {
+                                    if ($scope.paradas[parada].ubicados == null)
+                                        $scope.paradas[parada].ubicados = [];
                                     $scope.paradas[parada].ubicados.push(result[socio]);
+                                    break;
                                 }
 
                             }
@@ -179,7 +261,7 @@ angular.module('starter.controllers.taxista', [])
                 getCurrentPosition();
             }
         }, function error(msg) {
-            alert('error al obtener geo local error ' + msg);
+            alert('error al obtener geo local error ' + JSON.stringify(msg));
             getCurrentPosition();
         }, {
             maximumAge: 600000,
@@ -190,6 +272,8 @@ angular.module('starter.controllers.taxista', [])
     getCurrentPosition();
     var inicializa = function (latitude, longitude) {
         $ionicLoading.hide();
+        borraUbicacion(1, usuario.id);
+        ubica(1, usuario.id);
         posInicio = new google.maps.LatLng(latitude, longitude);
 
         var mapOptions = {
@@ -206,6 +290,8 @@ angular.module('starter.controllers.taxista', [])
 
         for (parada in $scope.paradas) {
             alert("PARADA " + $scope.paradas[parada].nombre);
+            if ($scope.paradas[parada].ubicados == null)
+                $scope.paradas[parada].ubicados = [];
             var posicion = new google.maps.LatLng($scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
             var cityCircle = new google.maps.Circle({
                 strokeColor: '#2E9AFE',
@@ -221,10 +307,10 @@ angular.module('starter.controllers.taxista', [])
             var distancia = calculaDistancia(latitude, longitude, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
             if (distancia < 0.1) {
                 $scope.ubicarDisponible.id = $scope.paradas[parada].id;
-                $scope.ubicarDisponible.disabled = "";
+                $scope.ubicarDisponible.disabled = false;
                 alert("DENTRO  " + $scope.ubicarDisponible.disabled + " ID " + $scope.ubicarDisponible.id)
             } else {
-                $scope.ubicarDisponible.disabled = "deshabilitado";
+                $scope.ubicarDisponible.disabled = true;
             }
 
         }
