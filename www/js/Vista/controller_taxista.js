@@ -1,7 +1,7 @@
 angular.module('starter.controllers.taxista', [])
 
-.controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails) {
-    //screen.lockOrientation('landscape');
+.controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails, FileUploader) {
+    screen.lockOrientation('landscape');
     var usuario = Usuario.usuario();
     var paradas = Peticiones.getParadas(usuario.grupo);
     $scope.ubicarDisponible = {};
@@ -9,6 +9,10 @@ angular.module('starter.controllers.taxista', [])
     var myMedia;
     $scope.recordImg = "./img/record.png";
     $scope.ubicadoText = "Ubicar";
+    $scope.uploader = new FileUploader({
+        url: '/administracion/file/upload'
+    });
+
     paradas.then(function (result) {
         $scope.paradas = result.paradas;
         var ubicados = result.ubicados;
@@ -27,20 +31,37 @@ angular.module('starter.controllers.taxista', [])
         }
     })
 
+
+
     $ionicLoading.show({
         template: '<i class="icon ion-looping"></i> Cargando tu posicion...'
     });
-
+    var recording = false;
     $scope.record = function () {
-        $scope.recordImg = "./img/recording.png"
-        myMedia = new Media("record.wav");
-        myMedia.startRecord();
+        if (!recording) {
+            $scope.recordImg = "./img/recording.png";
+            var introsound = new Media("./img/record.wav", function mediaSuccess() {
+                    myMedia = new Media("recorded.wav");
+                    myMedia.startRecord();
+                    recording = true;
+                },
+
+                function mediaFailure(err) {
+                    console.log("An error occurred: " + err.code);
+                },
+
+                function mediaStatus(status) {
+                    console.log("A status change occurred: " + status.code);
+                });
+
+            introsound.play();
+        } else {
+            $scope.recordImg = "./img/record.png"
+            myMedia.stopRecord();
+            recording = false;
+        }
     };
 
-    $scope.stopRecord = function () {
-        $scope.recordImg = "./img/record.png"
-        myMedia.stopRecord();
-    }
 
     $scope.prueba = function () {
         for (socio in $scope.socios) {
@@ -100,6 +121,8 @@ angular.module('starter.controllers.taxista', [])
                     borraUbicacion(1, resp.id);
                     ubica(1, resp.id);
                     $scope.socios[socio].marcador.setIcon('./img/activoicon.png');
+                    var myMedia = new Media("./img/on.wav");
+                    myMedia.play();
                     window.plugins.toast.showShortBottom("Se ha conectado el taxi nº" + resp.id,
                         function (a) {},
                         function (b) {});
@@ -187,6 +210,9 @@ angular.module('starter.controllers.taxista', [])
                 break;
             } else {
                 $scope.ubicarDisponible.disabled = true;
+                if ($scope.ubicadoText == 'Desubicar') {
+                    $scope.ubicar();
+                }
             }
         }
     }

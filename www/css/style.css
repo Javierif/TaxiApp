@@ -247,6 +247,7 @@
     height: 100%;
     position: absolute;
     background-color: #ffc900;
+    overflow-y: scroll;
 }
 
 .listadomapa li {
