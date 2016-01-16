@@ -58,19 +58,11 @@ angular.module('starter.controllers.taxista', [])
         } else {
             $scope.recordImg = "./img/record.png"
             myMedia.stopRecord();
+            myMedia.play();
             recording = false;
         }
     };
 
-
-    $scope.prueba = function () {
-        for (socio in $scope.socios) {
-            if ($scope.socios[socio].id == usuario.id) {
-                var posicion = new google.maps.LatLng(37.5710623, -1.236041);
-                $scope.socios[socio].marcador.setPosition(posicion);
-            }
-        }
-    }
 
     var borraUbicacion = function (paradaRecibida, socioRecibido) {
         for (parada in $scope.paradas) {
@@ -150,6 +142,8 @@ angular.module('starter.controllers.taxista', [])
 
     $sails.on('ubicado', function (resp) {
         console.log("SE UBICO " + JSON.stringify(resp));
+        var myMedia = new Media("./img/ubicar.wav");
+        myMedia.play();
         ubica(resp.parada, resp.socio);
     });
 
@@ -287,7 +281,7 @@ angular.module('starter.controllers.taxista', [])
                 getCurrentPosition();
             }
         }, function error(msg) {
-            alert('error al obtener geo local error ' + JSON.stringify(msg));
+            //alert('error al obtener geo local error ' + JSON.stringify(msg));
             getCurrentPosition();
         }, {
             maximumAge: 600000,
@@ -315,7 +309,7 @@ angular.module('starter.controllers.taxista', [])
         map.setCenter(posInicio);
 
         for (parada in $scope.paradas) {
-            alert("PARADA " + $scope.paradas[parada].nombre);
+            //alert("PARADA " + $scope.paradas[parada].nombre);
             if ($scope.paradas[parada].ubicados == null)
                 $scope.paradas[parada].ubicados = [];
             var posicion = new google.maps.LatLng($scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
@@ -334,7 +328,7 @@ angular.module('starter.controllers.taxista', [])
             if (distancia < 0.1) {
                 $scope.ubicarDisponible.id = $scope.paradas[parada].id;
                 $scope.ubicarDisponible.disabled = false;
-                alert("DENTRO  " + $scope.ubicarDisponible.disabled + " ID " + $scope.ubicarDisponible.id)
+                //alert("DENTRO  " + $scope.ubicarDisponible.disabled + " ID " + $scope.ubicarDisponible.id)
             } else {
                 $scope.ubicarDisponible.disabled = true;
             }
