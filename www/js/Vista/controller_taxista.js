@@ -190,24 +190,39 @@ angular.module('starter.controllers.taxista', [])
                 }
             }
             $scope.ubicadoText = "Ubicar";
-            valorarUbicacion(usuario.latitud, usuario.longitud);
+            //valorarUbicacion(usuario.latitud, usuario.longitud);
         }
     }
 
     var valorarUbicacion = function (latitud, longitud) {
+        var radio = false;
+        var limite = false;
         for (parada in $scope.paradas) {
             var distancia = calculaDistancia(latitud, longitud, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
-            console.log(" PARADA DISTANCIA: " + distancia + "NOMBRE: " + $scope.paradas[parada].nombre);
-            if (distancia < 0.1) {
-                $scope.ubicarDisponible.id = $scope.paradas[parada].id;
-                $scope.ubicarDisponible.disabled = false;
-                break;
-            } else {
-                $scope.ubicarDisponible.disabled = true;
-                if ($scope.ubicadoText == 'Desubicar') {
-                    $scope.ubicar();
+            if (distancia < 0.15) {
+                if (!radio) {
+                    radio = true;
+                    break;
                 }
             }
+            if (distancia > 0.3) {
+                if (!limite) {
+                    limite = true;
+                }
+            }
+        }
+        if (radio) {
+            $scope.ubicarDisponible.id = $scope.paradas[parada].id;
+            $scope.ubicarDisponible.disabled = false;
+        }
+        if (!radio && !limite) {
+            $scope.ubicarDisponible.disabled = true;
+            if ($scope.ubicadoText == 'Desubicar') {
+                $scope.ubicar();
+            }
+        }
+        if (limite && !radio) {
+            $scope.ubicarDisponible.disabled = true;
         }
     }
 

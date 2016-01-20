@@ -42,7 +42,6 @@ angular.module('starter.controllers', [])
 
 })
 
-
 .controller('loginCtrl', function ($scope, Peticiones, $state, $ionicLoading, Usuario, Comercios, Ofertas, $compile) {
     screen.lockOrientation('portrait');
     Usuario.loadusuario()
@@ -160,8 +159,6 @@ angular.module('starter.controllers', [])
         }
     }
 })
-
-
 
 .controller('MostradorOfertasCtrl', function ($ionicPlatform, $scope, Peticiones, $state, Ofertas, $ionicLoading, Usuario) {
     $ionicLoading.show({
