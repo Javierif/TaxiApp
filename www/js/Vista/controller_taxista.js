@@ -1,7 +1,7 @@
 angular.module('starter.controllers.taxista', [])
 
 .controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails, FileUploader) {
-    screen.lockOrientation('landscape');
+    //screen.lockOrientation('landscape');
     var usuario = Usuario.usuario();
     var paradas = Peticiones.getParadas(usuario.grupo);
     $scope.ubicarDisponible = {};
@@ -18,17 +18,26 @@ angular.module('starter.controllers.taxista', [])
         var ubicados = result.ubicados;
         for (parada in $scope.paradas) {
             if (!$scope.paradas[parada].ubicados) {
+                $scope.paradas[parada].prioridad = 0;
                 $scope.paradas[parada].ubicados = [];
             }
             for (ubicado in ubicados) {
                 if ($scope.paradas[parada].id == ubicados[ubicado].parada) {
+                    $scope.paradas[parada].prioridad += 1;
                     $scope.paradas[parada].ubicados.push(ubicados[ubicado].taxista);
                     if (ubicados[ubicado].taxista.id == usuario.id) {
                         $scope.ubicadoText = "Desubicar";
+                        if ($scope.paradas[parada].id == 0) {
+                            $scope.paradas[parada].prioridad = 10000;
+                        } else {
+                            $scope.paradas[parada].prioridad = 1000;
+                        }
+
                     }
                 }
             }
         }
+
     })
 
 
@@ -70,6 +79,7 @@ angular.module('starter.controllers.taxista', [])
                 for (ubicado in $scope.paradas[parada].ubicados) {
                     if ($scope.paradas[parada].ubicados[ubicado].id == socioRecibido) {
                         $scope.paradas[parada].ubicados.splice(ubicado, 1);
+                        $scope.paradas[parada].prioridad = $scope.paradas[parada].ubicados.length;
                     }
                 }
 
@@ -84,6 +94,11 @@ angular.module('starter.controllers.taxista', [])
                 for (socio in $scope.socios) {
                     if ($scope.socios[socio].id == socioRecibido) {
                         $scope.paradas[parada].ubicados.push($scope.socios[socio]);
+                        if ($scope.paradas[parada].id == 0) {
+                            $scope.paradas[parada].prioridad = 10000;
+                        } else {
+                            $scope.paradas[parada].prioridad = 1000;
+                        }
                     }
                 }
             }
@@ -161,16 +176,7 @@ angular.module('starter.controllers.taxista', [])
                 longitud: usuario.longitud,
                 taxista: usuario.id
             });
-
-            for (parada in $scope.paradas) {
-                if ($scope.paradas[parada].id == $scope.ubicarDisponible.id) {
-                    for (socio in $scope.socios) {
-                        if ($scope.socios[socio].id == usuario.id) {
-                            $scope.paradas[parada].ubicados.push($scope.socios[socio]);
-                        }
-                    }
-                }
-            }
+            ubica($scope.ubicarDisponible.id, usuario.id);
             $scope.ubicadoText = "Desubicar";
 
         } else {
@@ -179,18 +185,8 @@ angular.module('starter.controllers.taxista', [])
                 taxista: usuario.id,
                 grupo: usuario.grupo
             });
-
-            for (parada in $scope.paradas) {
-                if ($scope.paradas[parada].id == $scope.ubicarDisponible.id) {
-                    for (ubicado in $scope.paradas[parada].ubicados) {
-                        if ($scope.paradas[parada].ubicados[ubicado].id == usuario.id) {
-                            $scope.paradas[parada].ubicados.splice(ubicado, 1);
-                        }
-                    }
-                }
-            }
+            borraUbicacion($scope.ubicarDisponible.id, usuario.id);
             $scope.ubicadoText = "Ubicar";
-            //valorarUbicacion(usuario.latitud, usuario.longitud);
         }
     }
 
@@ -216,6 +212,7 @@ angular.module('starter.controllers.taxista', [])
             $scope.ubicarDisponible.disabled = false;
         }
         if (!radio && !limite) {
+
             $scope.ubicarDisponible.disabled = true;
             if ($scope.ubicadoText == 'Desubicar') {
                 $scope.ubicar();

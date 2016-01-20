@@ -3,10 +3,10 @@
 
         <div id="lateral">
             <button class="button button-block button-dark" ng-click="ubicar()" ng-class="{'deshabilitado' : ubicarDisponible.disabled, 'desubicar' : ubicadoText == 'Desubicar'}">
-                {{ubicadoText}}
+                {{ubicadoText}} {{ubicarDisponible.disabled}}
             </button>
-            <div ng-repeat="parada in paradas | orderBy:['id',]'id'">
-                <h4 class="titulo">{{parada.parada}}</h4>
+            <div ng-repeat="parada in paradas | orderBy:'prioridad':true">
+                <h5 class="titulo">{{parada.parada}}</h5> prioridad {{parada.prioridad}}
                 <ul class="listadomapa">
                     <li ng-repeat="socio in parada.ubicados"><i class="ion-model-s"></i> Taxi {{socio.numerotaxi}}</li>
                 </ul>
