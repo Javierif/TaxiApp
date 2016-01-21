@@ -2,13 +2,13 @@
     <ion-content scroll="false">
 
         <div id="lateral">
-            <button class="button button-block button-dark" ng-click="ubicar()" ng-class="{'deshabilitado' : ubicarDisponible.disabled, 'desubicar' : ubicadoText == 'Desubicar'}">
-                {{ubicadoText}} {{ubicarDisponible.disabled}}
+            <button class="button button-block button-dark" ng-class="{'deshabilitado' : ubicarDisponible.disabled, 'desubicar' : ubicadoText == 'Desubicar'}">
+                {{ubicadoText}}
             </button>
             <div ng-repeat="parada in paradas | orderBy:'prioridad':true">
-                <h5 class="titulo">{{parada.parada}}</h5> prioridad {{parada.prioridad}}
+                <h5 class="titulo">{{parada.parada}}</h5>
                 <ul class="listadomapa">
-                    <li ng-repeat="socio in parada.ubicados"><i class="ion-model-s"></i> Taxi {{socio.numerotaxi}}</li>
+                    <li ng-repeat="socio in parada.ubicados"><i class="ion-model-s"></i> Taxi Nº{{socio.numerotaxi}}</li>
                 </ul>
             </div>
 
@@ -16,7 +16,7 @@
         <!-- End controls-->
         <div id="mapa"></div>
         <div id="mic">
-            <a ng-click="record()"><img ng-src="{{recordImg}}"></a>
+            <a on-hold="itemOnLongPress()" on-release="itemOnTouchEnd()"><img ng-src="{{recordImg}}"></a>
         </div>
 
     </ion-content>
