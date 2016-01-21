@@ -385,7 +385,7 @@ angular.module('starter.controllers.taxista', [])
         $sails.post('/taxista/moviendose', {
             user: usuarioId,
             grupo: grupo,
-            latitud: coords.latitud,
+            latitud: latitud,
             longitud: longitud
         });
     }
