@@ -5,14 +5,8 @@ angular.module('starter.controllers.taxista', [])
     var usuario = Usuario.usuario();
     $scope.ubicarDisponible = {};
     $scope.ubicarDisponible.disabled = true;
-    var recording = false;
-    var myMedia;
     $scope.recordImg = "./img/record.png";
     $scope.ubicadoText = "Ubicar";
-    $scope.longPress = false;
-    $scope.uploader = new FileUploader({
-        url: '/administracion/file/upload'
-    });
 
     var paradas = Peticiones.getParadas(usuario.grupo);
     paradas.then(function (result) {
@@ -46,32 +40,14 @@ angular.module('starter.controllers.taxista', [])
         template: '<i class="icon ion-looping"></i> Cargando tu posicion...'
     });
 
-    $scope.itemOnLongPress = function (id) {
-        // alert("DENTRO DE LA FUC LONG");
+    $scope.itemOnLongPress = function () {
         $scope.recordImg = "./img/recording.png";
-        var introsound = new Media("./img/record.wav", function mediaSuccess() {
-                myMedia = new Media("recorded.wav");
-                myMedia.startRecord();
-                recording = true;
-            },
-
-            function mediaFailure(err) {
-                console.log("An error occurred: " + err.code);
-            },
-
-            function mediaStatus(status) {
-                console.log("A status change occurred: " + status.code);
-            });
-
-        introsound.play();
+        record();
     }
 
-    $scope.itemOnTouchEnd = function (id) {
-        // alert("TERMINADO");
-        $scope.recordImg = "./img/record.png"
-        myMedia.stopRecord();
-        myMedia.play();
-        recording = false;
+    $scope.itemOnTouchEnd = function () {
+        $scope.recordImg = "./img/record.png";
+        endRecord();
     }
 
     $scope.ubicar = function () {
@@ -301,6 +277,13 @@ angular.module('starter.controllers.taxista', [])
 
     }
 
+    var getPhoneGapPath = function () {
+        'use strict';
+        var path = window.location.pathname;
+        var phoneGapPath = path.substring(0, path.lastIndexOf('/') + 1);
+        return phoneGapPath;
+    }
+
     var calculaDistancia = function (lat1, lon1, lat2, lon2) {
         var radlat1 = Math.PI * lat1 / 180
         var radlat2 = Math.PI * lat2 / 180
@@ -407,4 +390,72 @@ angular.module('starter.controllers.taxista', [])
             grupo: grupo
         });
     }
+
+
+    //Prepares File System for Audio Recording
+    audioRecord = 'recorded.wav';
+    var myMedia;
+    var fileURL;
+
+    $scope.$on('$ionicView.enter', function (event, data) {
+        alert("DENTRO");
+        window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, gotFS(), fail());
+    });
+
+    var gotFS = function (fileSystem) {
+        fileSystem.root.getFile(audioRecord, {
+            create: true,
+            exclusive: false
+        }, gotFileEntry(), fail());
+    }
+
+    var gotFileEntry = function (fileEntry) {
+        fileURL = fileEntry.toURL();
+    }
+
+    var win = function (r) {
+        alert("WIN" + JSON.stringify(r));
+        console.log("Code = " + r.responseCode);
+        console.log("Response = " + r.response);
+        console.log("Sent = " + r.bytesSent);
+    }
+
+    var fail = function (error) {
+        alert("FAIL " + error.code + "SORU " + error.source + " tar " + error.target);
+        console.log("upload error source " + error.source);
+        console.log("upload error target " + error.target);
+    }
+
+    var record = function () {
+
+        var introsound = new Media("./img/record.wav", function mediaSuccess() {
+                myMedia = new Media("cdvfile://localhost/persistent/" + audioRecord);
+                myMedia.startRecord();
+            },
+
+            function mediaFailure(err) {
+                console.log("An error occurred: " + err.code);
+            },
+
+            function mediaStatus(status) {
+                console.log("A status change occurred: " + status.code);
+            });
+
+        introsound.play();
+    }
+
+    var endRecord = function () {
+        myMedia.stopRecord();
+        myMedia.play();
+
+        var options = new FileUploadOptions();
+        options.fileKey = "file";
+        options.fileName = "recordupload.wav";
+        options.mimeType = "audio/wav";
+
+        var ft = new FileTransfer();
+        alert("FILE URL " + myMedia.src);
+        ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/taxista/record"), win, fail, options);
+    }
+
 })

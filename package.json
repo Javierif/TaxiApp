@@ -21,7 +21,8 @@
     "net.yoik.cordova.plugins.screenorientation",
     "https://github.com/apache/cordova-plugin-file",
     "https://github.com/apache/cordova-plugin-media-capture",
-    "https://github.com/cogitor/PhoneGap-OrientationLock.git"
+    "https://github.com/cogitor/PhoneGap-OrientationLock.git",
+    "https://github.com/apache/cordova-plugin-file-transfer"
   ],
   "cordovaPlatforms": [
     "ios"

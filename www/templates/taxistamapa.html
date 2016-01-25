@@ -4,7 +4,7 @@
         <div id="lateral">
             <button class="button button-block button-dark" ng-class="{'deshabilitado' : ubicarDisponible.disabled, 'desubicar' : ubicadoText == 'Desubicar'}" ng-click="ubicar()" bo-text="ubicadoText">
             </button>
-            <div ng-repeat="parada in paradas | orderBy:'prioridad':true">
+            <div ng-repeat="parada in paradas track by parada.id | orderBy:'prioridad':true">
                 <h5 class="titulo" bo-text="parada.parada"></h5>
                 <ul class="listadomapa">
                     <li ng-repeat="socio in parada.ubicados"><i class="ion-model-s"></i> Taxi Nº{{socio.numerotaxi}}</li>
@@ -17,6 +17,5 @@
         <div id="mic">
             <a on-hold="itemOnLongPress()" on-release="itemOnTouchEnd()"><img ng-src="{{recordImg}}"></a>
         </div>
-
     </ion-content>
 </ion-view>
