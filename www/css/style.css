@@ -187,7 +187,14 @@
     border-radius: 15px;
 }
 
-#login_contenedor button {
+#inicioinit button {
+    font-weight: bold;
+    font-size: 1.3em;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+}
+
+#taxista_login button {
     top: 30px;
     width: 49%;
     -moz-border-radius: 5px;

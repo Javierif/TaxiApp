@@ -1,0 +1,21 @@
+<ion-view class="navbarheader" view-title="Listado de ofertas" hide-nav-bar="true">
+    <ion-content bindonce scroll="false">
+
+        <div id="lateral">
+            <button class="button button-block button-dark" ng-class="{'deshabilitado' : ubicarDisponible.disabled, 'desubicar' : ubicadoText == 'Desubicar'}" ng-click="ubicar()" bo-text="ubicadoText">
+            </button>
+            <div ng-repeat="parada in paradas track by parada.id | orderBy:'prioridad':true">
+                <h5 class="titulo" bo-text="parada.parada"></h5>
+                <ul class="listadomapa">
+                    <li ng-repeat="socio in parada.ubicados"><i class="ion-model-s"></i> Taxi Nº{{socio.numerotaxi}}</li>
+                </ul>
+            </div>
+
+        </div>
+        <!-- End controls-->
+        <div id="mapa"></div>
+        <div id="mic">
+            <a on-hold="itemOnLongPress()" on-release="itemOnTouchEnd()"><img ng-src="{{recordImg}}"></a>
+        </div>
+    </ion-content>
+</ion-view>

@@ -44,6 +44,7 @@ angular.module('starter.controllers', [])
 
 .controller('loginCtrl', function ($scope, Peticiones, $state, $ionicLoading, Usuario, Comercios, Ofertas, $compile) {
     //screen.lockOrientation('portrait');
+    $scope.taxista = false;
     Usuario.loadusuario()
     var usuario = Usuario.usuario();
 
@@ -64,7 +65,6 @@ angular.module('starter.controllers', [])
     $scope.stop = function () {
         myMedia.stopRecord();
     }
-
 
     $scope.login = function (email, password) {
         $ionicLoading.show({
