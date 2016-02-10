@@ -1,44 +1,32 @@
 angular.module('starter.controllers.taxista', [])
 
-.controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails, FileUploader) {
+.controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails, FileUploader, $q, MapaInstancia, MapaControl) {
     //screen.lockOrientation('landscape');
     var usuario = Usuario.usuario();
     $scope.ubicarDisponible = {};
     $scope.ubicarDisponible.disabled = true;
     $scope.recordImg = "./img/record.png";
-    $scope.ubicadoText = "Ubicar";
+    $scope.ubicadoText;
 
-    var paradas = Peticiones.getParadas(usuario.grupo);
-    paradas.then(function (result) {
-        $scope.paradas = result.paradas;
-        var ubicados = result.ubicados;
-        for (parada in $scope.paradas) {
-            if (!$scope.paradas[parada].ubicados) {
-                $scope.paradas[parada].prioridad = 0;
-                $scope.paradas[parada].ubicados = [];
-            }
-            for (ubicado in ubicados) {
-                if ($scope.paradas[parada].id == ubicados[ubicado].parada) {
-                    $scope.paradas[parada].prioridad += 1;
-                    $scope.paradas[parada].ubicados.push(ubicados[ubicado].taxista);
-                    if (ubicados[ubicado].taxista.id == usuario.id) {
-                        $scope.ubicadoText = "Desubicar";
-                        if ($scope.paradas[parada].id == 0) {
-                            $scope.paradas[parada].prioridad = 10000;
-                        } else {
-                            $scope.paradas[parada].prioridad = 1000;
-                        }
+    var initTaxista = function () {
+        $ionicLoading.show({
+            template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Obteniendo el mapa…'
+        });
+        inicializaMapa();
+        google.maps.event.addListenerOnce($scope.map, 'idle', function () {
+            MapaInstancia.cargaMapa(usuario, $scope.map).then(function () {
+                $scope.paradas = MapaInstancia.getParadas();
+                console.log("CARGADO DE insta parada" + JSON.stringify($scope.paradas));
+                $scope.socios = MapaInstancia.getSocios();
+                $scope.ubicadoText = MapaInstancia.getUbicadoText();
+                getCurrentPosition();
+                MapaControl.borraUbicacion($scope.paradas, $scope.socios, 1, usuario.id);
+                MapaControl.ubica($scope.paradas, $scope.socios, 1, usuario.id);
+            });
+        });
+    }
 
-                    }
-                }
-            }
-        }
 
-    })
-
-    $ionicLoading.show({
-        template: '<i class="icon ion-looping"></i> Cargando tu posicion...'
-    });
 
     $scope.itemOnLongPress = function () {
         $scope.recordImg = "./img/recording.png";
@@ -53,48 +41,16 @@ angular.module('starter.controllers.taxista', [])
     $scope.ubicar = function () {
         if ($scope.ubicadoText == "Ubicar") {
             postUbicar($scope.ubicarDisponible.id, usuario.grupo, usuario.latitud, usuario.longitud, usuario.id)
-            ubica($scope.ubicarDisponible.id, usuario.id);
+            MapaControl.ubica($scope.paradas, $scope.socios, $scope.ubicarDisponible.id, usuario.id);
             $scope.ubicadoText = "Desubicar";
 
         } else {
             postDesUbicar($scope.ubicarDisponible.id, usuario.id, usuario.grupo);
-            borraUbicacion($scope.ubicarDisponible.id, usuario.id);
+            MapaControl.borraUbicacion($scope.paradas, $scope.socios, $scope.ubicarDisponible.id, usuario.id);
             $scope.ubicadoText = "Ubicar";
         }
     }
 
-
-    var borraUbicacion = function (paradaRecibida, socioRecibido) {
-        for (parada in $scope.paradas) {
-            if ($scope.paradas[parada].id == paradaRecibida) {
-                for (ubicado in $scope.paradas[parada].ubicados) {
-                    if ($scope.paradas[parada].ubicados[ubicado].id == socioRecibido) {
-                        $scope.paradas[parada].ubicados.splice(ubicado, 1);
-                        $scope.paradas[parada].prioridad = $scope.paradas[parada].ubicados.length;
-                    }
-                }
-
-            }
-        }
-    }
-
-    var ubica = function (paradaRecibida, socioRecibido) {
-        for (parada in $scope.paradas) {
-            console.log(" UBICA PARa " + $scope.paradas[parada].id + " Y OTRO " + paradaRecibida);
-            if ($scope.paradas[parada].id == paradaRecibida) {
-                for (socio in $scope.socios) {
-                    if ($scope.socios[socio].id == socioRecibido) {
-                        $scope.paradas[parada].ubicados.push($scope.socios[socio]);
-                        if ($scope.paradas[parada].id == 0) {
-                            $scope.paradas[parada].prioridad = 10000;
-                        } else {
-                            $scope.paradas[parada].prioridad = 1000;
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     var valorarUbicacion = function (latitud, longitud) {
         var radio = false;
@@ -118,7 +74,6 @@ angular.module('starter.controllers.taxista', [])
             $scope.ubicarDisponible.disabled = false;
         }
         if (!radio && !limite) {
-
             $scope.ubicarDisponible.disabled = true;
             if ($scope.ubicadoText == 'Desubicar') {
                 $scope.ubicar();
@@ -129,61 +84,43 @@ angular.module('starter.controllers.taxista', [])
         }
     }
 
-    window.navigator.geolocation.watchPosition(function (location, error, options) {
-            if (location.coords.accuracy < 150) {
-                postMoviendose(usuario.id, usuario.grupo, location.coords.latitude, location.coords.longitude);
-                for (socio in $scope.socios) {
-                    if ($scope.socios[socio].id == usuario.id) {
-                        usuario.latitud = location.coords.latitude;
-                        usuario.longitud = location.coords.longitude;
+    var muevete = function (latitud, longitud) {
+        postMoviendose(usuario.id, usuario.grupo, latitud, longitud);
+        usuario.latitud = latitud;
+        usuario.longitud = longitud;
+        var posicion = new google.maps.LatLng(latitud, longitud);
+        $scope.socios[usuario.posicion].marcador.setPosition(posicion);
+        $scope.map.panTo(posicion);
+        valorarUbicacion(latitud, longitud);
+    }
 
-                        var posicion = new google.maps.LatLng(location.coords.latitude, location.coords.longitude);
-                        $scope.socios[socio].marcador.setPosition(posicion);
-                        //alert("MOVIENDO " + location.coords.latitude + " Y LONG " + location.coords.longitude)
-                        $scope.map.panTo(posicion);
-                        valorarUbicacion(location.coords.latitude, location.coords.longitude);
 
-                        break;
-                    }
+    var observaPosicion = function () {
+        window.navigator.geolocation.watchPosition(function (location, error, options) {
+                if (location.coords.accuracy < 150) {
+                    muevete(location.coords.latitude, location.coords.longitude);
                 }
-            }
-        },
-        function error(msg) {}, {
-            maximumAge: 600000,
-            timeout: 5000,
-            enableHighAccuracy: true
-        });
+            },
+            function error(msg) {}, {
+                maximumAge: 600000,
+                timeout: 5000,
+                enableHighAccuracy: true
+            });
+    }
 
     var getCurrentPosition = function () {
+        $ionicLoading.show({
+            template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Obteniendo tu geoposición…'
+        });
         window.navigator.geolocation.getCurrentPosition(function (location) {
             console.log("Accuracy current" + location.coords.accuracy);
+            alert("accuary" + location.coords.accuracy);
             //bajarlo a 150
             if (location.coords.accuracy < 150) {
-                postMoviendose(usuario.id, usuario.grupo, location.coords.latitude, location.coords.longitude);
-                var socios = Peticiones.getSocios(usuario.grupo);
-                socios.then(function (result) {
-                    for (socio in result) {
-                        if (result[socio].puestolocal != null) {
-                            for (parada in $scope.paradas) {
-                                if ($scope.paradas[parada].id == result[socio].paralocal) {
-                                    if ($scope.paradas[parada].ubicados == null)
-                                        $scope.paradas[parada].ubicados = [];
-                                    $scope.paradas[parada].ubicados.push(result[socio]);
-                                    break;
-                                }
-
-                            }
-                        }
-                        if (result[socio].id == usuario.id) {
-                            usuario.latitud = location.coords.latitude;
-                            usuario.longitud = location.coords.longitude;
-                            result[socio].latitud = location.coords.latitude;
-                            result[socio].longitud = location.coords.longitude;
-                        }
-                    }
-                    $scope.socios = result;
-                    inicializa(location.coords.latitude, location.coords.longitude);
-                });
+                muevete(location.coords.latitude, location.coords.longitude);
+                $ionicLoading.hide();
+                //comenzamos a observar si te mueves
+                observaPosicion();
             } else {
                 getCurrentPosition();
             }
@@ -197,92 +134,18 @@ angular.module('starter.controllers.taxista', [])
         });
     }
 
-    var inicializa = function (latitude, longitude) {
-        $ionicLoading.hide();
-        borraUbicacion(1, usuario.id);
-        ubica(1, usuario.id);
-        posInicio = new google.maps.LatLng(latitude, longitude);
 
+    var inicializaMapa = function () {
         var mapOptions = {
-            streetViewControl: true,
-            center: posInicio,
+            streetViewControl: false,
             zoom: 15,
             mapTypeId: google.maps.MapTypeId.TERRAIN
         };
-
-        map = new google.maps.Map(document.getElementById("mapa"),
+        $scope.map = new google.maps.Map(document.getElementById("mapa"),
             mapOptions);
-        console.log("POS INICIO ", posInicio);
-        map.setCenter(posInicio);
-
-        for (parada in $scope.paradas) {
-            //alert("PARADA " + $scope.paradas[parada].nombre);
-            if ($scope.paradas[parada].ubicados == null)
-                $scope.paradas[parada].ubicados = [];
-            var posicion = new google.maps.LatLng($scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
-            var cityCircle = new google.maps.Circle({
-                strokeColor: '#2E9AFE',
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: '#2E9AFE',
-                fillOpacity: 0.35,
-                map: map,
-                center: posicion,
-                radius: 100
-            });
-
-            var distancia = calculaDistancia(latitude, longitude, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
-            if (distancia < 0.1) {
-                $scope.ubicarDisponible.id = $scope.paradas[parada].id;
-                $scope.ubicarDisponible.disabled = false;
-                //alert("DENTRO  " + $scope.ubicarDisponible.disabled + " ID " + $scope.ubicarDisponible.id)
-            } else {
-                $scope.ubicarDisponible.disabled = true;
-            }
-
-        }
-
-        for (socio in $scope.socios) {
-            console.log("SOCIO ", $scope.socios[socio].latitud, $scope.socios[socio].longitud)
-            var posicion = new google.maps.LatLng($scope.socios[socio].latitud, $scope.socios[socio].longitud);
-
-            var contentString = '<strong>Taxi nº: </strong> ' +
-                $scope.socios[socio].numerotaxi;
-
-
-            var infowindow = new google.maps.InfoWindow({
-                content: contentString
-            });
-            var icon;
-            if ($scope.socios[socio].conectado || $scope.socios[socio].id == usuario.id) {
-                icon = './img/activoicon.png'
-            } else {
-                icon = './img/desconectadoicon.png'
-            }
-            var marcador = new google.maps.Marker({
-                position: posicion,
-                icon: icon,
-                map: map
-            });
-            $scope.socios[socio].marcador = marcador;
-            marcador.addListener('click', function (marker) {
-                infowindow.open(map, $scope.socios[socio].marcador);
-            });
-
-            infowindow.open(map, marcador);
-        }
-        console.log("EL CENTRO ES1  ", map);
-        map.setCenter(posInicio);
-        $scope.map = map;
-
+        return $scope.map;
     }
 
-    var getPhoneGapPath = function () {
-        'use strict';
-        var path = window.location.pathname;
-        var phoneGapPath = path.substring(0, path.lastIndexOf('/') + 1);
-        return phoneGapPath;
-    }
 
     var calculaDistancia = function (lat1, lon1, lat2, lon2) {
         var radlat1 = Math.PI * lat1 / 180
@@ -300,7 +163,6 @@ angular.module('starter.controllers.taxista', [])
         return dist
     }
 
-    getCurrentPosition();
 
     $sails.get("/taxista/conectarse/" + usuario.id + "/" + usuario.grupo);
 
@@ -395,23 +257,7 @@ angular.module('starter.controllers.taxista', [])
     //Prepares File System for Audio Recording
     audioRecord = 'recorded.wav';
     var myMedia;
-    var fileURL;
-
-    $scope.$on('$ionicView.enter', function (event, data) {
-        alert("DENTRO");
-        window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, gotFS(), fail());
-    });
-
-    var gotFS = function (fileSystem) {
-        fileSystem.root.getFile(audioRecord, {
-            create: true,
-            exclusive: false
-        }, gotFileEntry(), fail());
-    }
-
-    var gotFileEntry = function (fileEntry) {
-        fileURL = fileEntry.toURL();
-    }
+    var urlfilesystem = false;
 
     var win = function (r) {
         alert("WIN" + JSON.stringify(r));
@@ -429,8 +275,26 @@ angular.module('starter.controllers.taxista', [])
     var record = function () {
 
         var introsound = new Media("./img/record.wav", function mediaSuccess() {
-                myMedia = new Media("cdvfile://localhost/persistent/" + audioRecord);
-                myMedia.startRecord();
+                if (!urlfilesystem) {
+                    window.requestFileSystem(
+                        LocalFileSystem.TEMPORARY,
+                        0,
+                        function (fileSystem) {
+                            urlfilesystem = fileSystem.root.toURL();
+                            /* hohohla */
+                            urlfilesystem = urlfilesystem.slice(7);
+                            myMedia = new Media(urlfilesystem + audioRecord);
+                            myMedia.startRecord();
+                        },
+                        function (error) {
+                            alert('Error getting file system');
+                        }
+                    );
+                } else {
+                    myMedia = new Media(urlfilesystem + audioRecord);
+                    myMedia.startRecord();
+
+                }
             },
 
             function mediaFailure(err) {
@@ -449,13 +313,18 @@ angular.module('starter.controllers.taxista', [])
         myMedia.play();
 
         var options = new FileUploadOptions();
-        options.fileKey = "file";
-        options.fileName = "recordupload.wav";
-        options.mimeType = "audio/wav";
+        options.chunkedMode = false;
 
+        options.headers = {
+            Connection: "close"
+        };
+        options.fileKey = "file";
+        options.fileName = audioRecord;
+        options.mimeType = "audio/wav";
         var ft = new FileTransfer();
-        alert("FILE URL " + myMedia.src);
         ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/taxista/record"), win, fail, options);
     }
 
+
+    initTaxista();
 })
