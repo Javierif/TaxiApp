@@ -16,7 +16,6 @@ angular.module('starter.controllers.taxista', [])
         google.maps.event.addListenerOnce($scope.map, 'idle', function () {
             MapaInstancia.cargaMapa(usuario, $scope.map).then(function () {
                 $scope.paradas = MapaInstancia.getParadas();
-                console.log("CARGADO DE insta parada" + JSON.stringify($scope.paradas));
                 $scope.socios = MapaInstancia.getSocios();
                 $scope.ubicadoText = MapaInstancia.getUbicadoText();
                 getCurrentPosition();
@@ -113,8 +112,6 @@ angular.module('starter.controllers.taxista', [])
             template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Obteniendo tu geoposición…'
         });
         window.navigator.geolocation.getCurrentPosition(function (location) {
-            console.log("Accuracy current" + location.coords.accuracy);
-            alert("accuary" + location.coords.accuracy);
             //bajarlo a 150
             if (location.coords.accuracy < 150) {
                 muevete(location.coords.latitude, location.coords.longitude);
@@ -167,7 +164,6 @@ angular.module('starter.controllers.taxista', [])
     $sails.get("/taxista/conectarse/" + usuario.id + "/" + usuario.grupo);
 
     $sails.on("Web_Usuario", function (resp) {
-        console.log("RECIBI ", resp);
         for (socio in $scope.socios) {
             if ($scope.socios[socio].id == resp.data.user) {
                 var posicion = new google.maps.LatLng(resp.data.latitud, resp.data.longitud);
@@ -179,13 +175,12 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $sails.on('conexion', function (resp) {
-        console.log("SE CONECTO ALGUIEN");
         for (socio in $scope.socios) {
             if (resp.id == $scope.socios[socio].id) {
                 $scope.socios[socio].conectado = resp.conectado;
                 if (resp.conectado) {
-                    borraUbicacion(1, resp.id);
-                    ubica(1, resp.id);
+                    MapaControl.borraUbicacion($scope.paradas, $scope.socios, 1, resp.id);
+                    MapaControl.ubica($scope.paradas, $scope.socios, 1, resp.id);
                     $scope.socios[socio].marcador.setIcon('./img/activoicon.png');
                     var myMedia = new Media("./img/on.wav");
                     myMedia.play();
@@ -193,7 +188,7 @@ angular.module('starter.controllers.taxista', [])
                         function (a) {},
                         function (b) {});
                 } else {
-                    borraUbicacion(1, resp.id);
+                    MapaControl.borraUbicacion($scope.paradas, $scope.socios, 1, resp.id);
                     $scope.socios[socio].marcador.setIcon('./img/desconectadoicon.png');
                     window.plugins.toast.showShortBottom("Se ha desconectado el taxi nº" + resp.id,
                         function (a) {},
@@ -204,7 +199,6 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $sails.on('movimiento', function (resp) {
-        console.log("RECIBI ", resp);
         for (socio in $scope.socios) {
             if ($scope.socios[socio].id == resp.user) {
                 var posicion = new google.maps.LatLng(resp.latitud, resp.longitud);
@@ -215,15 +209,13 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $sails.on('ubicado', function (resp) {
-        console.log("SE UBICO " + JSON.stringify(resp));
         var myMedia = new Media("./img/ubicar.wav");
         myMedia.play();
-        ubica(resp.parada, resp.socio);
+        MapaControl.ubica($scope.paradas, $scope.socios, resp.parada, resp.socio);
     });
 
     $sails.on('desubicar', function (resp) {
-        console.log("DESUBICANDO A " + JSON.stringify(resp));
-        borraUbicacion(resp.parada, resp.socio);
+        MapaControl.borraUbicacion($scope.paradas, $scope.socios, resp.parada, resp.socio);
     });
 
     var postMoviendose = function (usuarioId, grupo, latitud, longitud) {
