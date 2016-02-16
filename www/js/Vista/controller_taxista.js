@@ -1,12 +1,51 @@
 angular.module('starter.controllers.taxista', [])
 
-.controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails, FileUploader, $q, MapaInstancia, MapaControl) {
+.controller('TaxistaCtrl', function ($scope, MapaInstancia) {
+    $scope.paradas = MapaInstancia.getParadas();
+    $scope.socios = MapaInstancia.getSocios();
+    $scope.ubicadoText = MapaInstancia.getUbicadoText();
+
+    $scope.$watch(function () {
+        return MapaInstancia.getParadas();
+    }, function (newValue, oldValue) {
+        if (newValue !== oldValue) $scope.paradas = newValue;
+    });
+
+    $scope.$watch(function () {
+        return MapaInstancia.getSocios();
+    }, function (newValue, oldValue) {
+        if (newValue !== oldValue) $scope.socios = newValue;
+    });
+
+    $scope.$watch(function () {
+        return MapaInstancia.getUbicadoText();
+    }, function (newValue, oldValue) {
+        if (newValue !== oldValue) $scope.ubicadoText = newValue;
+    });
+})
+
+.controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails, FileUploader, $q, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal) {
     //screen.lockOrientation('landscape');
     var usuario = Usuario.usuario();
     $scope.ubicarDisponible = {};
     $scope.ubicarDisponible.disabled = true;
     $scope.recordImg = "./img/record.png";
     $scope.ubicadoText;
+
+    $scope.toggleLeft = function () {
+        $ionicSideMenuDelegate.toggleLeft();
+    };
+
+
+    // Load the modal from the given template URL
+    $ionicModal.fromTemplateUrl('registro.html', function ($ionicModal) {
+        $scope.modal = $ionicModal;
+    }, {
+        // Use our scope for the scope of the modal to keep it simple
+        scope: $scope,
+        // The animation we want to use for the modal entrance
+        animation: 'slide-in-right'
+    });
 
     var initTaxista = function () {
         $ionicLoading.show({
@@ -136,7 +175,8 @@ angular.module('starter.controllers.taxista', [])
         var mapOptions = {
             streetViewControl: false,
             zoom: 15,
-            mapTypeId: google.maps.MapTypeId.TERRAIN
+            mapTypeId: google.maps.MapTypeId.TERRAIN,
+            disableDefaultUI: true
         };
         $scope.map = new google.maps.Map(document.getElementById("mapa"),
             mapOptions);

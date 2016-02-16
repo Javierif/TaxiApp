@@ -159,6 +159,7 @@
     width: 100%;
     min-width: 100%;
     height: auto;
+    background: #FFC900;
 }
 
 .my-menu .item,
@@ -244,7 +245,7 @@
 
 #mapa {
     height: 100%;
-    width: 80%;
+    width: 100%;
     position: absolute;
     right: 0px;
 }
@@ -487,12 +488,66 @@
     color: white;
 }
 
+.row {
+    margin-right: 0px !important;
+    margin-left: 0px !important;
+}
+
+.radius {
+    border-radius: 5px;
+}
+
+.ubicacion {
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+    margin-left: -5px !important;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    width: 80%;
+}
+
+.head {
+    margin-top: 10px;
+}
+
+.head {
+    position: absolute;
+    z-index: 9999;
+}
+
+.ubicacionspace {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
+
+.ubicacionicon {
+    width: 19%;
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
+    min-width: 5px !important;
+}
+
+#navbutton {
+    top: 10px;
+    left: 10px;
+    position: absolute;
+    text-align: center;
+}
+
 #mic {
     bottom: 10px;
     position: absolute;
-    width: 80%;
-    left: 20%;
     text-align: center;
+    padding: 15px;
+}
+
+.paradaheader {
+    background: #FFF0B8 !important;
+}
+
+#mic button {
+    border-radius: 15px;
+    font-size: 2em;
 }
 
 #mic a>img {

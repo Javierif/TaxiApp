@@ -1,51 +1,11 @@
 angular.module('starter.controllers', [])
 
-.controller('AppCtrl', function ($scope, $ionicModal, $timeout, Usuario, $state) {
-    // Form data for the login modal
-    $scope.loginData = {};
-
-    // Create the login modal that we will use later
-    $ionicModal.fromTemplateUrl('templates/login.html', {
-        scope: $scope
-    }).then(function (modal) {
-        $scope.modal = modal;
-    });
-
-    // Triggered in the login modal to close it
-    $scope.closeLogin = function () {
-        $scope.modal.hide();
-    };
-    var usuario = Usuario.usuario();
-
-    if (usuario.email)
-        Usuario.setEstado("Perfil");
-    $scope.log = Usuario.getEstado();
-    // Open the login modal
-    $scope.login = function (layout) {
-        var usuario = Usuario.usuario();
-        if (!usuario.email) {
-            $state.go("app.login")
-        } else {
-            switch (layout) {
-            case 0:
-                $state.go("app.perfil")
-                break;
-            case 1:
-                $state.go("app.mifarmacia")
-                break;
-            case 2:
-                $state.go("app.reservas")
-            }
-        }
-
-    };
-
-})
-
 .controller('loginCtrl', function ($scope, Peticiones, $state, $ionicLoading, Usuario, Comercios, Ofertas, $compile) {
     //screen.lockOrientation('portrait');
     $scope.taxista = false;
     Usuario.loadusuario()
+
+
     var usuario = Usuario.usuario();
 
     $scope.registro = function () {
@@ -90,7 +50,7 @@ angular.module('starter.controllers', [])
                     Usuario.set('grupo', result.grupo);
                     Usuario.saveusuario();
                     console.log(Usuario.usuario());
-                    $state.go("app.mapaTaxista");
+                    $state.go("taxista.mapaTaxista");
                 } else {
                     window.plugins.toast.showShortBottom(result.message,
                         function (a) {},
