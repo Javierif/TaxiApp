@@ -9,14 +9,20 @@ angular.module('starter.servicies_peticiones', [])
         PARADA: 'parada',
         LATITUD: 'latitud',
         LONGITUD: 'longitud',
-        TAXISTA: 'taxista'
+        TAXISTA: 'taxista',
+        NOMBRE: 'nombre',
+        APELLIDOS: 'apellidos',
+        SPAM: 'spam',
+        TELEFONO: 'telefono'
     }
 
     var urls = {
         URL: "http://taxialcantarilla.es",
         LOGIN: '/login',
+        CHECKCORREO: '/checkcorreo',
         GETSOCIOS: "/taxista/getSocios/",
-        GETPARADAS: "/taxista/getParadas/"
+        GETPARADAS: "/taxista/getParadas/",
+        REGISTRO: '/registro'
     }
     return {
         allTaxista: function () {
@@ -64,6 +70,36 @@ angular.module('starter.servicies_peticiones', [])
                 }).error(function (error) {
                     console.log(error);
                 });
+            return deferred.promise;
+        },
+        compruebaCorreo: function (correo) {
+            var urls = server_constantes.allUrls();
+            var constante = server_constantes.allTaxista();
+            var peticionjson = {};
+            peticionjson[constante.EMAIL] = correo;
+            var deferred = $q.defer();
+            console.log(" URL " + urls.URL + " checkcorreo " + urls.CHECKCORREO);
+            $http.post(urls.URL + urls.CHECKCORREO, peticionjson)
+                .success(function (respuesta) {
+                    deferred.resolve(respuesta);
+                }).error(function (error) {});
+            return deferred.promise;
+        },
+        registro: function (nombre, apellidos, correo, password, spam, telefono) {
+            var urls = server_constantes.allUrls();
+            var constante = server_constantes.allTaxista();
+            var peticionjson = {};
+            peticionjson[constante.NOMBRE] = nombre;
+            peticionjson[constante.APELLIDOS] = apellidos;
+            peticionjson[constante.SPAM] = spam;
+            peticionjson[constante.PASSWORD] = password;
+            peticionjson[constante.TELEFONO] = telefono;
+            peticionjson[constante.EMAIL] = correo;
+            var deferred = $q.defer();
+            $http.post(urls.URL + urls.REGISTRO, peticionjson)
+                .success(function (respuesta) {
+                    deferred.resolve(respuesta);
+                }).error(function (error) {});
             return deferred.promise;
         }
     }

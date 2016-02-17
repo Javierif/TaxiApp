@@ -4,7 +4,23 @@
 }
 
 #login_contenedor > img {
+    max-width: 100%;
     width: 100%;
+    max-height: 50%;
+}
+
+.centertext {
+    text-align: center;
+}
+
+.spam {
+    font-size: 0.8em;
+}
+
+.registro {
+    padding: 15px;
+    background: white;
+    border-radius: 5px;
 }
 
 #container {
@@ -50,6 +66,25 @@
 
 #contenedormapa {
     height: 300px;
+}
+
+
+/* animation time */
+.ng-enter,
+.ng-leave {
+    transition: 1.0s linear;
+}
+
+.ng-leave.ng-leave-active,
+.ng-enter {
+    opacity: 0;
+    height: 0px;
+}
+
+.ng-enter.ng-enter-active,
+.ng-leave {
+    opacity: 1;
+    height: 100px;
 }
 
 .tabs-top > .tabs,
@@ -128,9 +163,31 @@
     cursor: default !important;
 }
 
+
+/* when hiding the picture */
+
+.ng-hide-add {
+    animation: 0.5s fadeIn ease;
+}
+
+
+/* when showing the picture */
+
+.ng-hide-remove {
+    animation: 0.5s fadeInUpBig ease;
+}
+
 .textbox {
     position: relative;
     top: 30px;
+    padding-left: 5px;
+    width: 100%;
+    margin-bottom: 15px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.registrobox {
     padding-left: 5px;
     width: 100%;
     margin-bottom: 15px;
@@ -183,7 +240,7 @@
     padding-left: 2%;
     padding-right: 2%;
     padding-top: 3em;
-    height: 140px;
+    height: 100%;
     -moz-border-radius: 15px;
     border-radius: 15px;
 }
@@ -671,8 +728,6 @@
     /* inicio*/
     /* login */
     #login_contenedor button {
-        top: 30px;
-        width: 49%;
         -moz-border-radius: 5px;
         border-radius: 5px;
     }

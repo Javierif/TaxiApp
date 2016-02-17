@@ -4,31 +4,111 @@ angular.module('starter.controllers', [])
     //screen.lockOrientation('portrait');
     $scope.taxista = false;
     Usuario.loadusuario()
-
+    $scope.error = {
+        id: "noerror"
+    }
+    $scope.inicio = true;
+    $scope.seecionlogin = false;
+    $scope.seccionregistro = false;
+    $scope.registroid = {
+        id: 1
+    };
 
     var usuario = Usuario.usuario();
 
-    $scope.registro = function () {
-        $state.go("app.registro");
+    var lanzaerror = function (message) {
+        $scope.error.id = "error";
+        console.log("Message " + message);
+        // window.plugins.toast.showShortBottom(message,
+        //     function (a) {},
+        //      function (b) {});
     }
 
-    var myMedia;
-    $scope.record = function () {
-        myMedia = new Media("record.wav");
-        myMedia.startRecord();
-    };
+    $scope.checkstep = function (step, data1, data2) {
+        switch (step) {
+        case 1:
+            if (!data1) {
+                lanzaerror("Introduce tu nombre para continuar");
+            } else {
+                $scope.registroid.id = $scope.registroid.id + 1;
+            }
+            break;
+        case 2:
 
-    $scope.play = function () {
-        myMedia.play();
-    };
+            if (!data1) {
+                lanzaerror('El correo es un dato necesario para tu cuenta.')
+            } else if (!data2) {
+                lanzaerror('¡Necesitas poner una contraseña!')
+            } else {
+                $ionicLoading.show({
+                    template: '<ion-spinner icon="circles" class="spinner-energized"></ion-spinner><br>  Comprobando el correo...'
+                });
+                var checkCorreo = Peticiones.compruebaCorreo(data1);
+                checkCorreo.then(function (result) {
+                    $ionicLoading.hide();
+                    console.log("ERROR " + JSON.stringify(result));
+                    if (!result.error) {
+                        $scope.registroid.id = $scope.registroid.id + 1;
+                    } else {
+                        lanzaerror('Este correo ya esta registrado.')
+                    }
+                })
+            }
 
-    $scope.stop = function () {
-        myMedia.stopRecord();
+            break;
+        case 3:
+            if (!$scope.registro.telefono) {
+                lanzaerror('El taxista necesita tu numero para poder contactar por cualquier problema.')
+            } else {
+                $ionicLoading.show({
+                    template: '<ion-spinner icon="circles" class="spinner-energized"></ion-spinner><br>  Registrandote en la base de datos...'
+                });
+                var registro = Peticiones.registro($scope.registro.nombre, $scope.registro.apellidos, $scope.registro.correo, $scope.registro.password, $scope.registro.spam, $scope.registro.telefono);
+                registro.then(function (result) {
+                    $ionicLoading.hide();
+                    if (!result.error) {
+                        var user = result.usuario;
+                        Usuario.borrarusuario();
+                        Usuario.set('id', user.id);
+                        Usuario.set('email', user.email);
+                        Usuario.set('telefono', user.telefono);
+                        Usuario.set('nombre', user.nombre);
+                        Usuario.set('apellidos', user.apellidos);
+                        Usuario.set('grupo', user.grupo);
+                        Usuario.set('spam', user.spam);
+                        Usuario.saveusuario();
+                        console.log(Usuario.usuario());
+                        $scope.registroid.id = $scope.registroid.id + 1;
+                    }
+                });
+            }
+            break;
+        case 4:
+            $state.go("taxista.mapaTaxista");
+            break;
+        }
+    }
+
+    $scope.init = function (data) {
+        switch (data) {
+        case 1:
+            $scope.inicio = false;
+            $scope.seecionlogin = true;
+            console.log("INIT " + data);
+            break;
+        case 2:
+            $scope.inicio = true;
+            $scope.seecionlogin = false;
+            break;
+        case 3:
+            $scope.inicio = false;
+            $scope.seccionregistro = true;
+        }
     }
 
     $scope.login = function (email, password) {
         $ionicLoading.show({
-            template: '<i class="icon ion-looping"></i> Conectando con el servidor...'
+            template: '<ion-spinner icon="circles" class="spinner-energized"></ion-spinner><br>  Conectando con el servidor...'
         });
         var respuesta = Peticiones.login(email, password);
         respuesta.then(
@@ -40,477 +120,23 @@ angular.module('starter.controllers', [])
                     Usuario.borrarusuario();
                     Usuario.set('id', result.id);
                     Usuario.set('email', result.email);
-                    Usuario.set('codigoCliente', result.id);
                     Usuario.set('telefono', result.telefono);
-                    Usuario.set('codigoPostal', result.codigoPostal);
-                    Usuario.set('fechaNacimiento', result.anoNacimiento);
-                    Usuario.set('genero', result.sexo);
                     Usuario.set('nombre', result.nombre);
-                    Usuario.set('codigoFarmacia', result.farmacia);
+                    Usuario.set('apellidos', result.apellidos);
                     Usuario.set('grupo', result.grupo);
                     Usuario.saveusuario();
                     console.log(Usuario.usuario());
-                    $state.go("taxista.mapaTaxista");
+                    if (result.grupo > 0) {
+                        $state.go("taxista.mapaTaxista");
+                    }
+
                 } else {
-                    window.plugins.toast.showShortBottom(result.message,
-                        function (a) {},
-                        function (b) {});
+                    lanzaerror(result.message);
                     $ionicLoading.hide();
+
                 }
             },
             function (errorPlayload) {});
     }
 
-})
-
-.controller('RegistroCtrl', function ($scope, Peticiones, $state, Ofertas, $ionicLoading, Usuario, $ionicNavBarDelegate) {
-    var usuario = Usuario.usuario();
-    $scope.registrarse = function (cp, email, fnac, sex, telf, codfarma, nombre) {
-
-        if (angular.isUndefined(cp) || cp == null) {
-            window.plugins.toast.showLongBottom(
-                "Introduzca correctamente su codigo postal",
-                function (a) {},
-                function (b) {}
-            );
-        }
-        if (angular.isUndefined(email) || email == null) {
-            window.plugins.toast.showLongBottom(
-                "Introduzca correctamente su email",
-                function (a) {},
-                function (b) {}
-            );
-        } else {
-
-            $ionicLoading.show({
-                template: '<i class="icon ion-looping"></i> registrando usuario...'
-            });
-
-            var respuesta = Peticiones.registrar(usuario.codigoCliente, cp, email, fnac, sex, telf, codfarma, nombre);
-            respuesta.then(
-                function (result) {
-                    if (!result.error) {
-                        $ionicLoading.hide();
-                        Usuario.set('email', email);
-                        Usuario.set('codigoCliente', result.codigo);
-                        Usuario.set('codigoPostal', cp);
-                        Usuario.set('fechaNacimiento', fnac);
-                        Usuario.set('genero', sex);
-                        Usuario.set('nombre', nombre);
-                        if (!(angular.isUndefined(telf)) && !(telf == null)) {
-                            Usuario.set('telefono', telf);
-                        }
-                        if (!(angular.isUndefined(codfarma)) && !(codfarma == null)) {
-                            Usuario.set('codigoFarmacia', codfarma);
-                        }
-                        Usuario.saveusuario();
-                        $state.go("app.mostradorofertas");
-                    } else {
-                        window.plugins.toast.showShortBottom(result.msg,
-                            function (a) {},
-                            function (b) {});
-                        $ionicLoading.hide();
-                    }
-                },
-                function (errorPlayload) {
-                    $ionicLoading.hide();
-                    alert("error");
-                });
-        }
-    }
-})
-
-.controller('MostradorOfertasCtrl', function ($ionicPlatform, $scope, Peticiones, $state, Ofertas, $ionicLoading, Usuario) {
-    $ionicLoading.show({
-        template: '<i class="icon ion-looping"></i>Espere un momento, descargando las ofertas...'
-    });
-    var usuario = Usuario.usuario();
-    var ofertasGenerales = Peticiones.getOfertasGenerales(usuario.codigoCliente);
-    ofertasGenerales.then(function (result) {
-        $scope.ofertasGenerales = result;
-        $ionicLoading.hide();
-    });
-    $scope.ofertas = Ofertas.getofertas();
-
-    window.navigator.geolocation.getCurrentPosition(function (location) {
-        var especificas = Peticiones.getOfertasEspecificas(location.coords.latitude, location.coords.longitude);
-        especificas.then(function (result) {
-            $scope.ofertasEspecificas = result;
-        });
-    });
-    $scope.detalle = function (oferta) {
-        Ofertas.setViendoOferta(oferta);
-        $state.go("app.detalleoferta");
-    }
-    $ionicPlatform.onHardwareBackButton(function () {
-        event.preventDefault();
-        event.stopPropagation();
-    });
-})
-
-.controller('DetalleOfertaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout) {
-
-    $scope.oferta = Ofertas.getViendoOferta();
-    var usuario = Usuario.usuario();
-    var map;
-    var posInicio;
-    if ($scope.oferta.asociado) {
-        var farmaciaAsociada = Peticiones.getFarmacia($scope.oferta.asociado);
-        farmaciaAsociada.then(function (result) {
-            console.log("RESUL ", result);
-            $scope.farmacias[0] = result;
-        });
-    } else {
-        window.navigator.geolocation.getCurrentPosition(function (location) {
-            var farmaciasCercanas = Peticiones.getFarmacias(location.coords.latitude, location.coords.longitude);
-            farmaciasCercanas.then(function (result) {
-                $scope.farmacias = result;
-            });
-        });
-    }
-
-
-    var inicializa = function () {
-        if (!$scope.farmacias)
-            return;
-        if ($scope.farmacias.lenght > 1) {
-            var zoom = 8;
-        } else {
-            var zoom = 15;
-        }
-
-        posInicio = new google.maps.LatLng($scope.farmacias[0].latitud, $scope.farmacias[0].longitud);
-        var mapOptions = {
-            streetViewControl: true,
-            center: posInicio,
-            zoom: zoom,
-            mapTypeId: google.maps.MapTypeId.TERRAIN
-        };
-
-        map = new google.maps.Map(document.getElementById("map"),
-            mapOptions);
-
-        for (farmacia in $scope.farmacias) {
-            var posicion = new google.maps.LatLng($scope.farmacias[farmacia].latitud, $scope.farmacias[farmacia].longitud);
-
-            var contentString = '<strong>Dirección de la farmacia: </strong> ' +
-                $scope.farmacias[farmacia].direccion;
-
-
-            var infowindow = new google.maps.InfoWindow({
-                content: contentString
-            });
-
-            var farmaciaMarker = new google.maps.Marker({
-                position: posicion,
-                map: map
-            });
-            farmaciaMarker.addListener('click', function () {
-                infowindow.open(map, farmaciaMarker);
-            });
-
-            infowindow.open(map, farmaciaMarker);
-        }
-
-        reloaded = true;
-        $scope.map = map;
-    }
-
-    $scope.cupon = function () {
-        var disponibilidad = Peticiones.getOferta($scope.oferta.id, usuario.codigoCliente);
-        disponibilidad.then(function (result) {
-            $scope.oferta.cantidadMaxUser = result[0].cantidadMaxUser;
-            ejecutaCupon();
-        });
-    }
-
-    $scope.reserva = function () {
-        var disponibilidad = Peticiones.getOferta($scope.oferta.id, usuario.codigoCliente);
-        disponibilidad.then(function (result) {
-            $scope.oferta.reservadas = result[0].reservadas
-            ejecutaReserva();
-        });
-    }
-    var urls = server_constantes.all();
-    $scope.url = urls.URL;
-
-    var ejecutaCupon = function () {
-        $scope.data = {};
-        var myPopup = $ionicPopup.show({
-            template: '<input type="number"  ng-model="data.cantidadcupon" placeholder= "La cantidad minima es ' + $scope.oferta.cantidadMin + '">',
-            title: 'Introduzca la cantidad de articulos que quiere en su cupón descuento',
-            subTitle: 'Solo quedan disponibles: ' + $scope.oferta.cantidadMaxUser,
-            scope: $scope,
-            buttons: [
-                {
-                    text: 'Cancelar',
-                    type: 'button button-outline button-calm'
-                },
-                {
-                    text: 'Ver cupón',
-                    type: 'button button-calm',
-                    scope: $scope,
-                    onTap: function (e) {
-                        return $scope.data.cantidadcupon
-                    }
-              }
-            ]
-        });
-        myPopup.then(function (res) {
-            if (!(angular.isUndefined(res)) && !(res == null)) {
-                if (res <= 0) {
-                    window.plugins.toast.showShortBottom("Introduzca un numero mayor de 0",
-                        function (a) {},
-                        function (b) {});
-                } else if (res < $scope.oferta.cantidadMin) {
-                    window.plugins.toast.showShortBottom("La cantidad mínima para poder ofrecerte este cupón es " + $scope.oferta.cantidadMin,
-                        function (a) {},
-                        function (b) {});
-                } else if (res > $scope.oferta.cantidadMaxUser) {
-                    window.plugins.toast.showShortBottom("La cantidad maxima disponible para este cupón es " + $scope.oferta.cantidadMaxUser,
-                        function (a) {},
-                        function (b) {});
-                } else {
-                    $ionicLoading.show({
-                        template: '<i class="icon ion-looping"></i> Obteniendo su código de descuento...'
-                    });
-                    var cupon = Peticiones.obtenerCupon($scope.oferta.id, usuario.codigoCliente, res);
-                    cupon.then(
-                        function (result) {
-                            $scope.urlcupon = result.url;
-                            $scope.barcodecodigo = result.codigo;
-                            console.log("cupo ", $scope.url, $scope.urlcupon);
-                            var pop = $ionicPopup.show({
-                                scope: $scope,
-                                template: '<img class="cuponimg" ng-src="{{urlcupon}}"><br><p class="barcode">{{barcodecodigo}}</p>',
-                                buttons: [
-                                    {
-                                        text: 'Salir',
-                                        type: 'button-positive'
-                                        }
-                                    ]
-                            });
-                            $ionicLoading.hide();
-                        }
-                    );
-                }
-            }
-        });
-        $timeout(function () {
-            myPopup.close(); //close the popup after 20 seconds for some reason
-        }, 20000);
-    };
-
-    //tengo que hacer que si no esta registrado avisarle que se registre
-    var ejecutaReserva = function () {
-        $scope.data = {};
-        $scope.disabled = false;
-        var boton;
-        var texto = "Introduzca la cantidad de articulos que quiere reservar";
-        if (!usuario.email) {
-            $scope.disabled = true;
-            boton = "Iniciar sesión";
-        } else if (!usuario.codigoFarmacia) {
-            $scope.disabled = true;
-            boton = "Ver Farmacias PharmaPrivé";
-            texto = "No tienes farmacia asignada, para poder reservar necesitas tener una farmacia PharmaPrivé.";
-        } else  {
-            boton = "Reservar";
-        }
-        var myPopup = $ionicPopup.show({
-            template: '<input type="number"  ng-disabled="disabled" ng-model="data.cantidadcupon">',
-            title: texto,
-            subTitle: 'Tienes reservadas: ' + $scope.oferta.reservadas,
-            scope: $scope,
-            buttons: [
-                {
-                    text: 'Cancelar'
-                },
-                {
-                    text: boton,
-                    type: 'button-positive',
-                    scope: $scope,
-                    onTap: function (e) {
-                        return $scope.data.cantidadcupon
-                    }
-              }
-            ]
-        });
-        myPopup.then(function (res) {
-            if (!usuario.email) {
-                $state.go("app.login");
-            } else if (!usuario.codigoFarmacia) {
-                $state.go('app.mifarmacia');
-            } else {
-                if (!(angular.isUndefined(res)) && !(res == null)) {
-                    if (res <= 0) {
-                        window.plugins.toast.showShortBottom("Introduzca un numero mayor de 0",
-                            function (a) {},
-                            function (b) {});
-                    } else if (res < $scope.oferta.cantidadMin) {
-                        window.plugins.toast.showShortBottom("La cantidad mínima para poder ofrecerte este cupón es " + $scope.oferta.cantidadMin,
-                            function (a) {},
-                            function (b) {});
-                    } else if (res > $scope.oferta.cantidadMaxUser) {
-                        window.plugins.toast.showShortBottom("La cantidad maxima disponible para este cupón es " + $scope.oferta.cantidadMaxUser,
-                            function (a) {},
-                            function (b) {});
-                    } else {
-                        if (res <= 0) {
-                            window.plugins.toast.showShortBottom("Introduzca un numero mayor de 0",
-                                function (a) {},
-                                function (b) {});
-                        } else {
-                            $ionicLoading.show({
-                                template: '<i class="icon ion-looping"></i> Creando su reserva, espere un momento...'
-                            });
-                            var cupon = Peticiones.reservar($scope.oferta.id, Usuario.get('codigoCliente'), res, usuario.codigoFarmacia);
-                            cupon.then(
-                                function (result) {
-                                    if (!result.error) {
-                                        $ionicLoading.hide();
-                                        $scope.oferta.reservadas += res;
-                                        window.plugins.toast.showShortBottom("Reservado correctamente",
-                                            function (a) {},
-                                            function (b) {});
-                                    } else {
-                                        $ionicLoading.hide();
-                                    }
-                                }
-                            );
-                        }
-                    }
-                }
-            }
-        });
-        $timeout(function () {
-            myPopup.close(); //close the popup after 20 seconds for some reason
-        }, 20000);
-    };
-    $scope.info = "mostrado";
-    $scope.mapa = "oculto";
-    $scope.showinfo = function () {
-        $scope.info = "mostrado";
-        $scope.mapa = "oculto";
-    }
-    $scope.showmapa = function () {
-        $scope.mapa = "mostrado";
-        $scope.info = "oculto";
-    }
-
-    /*
-     * if given group is the selected group, deselect it
-     * else, select the given group
-     */
-
-    $scope.opciones = [{
-        show: false
-    }, {
-        show: false
-    }, {
-        show: false
-    }];
-    var reloaded = false;
-    $scope.toggleGroup = function (group) {
-        if ($scope.opciones[group].show)
-            $scope.opciones[group].show = false;
-        else
-            $scope.opciones[group].show = true;
-        if (!reloaded) {
-            inicializa();
-        }
-    };
-    $scope.isGroupShown = function (group) {
-        return $scope.opciones[group].show;
-    };
-
-})
-
-.controller('PerfilCtrl', function ($scope, Peticiones, $state, Ofertas, $ionicLoading, Usuario, $ionicNavBarDelegate) {
-    var usuario = Usuario.usuario();
-    console.log("USUARIO ES ", usuario);
-    $scope.cp = usuario.codigoPostal;
-    $scope.email = usuario.email;
-    $scope.fnac = usuario.fechaNacimiento;
-    $scope.telf = usuario.telefono;
-    $scope.nombre = usuario.nombre;
-    $scope.codfarma = usuario.codigoFarmacia;
-
-    if (!usuario.email) {
-        $state.go("app.login")
-    }
-    $scope.actualizar = function (cp, email, fnac, sex, telf, codfarma, nombre) {
-
-        if (angular.isUndefined(cp) || cp == null) {
-            window.plugins.toast.showLongBottom(
-                "Introduzca correctamente su codigo postal",
-                function (a) {},
-                function (b) {}
-            );
-        }
-        if (angular.isUndefined(email) || email == null) {
-            window.plugins.toast.showLongBottom(
-                "Introduzca correctamente su email",
-                function (a) {},
-                function (b) {}
-            );
-        } else {
-            $ionicLoading.show({
-                template: '<i class="icon ion-looping"></i> actualizando usuario...'
-            });
-
-            var respuesta = Peticiones.perfil(usuario.codigoCliente, cp, email, fnac, sex, telf, codfarma, nombre);
-            respuesta.then(
-                function (result) {
-                    if (!result.error) {
-                        $ionicLoading.hide();
-                        Usuario.set('email', email);
-                        Usuario.set('codigoCliente', result.codigo);
-                        Usuario.set('codigoPostal', cp);
-                        Usuario.set('fechaNacimiento', fnac);
-                        Usuario.set('genero', sex);
-                        Usuario.set('nombre', nombre);
-                        if (!(angular.isUndefined(telf)) && !(telf == null)) {
-                            Usuario.set('telefono', telf);
-                        }
-                        if (!(angular.isUndefined(codfarma)) && !(codfarma == null)) {
-                            Usuario.set('codigoFarmacia', codfarma);
-                        }
-                        Usuario.saveusuario();
-
-                    } else {
-                        $ionicLoading.hide();
-                    }
-                },
-                function (errorPlayload) {
-                    $ionicLoading.hide();
-                    alert("error");
-                });
-        }
-    }
-})
-
-.controller('ReservaCtrl', function ($ionicPlatform, $scope, Peticiones, $state, Ofertas, $ionicLoading, Usuario) {
-    $ionicLoading.show({
-        template: '<i class="icon ion-looping"></i>Espere un momento, descargando las reservas...'
-    });
-    var usuario = Usuario.usuario();
-    console.log(usuario.email);
-    if (!usuario.email) {
-        $state.go("app.login")
-    }
-    var ofertasGenerales = Peticiones.getReservas(usuario.codigoCliente);
-    ofertasGenerales.then(function (result) {
-        $scope.reservas = result;
-        $ionicLoading.hide();
-    });
-
-    $scope.detalle = function (oferta) {
-        Ofertas.setViendoOferta(oferta);
-        $state.go("app.detalleoferta");
-    }
-    $ionicPlatform.onHardwareBackButton(function () {
-        event.preventDefault();
-        event.stopPropagation();
-    });
 });
