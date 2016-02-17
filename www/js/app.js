@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.controllers.taxista', 'starter.servicies_mapa', 'starter.servicies_peticiones', 'starter.servicies_modelos', 'starter.directives', 'angular-carousel', 'ngSails', 'pasvaz.bindonce', 'angularAudioRecorder', 'angularFileUpload'])
+angular.module('starter', ['ionic', 'starter.controllers', 'starter.controllers.taxista', 'starter.controllers.clientes', 'starter.servicies_mapa', 'starter.servicies_peticiones', 'starter.servicies_modelos', 'starter.directives', 'angular-carousel', 'ngSails', 'pasvaz.bindonce', 'angularAudioRecorder', 'angularFileUpload'])
 
 .config(['$sailsProvider', function ($sailsProvider) {
         $sailsProvider.url = 'http://taxialcantarilla.es:80';
@@ -61,12 +61,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.controllers.
             })
             .state('clientemapa', {
                 url: "/clientemapa",
-                views: {
-                    'menuContent': {
-                        templateUrl: "templates/clientemapa.html",
-                        controller: 'MapaTaxistaCtrl'
-                    }
-                }
+                templateUrl: "templates/clientemapa.html",
+                controller: 'ClienteMapaCtrl'
             })
 
         // if none of the above states are matched, use this as the fallback

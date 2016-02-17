@@ -70,6 +70,7 @@
 
 
 /* animation time */
+
 .ng-enter,
 .ng-leave {
     transition: 1.0s linear;
@@ -195,6 +196,14 @@
     border-radius: 5px;
 }
 
+.input-group-addon {
+    background: white !important;
+}
+
+.input-group > input {
+    padding: 5px;
+}
+
 .hide {
     display: none;
 }
@@ -305,6 +314,28 @@
     width: 100%;
     position: absolute;
     right: 0px;
+}
+
+.mapacliente {
+    height: 80% !important;
+    max-height: 80%;
+    width: 100%;
+    position: absolute;
+    right: 0px;
+}
+
+#seccionmapa {
+    height: 20%;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    background: white;
+}
+
+#seccionmapa > button {
+    margin-bottom: 0px;
+    margin-top: 0px;
+    width: 49%;
 }
 
 #lateral {

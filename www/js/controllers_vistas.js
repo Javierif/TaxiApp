@@ -84,7 +84,12 @@ angular.module('starter.controllers', [])
             }
             break;
         case 4:
-            $state.go("taxista.mapaTaxista");
+            var usuario = Usuario.usuario();
+            if (usuario.grupo > 0) {
+                $state.go("taxista.mapaTaxista");
+            } else {
+                $state.go("taxista.clientemapa");
+            }
             break;
         }
     }
@@ -128,6 +133,9 @@ angular.module('starter.controllers', [])
                     console.log(Usuario.usuario());
                     if (result.grupo > 0) {
                         $state.go("taxista.mapaTaxista");
+                    } else {
+                        console.log("DENTRO DE CLIENTEMAPA")
+                        $state.go("clientemapa");
                     }
 
                 } else {

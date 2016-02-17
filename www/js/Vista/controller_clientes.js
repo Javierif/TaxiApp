@@ -1,8 +1,17 @@
-angular.module('starter.controllers.taxista', [])
+angular.module('starter.controllers.clientes', [])
 
-.controller('ClienteMapaCtrl', function ($scope, $ionicModal, $ionicLoading, Usuario, MapaInstancia, MapaControl) {
+.controller('ClienteMapaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails, FileUploader, $q, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal) {
+    //screen.lockOrientation('landscape');
     var usuario = Usuario.usuario();
+    $scope.ubicarDisponible = {};
+    $scope.ubicarDisponible.disabled = true;
+    $scope.recordImg = "./img/record.png";
     $scope.ubicadoText;
+
+    $scope.toggleLeft = function () {
+        $ionicSideMenuDelegate.toggleLeft();
+    };
+
 
     // Load the modal from the given template URL
     $ionicModal.fromTemplateUrl('registro.html', function ($ionicModal) {
@@ -21,11 +30,12 @@ angular.module('starter.controllers.taxista', [])
         inicializaMapa();
         google.maps.event.addListenerOnce($scope.map, 'idle', function () {
             MapaInstancia.cargaMapa(usuario, $scope.map).then(function () {
-                $scope.paradas = MapaInstancia.getParadas();
                 getCurrentPosition();
             });
         });
     }
+
+
 
     $scope.itemOnLongPress = function () {
         $scope.recordImg = "./img/recording.png";
@@ -37,13 +47,82 @@ angular.module('starter.controllers.taxista', [])
         endRecord();
     }
 
+    $scope.ubicar = function () {
+        if ($scope.ubicadoText == "Ubicar") {
+            postUbicar($scope.ubicarDisponible.id, usuario.grupo, usuario.latitud, usuario.longitud, usuario.id)
+            MapaControl.ubica($scope.paradas, $scope.socios, $scope.ubicarDisponible.id, usuario.id);
+            $scope.ubicadoText = "Desubicar";
+
+        } else {
+            postDesUbicar($scope.ubicarDisponible.id, usuario.id, usuario.grupo);
+            MapaControl.borraUbicacion($scope.paradas, $scope.socios, $scope.ubicarDisponible.id, usuario.id);
+            $scope.ubicadoText = "Ubicar";
+        }
+    }
 
 
+    var valorarUbicacion = function (latitud, longitud) {
+        var radio = false;
+        var limite = false;
+        for (parada in $scope.paradas) {
+            var distancia = calculaDistancia(latitud, longitud, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
+            if (distancia < 0.15) {
+                if (!radio) {
+                    radio = true;
+                    break;
+                }
+            }
+            if (distancia > 0.3) {
+                if (!limite) {
+                    limite = true;
+                }
+            }
+        }
+        if (radio) {
+            $scope.ubicarDisponible.id = $scope.paradas[parada].id;
+            $scope.ubicarDisponible.disabled = false;
+        }
+        if (!radio && !limite) {
+            $scope.ubicarDisponible.disabled = true;
+            if ($scope.ubicadoText == 'Desubicar') {
+                $scope.ubicar();
+            }
+        }
+        if (limite && !radio) {
+            $scope.ubicarDisponible.disabled = true;
+        }
+    }
+
+    var muevete = function (latitud, longitud) {
+        postMoviendose(usuario.id, usuario.grupo, latitud, longitud);
+        usuario.latitud = latitud;
+        usuario.longitud = longitud;
+        var posicion = new google.maps.LatLng(latitud, longitud);
+        $scope.map.panTo(posicion);
+        valorarUbicacion(latitud, longitud);
+    }
+
+
+    var observaPosicion = function () {
+        window.navigator.geolocation.watchPosition(function (location, error, options) {
+                if (location.coords.accuracy < 150) {
+                    muevete(location.coords.latitude, location.coords.longitude);
+                }
+            },
+            function error(msg) {}, {
+                maximumAge: 600000,
+                timeout: 5000,
+                enableHighAccuracy: true
+            });
+    }
 
     var getCurrentPosition = function () {
+        $ionicLoading.show({
+            template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Obteniendo tu geoposición…'
+        });
         window.navigator.geolocation.getCurrentPosition(function (location) {
             //bajarlo a 150
-            if (location.coords.accuracy < 350) {
+            if (location.coords.accuracy < 150) {
                 muevete(location.coords.latitude, location.coords.longitude);
                 $ionicLoading.hide();
                 //comenzamos a observar si te mueves
@@ -66,7 +145,8 @@ angular.module('starter.controllers.taxista', [])
         var mapOptions = {
             streetViewControl: false,
             zoom: 15,
-            mapTypeId: google.maps.MapTypeId.TERRAIN
+            mapTypeId: google.maps.MapTypeId.TERRAIN,
+            disableDefaultUI: true
         };
         $scope.map = new google.maps.Map(document.getElementById("mapa"),
             mapOptions);
@@ -89,6 +169,20 @@ angular.module('starter.controllers.taxista', [])
             //devuelve en kilometros
         return dist
     }
+
+
+    google.maps.event.addListener($scope.map, 'center_changed', function () {
+        // 0.1 seconds after the center of the map has changed,
+        // set back the marker position.
+        window.setTimeout(function () {
+            var center = $scope.map.getCenter();
+            marker.setPosition(center);
+        }, 100);
+    });
+    google.maps.event.addListener($scope.map, 'dragend', function () {
+
+        //CAMBIAR EL ICONO BOUNCING
+    });
 
 
 
