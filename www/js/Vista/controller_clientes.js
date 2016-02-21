@@ -11,6 +11,8 @@ angular.module('starter.controllers.clientes', [])
         discapacitado: false
     };
 
+    $sails.get("/cliente/conectarse/" + usuario.id + "/1");
+
     $scope.toggleLeft = function () {
         $ionicSideMenuDelegate.toggleLeft();
     };
@@ -46,6 +48,7 @@ angular.module('starter.controllers.clientes', [])
 
         });
     }
+
     var preparaPedido = function () {
         var center = $scope.map.getCenter();
         $scope.localizacion = "http://maps.googleapis.com/maps/api/staticmap?size=640x320&sensor=false&zoom=18&markers=" + center.lat() + "%2C" + center.lng();
@@ -57,10 +60,27 @@ angular.module('starter.controllers.clientes', [])
         $scope.modalPedir.show();
     }
 
-    $scope.confirmarTaxi = function () {
-        var pedir = Peticiones.comunicarseTaxi(idusuario, latRecogida, lngRecogida, latDestino, lngDestino, fecha, discapacitado, mascota)
+    $scope.confirmarTaxi = function (destino, fecha, discapacitado, mascota) {
+        var center = $scope.map.getCenter();
+        var latdestino;
+        var lngdestino;
+        console.log("DESTINO " + destino.geometry.location.lat() + "fecha " + fecha);
+        if (destino) {
+            latdestino = destino.geometry.location.lat();
+            lngdestino = destino.geometry.location.lng();
+        }
+        $sails.post('/cliente/pedirtaxi', {
+            idCliente: usuario.id,
+            grupo: 1,
+            latRecogida: center.lat(),
+            lngRecogida: center.lng(),
+            latDestino: latdestino,
+            lngDestino: lngdestino,
+            fechaRecogida: fecha,
+            discapacitado: discapacitado,
+            mascota: mascota
+        });
     }
-
     $scope.itemOnLongPress = function () {
         $scope.recordImg = "./img/recording.png";
         record();
@@ -70,6 +90,7 @@ angular.module('starter.controllers.clientes', [])
         $scope.recordImg = "./img/record.png";
         endRecord();
     }
+
     $scope.geolocation = function () {
         getCurrentPosition();
     }

@@ -39,8 +39,8 @@ angular.module("starter.servicies_modelos", [])
         loadusuario: function () {
             var cargado = window.localStorage[NombresGuardado.get["usuario"]];
             if (cargado != undefined && cargado != "vacio") {
-                var usuario = JSON.parse(cargado);
-                user = usuario;
+                console.log(JSON.stringify(cargado));
+                user = JSON.parse(cargado);
                 return true;
             }
             return false;
