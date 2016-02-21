@@ -158,6 +158,9 @@ angular.module('starter.controllers.taxista', [])
                 //comenzamos a observar si te mueves
                 observaPosicion();
             } else {
+                $ionicLoading.show({
+                    template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Estamos intentando conseguir una precisión minima de 150m de tu posición, actualmente recibimos ' + location.coords.accuracy + 'm'
+                });
                 getCurrentPosition();
             }
         }, function error(msg) {

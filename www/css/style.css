@@ -68,11 +68,19 @@
     height: 300px;
 }
 
+.opcionactiva {
+    color: #A09000;
+    background: #FFECAE;
+}
+
 
 /* animation time */
 
-.ng-enter,
-.ng-leave {
+.ng-enter.animated {
+    transition: 1.0s linear;
+}
+
+.ng-leave.animated {
     transition: 1.0s linear;
 }
 
@@ -162,20 +170,6 @@
     opacity: .4;
     pointer-events: none;
     cursor: default !important;
-}
-
-
-/* when hiding the picture */
-
-.ng-hide-add {
-    animation: 0.5s fadeIn ease;
-}
-
-
-/* when showing the picture */
-
-.ng-hide-remove {
-    animation: 0.5s fadeInUpBig ease;
 }
 
 .textbox {
@@ -309,6 +303,16 @@
     clear: right;
 }
 
+#modalmapa {
+    width: 100%;
+    max-width: 100%;
+    height: 40%;
+}
+
+.modal {
+    background: #FEFFC7;
+}
+
 #mapa {
     height: 100%;
     width: 100%;
@@ -317,25 +321,61 @@
 }
 
 .mapacliente {
-    height: 80% !important;
-    max-height: 80%;
     width: 100%;
     position: absolute;
     right: 0px;
 }
 
+.centerbutton {
+    border-radius: 100%;
+    margin-left: 50%;
+    left: -5px;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    min-height: 1px;
+    min-width: 1px;
+    padding: 0px 0px !important;
+    background: #FFC900;
+    background-image: -webkit-linear-gradient(top, #FFC900, #e3b200);
+    background-image: -moz-linear-gradient(top, #FFC900, #e3b200);
+    background-image: -ms-linear-gradient(top, #FFC900, #e3b200);
+    background-image: -o-linear-gradient(top, #FFC900, #e3b200);
+    background-image: linear-gradient(to bottom, #FFC900, #e3b200);
+}
+
+.fullh {
+    height: 100%;
+}
+
+.ng-pristine {
+    text-overflow: ellipsis;
+    background: rgba(255, 255, 255, 0.8)!important;
+}
+
 #seccionmapa {
-    height: 20%;
+    max-height: 20%;
     width: 100%;
     position: absolute;
     bottom: 0;
-    background: white;
+    -webkit-box-shadow: inset 0px 6px 19px 0px rgba(0, 0, 0, 0.26);
+    -moz-box-shadow: inset 0px 6px 19px 0px rgba(0, 0, 0, 0.26);
+    box-shadow: inset 0px 6px 19px 0px rgba(0, 0, 0, 0.26);
+}
+
+.modal > header {
+    position: relative !important;
 }
 
 #seccionmapa > button {
     margin-bottom: 0px;
     margin-top: 0px;
-    width: 49%;
+    width: 100%;
+    height: 60%;
+}
+
+.input-group {
+    height: 30%;
 }
 
 #lateral {
@@ -592,6 +632,16 @@
     border-bottom-right-radius: 10px;
     border-top-right-radius: 10px;
     width: 80%;
+}
+
+.full {
+    width: 100%;
+    height: 100%;
+    font-weight: bold;
+}
+
+.margintop {
+    margin-top: 15px;
 }
 
 .head {

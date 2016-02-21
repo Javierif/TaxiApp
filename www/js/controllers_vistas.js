@@ -19,9 +19,9 @@ angular.module('starter.controllers', [])
     var lanzaerror = function (message) {
         $scope.error.id = "error";
         console.log("Message " + message);
-        // window.plugins.toast.showShortBottom(message,
-        //     function (a) {},
-        //      function (b) {});
+        window.plugins.toast.showShortBottom(message,
+            function (a) {},
+            function (b) {});
     }
 
     $scope.checkstep = function (step, data1, data2) {
