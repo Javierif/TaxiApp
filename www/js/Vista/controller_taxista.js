@@ -203,6 +203,15 @@ angular.module('starter.controllers.taxista', [])
         return dist
     }
 
+    var checkTurno = function (latitud, longitud) {
+        var puesto;
+        for (parada in $scope.paradas) {
+            $scope.paradas[parada].distanciaservicio = calculaDistancia(latitud, longitud, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
+
+        }
+        $scope.paradasFiltradas = $filter('orderBy')($scope.paradas, 'distanciaservicio');
+
+    }
 
     $sails.get("/taxista/conectarse/" + usuario.id + "/" + usuario.grupo);
 
@@ -259,6 +268,11 @@ angular.module('starter.controllers.taxista', [])
 
     $sails.on('desubicar', function (resp) {
         MapaControl.borraUbicacion($scope.paradas, $scope.socios, resp.parada, resp.socio);
+    });
+
+    $sails.on('Servicio', function (resp) {
+        console.log("RECIBIDO SERVICIO");
+        checkTurno(resp.latitudRecogida, resp.longitudRecogida)
     });
 
     var postMoviendose = function (usuarioId, grupo, latitud, longitud) {
