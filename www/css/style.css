@@ -145,6 +145,16 @@
     height: 100%;
 }
 
+.modal {
+    min-height: inherit !important;
+    width: 100% !important;
+    height: 100% !important;
+    top: inherit !important;
+    left: inherit !important;
+    bottom: inherit !important;
+    right: inherit !important;
+}
+
 
 /* Global */
 

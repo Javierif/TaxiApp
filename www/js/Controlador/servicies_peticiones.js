@@ -47,7 +47,8 @@ angular.module('starter.servicies_peticiones', [])
             $http.post(urls.URL + urls.LOGIN, peticionjson)
                 .success(function (respuesta) {
                     deferred.resolve(respuesta);
-                }).error(function (error) {});
+                }).error(function(response, status, headers, config) {
+            });
             return deferred.promise;
         },
         getSocios: function (grupo) {

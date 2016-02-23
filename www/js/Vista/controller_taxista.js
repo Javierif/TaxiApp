@@ -5,6 +5,8 @@ angular.module('starter.controllers.taxista', [])
     $scope.socios = MapaInstancia.getSocios();
     $scope.ubicadoText = MapaInstancia.getUbicadoText();
 
+
+
     $scope.$watch(function () {
         return MapaInstancia.getParadas();
     }, function (newValue, oldValue) {
@@ -24,27 +26,28 @@ angular.module('starter.controllers.taxista', [])
     });
 })
 
-.controller('MapaTaxistaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails, FileUploader, $q, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal) {
+.controller('MapaTaxistaCtrl', function ($scope, Ofertas, $ionicLoading, Peticiones, server_constantes, Usuario, $timeout, $sails, FileUploader, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal, $filter) {
     //screen.lockOrientation('landscape');
     var usuario = Usuario.usuario();
     $scope.ubicarDisponible = {};
     $scope.ubicarDisponible.disabled = true;
     $scope.recordImg = "./img/record.png";
     $scope.ubicadoText;
+     $scope.route = [];
+    var servicioTimeOut;
 
     $scope.toggleLeft = function () {
         $ionicSideMenuDelegate.toggleLeft();
     };
 
 
-    // Load the modal from the given template URL
-    $ionicModal.fromTemplateUrl('registro.html', function ($ionicModal) {
-        $scope.modal = $ionicModal;
+    $ionicModal.fromTemplateUrl('templates/servicio.html', function ($ionicModal) {
+        $scope.modalPedir = $ionicModal;
     }, {
         // Use our scope for the scope of the modal to keep it simple
         scope: $scope,
         // The animation we want to use for the modal entrance
-        animation: 'slide-in-right'
+        animation: 'slide-in-up'
     });
 
     var initTaxista = function () {
@@ -57,6 +60,9 @@ angular.module('starter.controllers.taxista', [])
                 $scope.paradas = MapaInstancia.getParadas();
                 $scope.socios = MapaInstancia.getSocios();
                 $scope.ubicadoText = MapaInstancia.getUbicadoText();
+                $ionicLoading.show({
+                    template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Obteniendo tu geoposición…'
+                });
                 getCurrentPosition();
                 MapaControl.borraUbicacion($scope.paradas, $scope.socios, 1, usuario.id);
                 MapaControl.ubica($scope.paradas, $scope.socios, 1, usuario.id);
@@ -147,12 +153,10 @@ angular.module('starter.controllers.taxista', [])
     }
 
     var getCurrentPosition = function () {
-        $ionicLoading.show({
-            template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Obteniendo tu geoposición…'
-        });
+
         window.navigator.geolocation.getCurrentPosition(function (location) {
-            //bajarlo a 150
-            if (location.coords.accuracy < 150) {
+            console.log("ACCUARY" + location.coords.accuracy)
+            if (location.coords.accuracy < 1500) {
                 muevete(location.coords.latitude, location.coords.longitude);
                 $ionicLoading.hide();
                 //comenzamos a observar si te mueves
@@ -161,7 +165,9 @@ angular.module('starter.controllers.taxista', [])
                 $ionicLoading.show({
                     template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Estamos intentando conseguir una precisión minima de 150m de tu posición, actualmente recibimos ' + location.coords.accuracy + 'm'
                 });
+                $timeout(function() {
                 getCurrentPosition();
+                },1500);
             }
         }, function error(msg) {
             //alert('error al obtener geo local error ' + JSON.stringify(msg));
@@ -203,14 +209,62 @@ angular.module('starter.controllers.taxista', [])
         return dist
     }
 
-    var checkTurno = function (latitud, longitud) {
-        var puesto;
+    var checkTurno = function (latitud, longitud, latdestino, lngdestino, socioid) {
+        var puesto = 0;
+        if(socioid) {
+            $timeout.cancel(servicioTimeOut);
+        }
         for (parada in $scope.paradas) {
+            console.log("Paradas 1" + $scope.paradas[parada].parada);
             $scope.paradas[parada].distanciaservicio = calculaDistancia(latitud, longitud, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
-
         }
         $scope.paradasFiltradas = $filter('orderBy')($scope.paradas, 'distanciaservicio');
+        for(filtrado in $scope.paradasFiltradas) {
+            var breaker = false;
+            var encontrado = false;
+            for(ubicado in $scope.paradasFiltradas[filtrado].ubicados) {
+                if($scope.paradasFiltradas[filtrado].ubicados[ubicado].id == usuario.id) {
+                    breaker = true;
+                    break;
+                } else {
+                    if(socioid) {
+                         if(encontrado) {
+                             puesto = puesto+1;
+                         }
+                        if(socioid == $scope.paradasFiltradas[filtrado].ubicados[ubicado].id) {
+                            encontrado = true;
+                        }
 
+                    } else {
+                        console.log("socio " + $scope.paradasFiltradas[filtrado].ubicados[ubicado].id);
+                        puesto = puesto+1;
+                    }
+                }
+            }
+            if(breaker) {
+                break;
+            }
+        }
+        if(puesto == $scope.socios.length) {
+            alert("CUIDADIN QUE SOY EL ULTIMO :O")
+        }
+        var tiempo = puesto * 10000;
+        servicioTimeOut = $timeout(function() {
+            alert("TE TOCA!");
+            servicio(latitud,longitud,latdestino,lngdestino);
+        },tiempo)
+    }
+
+    var servicio = function(latrecogida,lngrecogida,latdestino,lngdestino) {
+        if(latdestino) {
+            var distancia = calculaDistancia(latitud, longitud, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
+            var zoom = 16;
+            if (distancia>2) {
+                zoom = 12
+            }
+            $scope.localizacion = "http://maps.googleapis.com/maps/api/staticmap?size=640x320&sensor=false&zoom="+zoom+"&markers=" + latrecogida + "%2C" + lngrecogida+"8&markers="+latdestino + "%2C" +lngdestino;
+             $scope.modalPedir.show();
+        }
     }
 
     $sails.get("/taxista/conectarse/" + usuario.id + "/" + usuario.grupo);
@@ -271,9 +325,16 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $sails.on('Servicio', function (resp) {
-        console.log("RECIBIDO SERVICIO");
-        checkTurno(resp.latitudRecogida, resp.longitudRecogida)
+        console.log("RECIBIDO SERVICIO "+JSON.stringify(resp));
+        checkTurno(resp.latRecogida, resp.lngRecogida, resp.latDestino,resp.lngDestino);
     });
+
+    $sails.on('ServicioRechazado', function (resp) {
+        console.log("Rechazado SERVICIO");
+        checkTurno(resp.latRecogida, resp.lngRecogida,resp.latDestino,resp.lngDestino, resp.idSocio);
+    });
+
+
 
     var postMoviendose = function (usuarioId, grupo, latitud, longitud) {
         $sails.post('/taxista/moviendose', {
