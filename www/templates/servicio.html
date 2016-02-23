@@ -1,5 +1,5 @@
 <div class="modal">
-    <header class="bar bar-header bar-energized">
+    <header class="bar bar-header bar-energized fixed">
         <h1 class="title">Servicio Entrante</h1>
         <div class="button button-clear" ng-click="modalPedir.hide()"><span class="icon ion-close"></span></div>
     </header>
@@ -31,7 +31,15 @@
                                 <i class="icon ion-ios-paw"></i>
                             </a>
             </div>
-            <button class="button full button-energized" ng-click="confirmarTaxi(destino,datetimeValue,opcion.discapacitado,opcion.mascota)">Confirmar recogida</button>
+
+            <div class="progress">
+              <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{progressValue}}"
+              aria-valuemin="0" aria-valuemax="10" style="{{progresstyle}}">
+
+              </div>
+            </div>
+            <button class="button midbutton button-assertive" ng-click="confirmarTaxi(destino,datetimeValue,opcion.discapacitado,opcion.mascota)">Rechazar</button>
+            <button class="button midbutton button-energized" ng-click="confirmarTaxi(destino,datetimeValue,opcion.discapacitado,opcion.mascota)">Aceptar</button>
         </div>
     </content>
 </div>

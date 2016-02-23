@@ -40,6 +40,7 @@ angular.module('starter.controllers.taxista', [])
         mascota: false,
         discapacitado: false
     };
+    $scope.progressValue = 0;
 
     $scope.toggleLeft = function () {
         $ionicSideMenuDelegate.toggleLeft();
@@ -251,6 +252,7 @@ angular.module('starter.controllers.taxista', [])
                 break;
             }
         }
+        console.log("MI PUESTO es " + puesto + "Y LOS SOCIOS SOMOS... " + $scope.socios.length)
         if(puesto == $scope.socios.length) {
             alert("CUIDADIN QUE SOY EL ULTIMO :O")
         }
@@ -296,14 +298,27 @@ angular.module('starter.controllers.taxista', [])
                     alert('Geocoder failed due to: ' + status);
                 }
             });
-        console.log("MACOSTA "+ mascota + "DIS " +discapacitado);
             $scope.datetimeValue = fecha;
             $scope.opcion.mascota = mascota;
             $scope.opcion.discapacitado = discapacitado;
-            console.log("RECOGIDA "+ $scope.recogidaText + " DEST "+ $scope.destinoText);
             $scope.modalPedir.show();
+            cuenta();
+
     }
 
+    var cuenta = function() {
+      $timeout(function(){
+        $scope.progressValue = $scope.progressValue + 1;
+        var total =  $scope.progressValue * 10;
+        $scope.progresstyle = "width:"+total+"%";
+        if($scope.progressValue != 10) {
+            cuenta();
+        } else {
+            $scope.progressValue = 0;
+            $scope.modalPedir.hide();
+        }
+      }, 1000);
+    }
 
     $sails.get("/taxista/conectarse/" + usuario.id + "/" + usuario.grupo);
 
