@@ -33,8 +33,13 @@ angular.module('starter.controllers.taxista', [])
     $scope.ubicarDisponible.disabled = true;
     $scope.recordImg = "./img/record.png";
     $scope.ubicadoText;
-     $scope.route = [];
-    var servicioTimeOut;
+    $scope.route = [];
+    var servicioTimeOut=[];
+    var geocoder = new google.maps.Geocoder();
+    $scope.opcion = {
+        mascota: false,
+        discapacitado: false
+    };
 
     $scope.toggleLeft = function () {
         $ionicSideMenuDelegate.toggleLeft();
@@ -209,10 +214,11 @@ angular.module('starter.controllers.taxista', [])
         return dist
     }
 
-    var checkTurno = function (latitud, longitud, latdestino, lngdestino, socioid) {
+    var checkTurno = function (latitud, longitud, latdestino, lngdestino, fechaRecogida, servicioid,mascota,discapacitado,socioid) {
         var puesto = 0;
         if(socioid) {
-            $timeout.cancel(servicioTimeOut);
+            var servicioObtenido = $filter('Object')(servicioTimeOut,{servicioid:servicioid});
+            $timeout.cancel(servicioObtenido.timeout);
         }
         for (parada in $scope.paradas) {
             console.log("Paradas 1" + $scope.paradas[parada].parada);
@@ -249,23 +255,55 @@ angular.module('starter.controllers.taxista', [])
             alert("CUIDADIN QUE SOY EL ULTIMO :O")
         }
         var tiempo = puesto * 10000;
-        servicioTimeOut = $timeout(function() {
+        console.log("PUESTO "+ puesto + " SOCIOS "+ $scope.socios.length)
+        var timeout = $timeout(function() {
             alert("TE TOCA!");
-            servicio(latitud,longitud,latdestino,lngdestino);
+            servicio(latitud,longitud,latdestino,lngdestino,fechaRecogida,mascota,discapacitado);
         },tiempo)
+        servicioTimeOut.push({servicioid:servicioid,timeout:timeout});
     }
 
-    var servicio = function(latrecogida,lngrecogida,latdestino,lngdestino) {
-        if(latdestino) {
-            var distancia = calculaDistancia(latitud, longitud, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
+    var servicio = function(latrecogida,lngrecogida,latdestino,lngdestino,fecha,mascota,discapacitado) {
+            var distancia = calculaDistancia(lngrecogida, lngrecogida,latdestino,lngdestino);
             var zoom = 16;
             if (distancia>2) {
                 zoom = 12
             }
-            $scope.localizacion = "http://maps.googleapis.com/maps/api/staticmap?size=640x320&sensor=false&zoom="+zoom+"&markers=" + latrecogida + "%2C" + lngrecogida+"8&markers="+latdestino + "%2C" +lngdestino;
-             $scope.modalPedir.show();
-        }
+            $scope.localizacion = "http://maps.googleapis.com/maps/api/staticmap?size=640x320&sensor=false&zoom="+zoom+"&markers=" + latrecogida + "%2C" + lngrecogida+"8&markers=color:0x4592ba|"+latdestino + "%2C" +lngdestino;
+            geocoder.geocode({
+                'latLng': new google.maps.LatLng(latrecogida,lngrecogida)
+            }, function (results, status) {
+                if (status === google.maps.GeocoderStatus.OK) {
+                    if (results[1]) {
+                         $scope.recogidaText = results[0].formatted_address;
+                    } else {
+                        alert('No results found');
+                    }
+                } else {
+                    alert('Geocoder failed due to: ' + status);
+                }
+            });
+            geocoder.geocode({
+                'latLng': new google.maps.LatLng(latdestino,lngdestino)
+            }, function (results, status) {
+                if (status === google.maps.GeocoderStatus.OK) {
+                    if (results[1]) {
+                        $scope.destinoText =  results[0].formatted_address;
+                    } else {
+                        alert('No results found');
+                    }
+                } else {
+                    alert('Geocoder failed due to: ' + status);
+                }
+            });
+        console.log("MACOSTA "+ mascota + "DIS " +discapacitado);
+            $scope.datetimeValue = fecha;
+            $scope.opcion.mascota = mascota;
+            $scope.opcion.discapacitado = discapacitado;
+            console.log("RECOGIDA "+ $scope.recogidaText + " DEST "+ $scope.destinoText);
+            $scope.modalPedir.show();
     }
+
 
     $sails.get("/taxista/conectarse/" + usuario.id + "/" + usuario.grupo);
 
@@ -326,12 +364,12 @@ angular.module('starter.controllers.taxista', [])
 
     $sails.on('Servicio', function (resp) {
         console.log("RECIBIDO SERVICIO "+JSON.stringify(resp));
-        checkTurno(resp.latRecogida, resp.lngRecogida, resp.latDestino,resp.lngDestino);
+        checkTurno(resp.latRecogida, resp.lngRecogida, resp.latDestino,resp.lngDestino,resp.fechaRecogida,resp.id,resp.animal,resp.dispacitado);
     });
 
     $sails.on('ServicioRechazado', function (resp) {
         console.log("Rechazado SERVICIO");
-        checkTurno(resp.latRecogida, resp.lngRecogida,resp.latDestino,resp.lngDestino, resp.idSocio);
+        checkTurno(resp.latRecogida, resp.lngRecogida,resp.latDestino,resp.lngDestino,resp.fechaRecogida,resp.id, resp.animal,resp.dispacitado,resp.idSocio);
     });
 
 
