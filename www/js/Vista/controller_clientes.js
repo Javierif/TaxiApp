@@ -10,8 +10,11 @@ angular.module('starter.controllers.clientes', [])
         mascota: false,
         discapacitado: false
     };
+    $scope.estiloAceptado = true;
+    var timerRespuesta = false;
+    var timeRespuesta = 0;
 
-    $sails.get("/cliente/conectarse/" + usuario.id + "/1");
+
 
     $scope.toggleLeft = function () {
         $ionicSideMenuDelegate.toggleLeft();
@@ -54,7 +57,6 @@ angular.module('starter.controllers.clientes', [])
         var center = $scope.map.getCenter();
         var latdestino;
         var lngdestino;
-        console.log("DESTINO " + destino.geometry.location.lat() + "fecha " + fecha);
         if (destino) {
             latdestino = destino.geometry.location.lat();
             lngdestino = destino.geometry.location.lng();
@@ -70,6 +72,26 @@ angular.module('starter.controllers.clientes', [])
             discapacitado: discapacitado,
             mascota: mascota
         });
+        esperandoTaxi();
+
+
+    }
+
+    var esperandoTaxi = function() {
+            $timeout(function() {
+            var hours   = Math.floor(timeRespuesta / 3600);
+            var minutes = Math.floor((timeRespuesta - (hours * 3600)) / 60);
+            var seconds = timeRespuesta - (hours * 3600) - (minutes * 60);
+            if (hours   < 10) {hours   = "0"+hours;}
+            if (minutes < 10) {minutes = "0"+minutes;}
+            if (seconds < 10) {seconds = "0"+seconds;}
+            var time    = minutes+':'+seconds;
+            timeRespuesta = timeRespuesta + 1;
+               $ionicLoading.show({
+                    template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Conectandonos con los taxistas.<br> tiempo estimado: 02:00 <br> tiempo espera: '+time
+                });
+            esperandoTaxi();
+        },1000);
     }
     $scope.itemOnLongPress = function () {
         $scope.recordImg = "./img/recording.png";
@@ -165,6 +187,11 @@ angular.module('starter.controllers.clientes', [])
         }, 100);
     }
 
+    $sails.get("/cliente/conectarse/" + usuario.id + "/1");
+
+    $sails.on("Aceptado", function (resp) {
+        $scope.estiloAceptado = true;
+    });
 
     //Prepares File System for Audio Recording
     audioRecord = 'recorded.wav';

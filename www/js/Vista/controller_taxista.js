@@ -217,6 +217,7 @@ angular.module('starter.controllers.taxista', [])
 
     var checkTurno = function (latitud, longitud, latdestino, lngdestino, fechaRecogida, servicioid,mascota,discapacitado,socioid) {
         var puesto = 0;
+        var ubicados = 0;
         if(socioid) {
             var servicioObtenido = $filter('Object')(servicioTimeOut,{servicioid:servicioid});
             $timeout.cancel(servicioObtenido.timeout);
@@ -224,6 +225,9 @@ angular.module('starter.controllers.taxista', [])
         for (parada in $scope.paradas) {
             console.log("Paradas 1" + $scope.paradas[parada].parada);
             $scope.paradas[parada].distanciaservicio = calculaDistancia(latitud, longitud, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
+            for(ubicado in $scope.paradas[parada].ubicados) {
+                ubicados = ubicados +1;
+            }
         }
         $scope.paradasFiltradas = $filter('orderBy')($scope.paradas, 'distanciaservicio');
         for(filtrado in $scope.paradasFiltradas) {
@@ -252,12 +256,10 @@ angular.module('starter.controllers.taxista', [])
                 break;
             }
         }
-        console.log("MI PUESTO es " + puesto + "Y LOS SOCIOS SOMOS... " + $scope.socios.length)
-        if(puesto == $scope.socios.length) {
+        if(puesto+1 == ubicados) {
             alert("CUIDADIN QUE SOY EL ULTIMO :O")
         }
         var tiempo = puesto * 10000;
-        console.log("PUESTO "+ puesto + " SOCIOS "+ $scope.socios.length)
         var timeout = $timeout(function() {
             alert("TE TOCA!");
             servicio(latitud,longitud,latdestino,lngdestino,fechaRecogida,mascota,discapacitado);
@@ -271,7 +273,8 @@ angular.module('starter.controllers.taxista', [])
             if (distancia>2) {
                 zoom = 12
             }
-            $scope.localizacion = "http://maps.googleapis.com/maps/api/staticmap?size=640x320&sensor=false&zoom="+zoom+"&markers=" + latrecogida + "%2C" + lngrecogida+"8&markers=color:0x4592ba|"+latdestino + "%2C" +lngdestino;
+            $scope.localizacion = "http://maps.googleapis.com/maps/api/staticmap?size=640x320&sensor=false&zoom="+zoom+"&markers=" + latrecogida + "%2C" + lngrecogida;
+
             geocoder.geocode({
                 'latLng': new google.maps.LatLng(latrecogida,lngrecogida)
             }, function (results, status) {
@@ -285,25 +288,27 @@ angular.module('starter.controllers.taxista', [])
                     alert('Geocoder failed due to: ' + status);
                 }
             });
-            geocoder.geocode({
-                'latLng': new google.maps.LatLng(latdestino,lngdestino)
-            }, function (results, status) {
-                if (status === google.maps.GeocoderStatus.OK) {
-                    if (results[1]) {
-                        $scope.destinoText =  results[0].formatted_address;
+            if(latdestino) {
+                $scope.localizacion =  $scope.localizacion + "8&markers=color:0x4592ba|"+latdestino + "%2C" +lngdestino;
+                geocoder.geocode({
+                    'latLng': new google.maps.LatLng(latdestino,lngdestino)
+                }, function (results, status) {
+                    if (status === google.maps.GeocoderStatus.OK) {
+                        if (results[1]) {
+                            $scope.destinoText =  results[0].formatted_address;
+                        } else {
+                            alert('No results found');
+                        }
                     } else {
-                        alert('No results found');
+                        alert('Geocoder failed due to: ' + status);
                     }
-                } else {
-                    alert('Geocoder failed due to: ' + status);
-                }
-            });
+                });
+            }
             $scope.datetimeValue = fecha;
             $scope.opcion.mascota = mascota;
             $scope.opcion.discapacitado = discapacitado;
             $scope.modalPedir.show();
             cuenta();
-
     }
 
     var cuenta = function() {

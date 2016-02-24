@@ -10,6 +10,8 @@ angular.module('starter.controllers', [])
     $scope.inicio = true;
     $scope.seecionlogin = false;
     $scope.seccionregistro = false;
+    $scope.registro = {};
+
     $scope.registroid = {
         id: 1
     };
@@ -57,7 +59,8 @@ angular.module('starter.controllers', [])
 
             break;
         case 3:
-            if (!$scope.registro.telefono) {
+                console.log("REG " + $scope.registroid.id );
+            if (!data1) {
                 lanzaerror('El taxista necesita tu numero para poder contactar por cualquier problema.')
             } else {
                 $ionicLoading.show({

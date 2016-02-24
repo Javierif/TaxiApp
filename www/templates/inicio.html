@@ -45,7 +45,7 @@
                     <div class="registro">
                         Escribe tu telefono para que el taxista pueda comunicarse contigo cuando vaya a recogerte.
                         <input class="registrobox" type="number" placeholder="Telefono *" ng-model="registro.telefono">
-                        <button class="button button-block button-energized" ng-click="checkstep(3)">
+                        <button class="button button-block button-energized" ng-click="checkstep(3,registro.telefono)">
                             Siguiente
                         </button>
                         *Información necesaria
