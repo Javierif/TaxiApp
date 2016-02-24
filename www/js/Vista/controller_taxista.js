@@ -1,6 +1,6 @@
 angular.module('starter.controllers.taxista', [])
 
-.controller('TaxistaCtrl', function ($scope, MapaInstancia) {
+    .controller('TaxistaCtrl', function ($scope, MapaInstancia) {
     $scope.paradas = MapaInstancia.getParadas();
     $scope.socios = MapaInstancia.getSocios();
     $scope.ubicadoText = MapaInstancia.getUbicadoText();
@@ -26,7 +26,7 @@ angular.module('starter.controllers.taxista', [])
     });
 })
 
-.controller('MapaTaxistaCtrl', function ($scope, Ofertas, $ionicLoading, Peticiones, server_constantes, Usuario, $timeout, $sails, FileUploader, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal, $filter) {
+    .controller('MapaTaxistaCtrl', function ($scope, Ofertas, $ionicLoading, Peticiones, server_constantes, Usuario, $timeout, $sails, FileUploader, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal, $filter) {
     //screen.lockOrientation('landscape');
     var usuario = Usuario.usuario();
     $scope.ubicarDisponible = {};
@@ -101,6 +101,13 @@ angular.module('starter.controllers.taxista', [])
         }
     }
 
+    $scope.aceptar = function() {
+        postAceptar();
+    }
+
+    $scope.rechazar = function() {
+
+    }
 
     var valorarUbicacion = function (latitud, longitud) {
         var radio = false;
@@ -147,15 +154,14 @@ angular.module('starter.controllers.taxista', [])
 
     var observaPosicion = function () {
         window.navigator.geolocation.watchPosition(function (location, error, options) {
-                if (location.coords.accuracy < 150) {
-                    muevete(location.coords.latitude, location.coords.longitude);
-                }
-            },
-            function error(msg) {}, {
-                maximumAge: 600000,
-                timeout: 5000,
-                enableHighAccuracy: true
-            });
+            if (location.coords.accuracy < 150) {
+                muevete(location.coords.latitude, location.coords.longitude);
+            }
+        },function error(msg) {}, {
+            maximumAge: 600000,
+            timeout: 5000,
+            enableHighAccuracy: true
+        });
     }
 
     var getCurrentPosition = function () {
@@ -172,7 +178,7 @@ angular.module('starter.controllers.taxista', [])
                     template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Estamos intentando conseguir una precisión minima de 150m de tu posición, actualmente recibimos ' + location.coords.accuracy + 'm'
                 });
                 $timeout(function() {
-                getCurrentPosition();
+                    getCurrentPosition();
                 },1500);
             }
         }, function error(msg) {
@@ -194,7 +200,7 @@ angular.module('starter.controllers.taxista', [])
             disableDefaultUI: true
         };
         $scope.map = new google.maps.Map(document.getElementById("mapa"),
-            mapOptions);
+                                         mapOptions);
         return $scope.map;
     }
 
@@ -211,7 +217,7 @@ angular.module('starter.controllers.taxista', [])
         dist = dist * 180 / Math.PI
         dist = dist * 60 * 1.1515
         dist = dist * 1.609344
-            //devuelve en kilometros
+        //devuelve en kilometros
         return dist
     }
 
@@ -239,9 +245,9 @@ angular.module('starter.controllers.taxista', [])
                     break;
                 } else {
                     if(socioid) {
-                         if(encontrado) {
-                             puesto = puesto+1;
-                         }
+                        if(encontrado) {
+                            puesto = puesto+1;
+                        }
                         if(socioid == $scope.paradasFiltradas[filtrado].ubicados[ubicado].id) {
                             encontrado = true;
                         }
@@ -256,31 +262,47 @@ angular.module('starter.controllers.taxista', [])
                 break;
             }
         }
+        var ultimo = false;
         if(puesto+1 == ubicados) {
-            alert("CUIDADIN QUE SOY EL ULTIMO :O")
+            ultimo = true;
         }
         var tiempo = puesto * 10000;
         var timeout = $timeout(function() {
             alert("TE TOCA!");
             servicio(latitud,longitud,latdestino,lngdestino,fechaRecogida,mascota,discapacitado);
         },tiempo)
-        servicioTimeOut.push({servicioid:servicioid,timeout:timeout});
+        servicioTimeOut.push({servicioid:servicioid,timeout:timeout,ultimo:ultimo});
     }
 
     var servicio = function(latrecogida,lngrecogida,latdestino,lngdestino,fecha,mascota,discapacitado) {
-            var distancia = calculaDistancia(lngrecogida, lngrecogida,latdestino,lngdestino);
-            var zoom = 16;
-            if (distancia>2) {
-                zoom = 12
-            }
-            $scope.localizacion = "http://maps.googleapis.com/maps/api/staticmap?size=640x320&sensor=false&zoom="+zoom+"&markers=" + latrecogida + "%2C" + lngrecogida;
+        var distancia = calculaDistancia(lngrecogida, lngrecogida,latdestino,lngdestino);
+        var zoom = 16;
+        if (distancia>2) {
+            zoom = 12
+        }
+        $scope.localizacion = "http://maps.googleapis.com/maps/api/staticmap?size=640x320&sensor=false&zoom="+zoom+"&markers=" + latrecogida + "%2C" + lngrecogida;
 
+        geocoder.geocode({
+            'latLng': new google.maps.LatLng(latrecogida,lngrecogida)
+        }, function (results, status) {
+            if (status === google.maps.GeocoderStatus.OK) {
+                if (results[1]) {
+                    $scope.recogidaText = results[0].formatted_address;
+                } else {
+                    alert('No results found');
+                }
+            } else {
+                alert('Geocoder failed due to: ' + status);
+            }
+        });
+        if(latdestino) {
+            $scope.localizacion =  $scope.localizacion + "8&markers=color:0x4592ba|"+latdestino + "%2C" +lngdestino;
             geocoder.geocode({
-                'latLng': new google.maps.LatLng(latrecogida,lngrecogida)
+                'latLng': new google.maps.LatLng(latdestino,lngdestino)
             }, function (results, status) {
                 if (status === google.maps.GeocoderStatus.OK) {
                     if (results[1]) {
-                         $scope.recogidaText = results[0].formatted_address;
+                        $scope.destinoText =  results[0].formatted_address;
                     } else {
                         alert('No results found');
                     }
@@ -288,41 +310,26 @@ angular.module('starter.controllers.taxista', [])
                     alert('Geocoder failed due to: ' + status);
                 }
             });
-            if(latdestino) {
-                $scope.localizacion =  $scope.localizacion + "8&markers=color:0x4592ba|"+latdestino + "%2C" +lngdestino;
-                geocoder.geocode({
-                    'latLng': new google.maps.LatLng(latdestino,lngdestino)
-                }, function (results, status) {
-                    if (status === google.maps.GeocoderStatus.OK) {
-                        if (results[1]) {
-                            $scope.destinoText =  results[0].formatted_address;
-                        } else {
-                            alert('No results found');
-                        }
-                    } else {
-                        alert('Geocoder failed due to: ' + status);
-                    }
-                });
-            }
-            $scope.datetimeValue = fecha;
-            $scope.opcion.mascota = mascota;
-            $scope.opcion.discapacitado = discapacitado;
-            $scope.modalPedir.show();
-            cuenta();
+        }
+        $scope.datetimeValue = fecha;
+        $scope.opcion.mascota = mascota;
+        $scope.opcion.discapacitado = discapacitado;
+        $scope.modalPedir.show();
+        cuenta();
     }
 
     var cuenta = function() {
-      $timeout(function(){
-        $scope.progressValue = $scope.progressValue + 1;
-        var total =  $scope.progressValue * 10;
-        $scope.progresstyle = "width:"+total+"%";
-        if($scope.progressValue != 10) {
-            cuenta();
-        } else {
-            $scope.progressValue = 0;
-            $scope.modalPedir.hide();
-        }
-      }, 1000);
+        $timeout(function(){
+            $scope.progressValue = $scope.progressValue + 1;
+            var total =  $scope.progressValue * 10;
+            $scope.progresstyle = "width:"+total+"%";
+            if($scope.progressValue != 10) {
+                cuenta();
+            } else {
+                $scope.progressValue = 0;
+                $scope.modalPedir.hide();
+            }
+        }, 1000);
     }
 
     $sails.get("/taxista/conectarse/" + usuario.id + "/" + usuario.grupo);
@@ -349,14 +356,14 @@ angular.module('starter.controllers.taxista', [])
                     var myMedia = new Media("./img/on.wav");
                     myMedia.play();
                     window.plugins.toast.showShortBottom("Se ha conectado el taxi nº" + resp.id,
-                        function (a) {},
-                        function (b) {});
+                                                         function (a) {},
+                                                         function (b) {});
                 } else {
                     MapaControl.borraUbicacion($scope.paradas, $scope.socios, 1, resp.id);
                     $scope.socios[socio].marcador.setIcon('./img/desconectadoicon.png');
                     window.plugins.toast.showShortBottom("Se ha desconectado el taxi nº" + resp.id,
-                        function (a) {},
-                        function (b) {});
+                                                         function (a) {},
+                                                         function (b) {});
                 }
             }
         }
@@ -393,6 +400,41 @@ angular.module('starter.controllers.taxista', [])
     });
 
 
+    var postAceptar = function() {
+        $sails.post('/taxista/aceptarServicio', {
+            user: usuario.id,
+            latitud: usuario.latitud,
+            longitud: usuario.longitud
+        });
+    }
+
+    var postRechazar = function(latRecogida,lngRecogida,latDestino,lngDestino,fechaRecogida,id, animal,dispacitado,idSocio) {
+        $sails.post('/taxista/rechazar', {
+            idSocio: usuario.id,
+            latRecogida: latRecogida,
+            lngRecogida: lngRecogida,
+            latDestino: latDestino,
+            lngDestino: lngDestino,
+            fechaRecogida: fechaRecogida,
+            id:id,
+            animal:animal,
+            discapacitado: discapacitado
+        });
+    }
+
+    var postRechazarUltimo = function(latRecogida,lngRecogida,latDestino,lngDestino,fechaRecogida,id, animal,dispacitado,idSocio) {
+        $sails.post('/taxista/rechazarUltimo', {
+            idSocio: usuario.id,
+            latRecogida: latRecogida,
+            lngRecogida: lngRecogida,
+            latDestino: latDestino,
+            lngDestino: lngDestino,
+            fechaRecogida: fechaRecogida,
+            id:id,
+            animal:animal,
+            discapacitado: discapacitado
+        });
+    }
 
     var postMoviendose = function (usuarioId, grupo, latitud, longitud) {
         $sails.post('/taxista/moviendose', {
@@ -443,35 +485,35 @@ angular.module('starter.controllers.taxista', [])
     var record = function () {
 
         var introsound = new Media("./img/record.wav", function mediaSuccess() {
-                if (!urlfilesystem) {
-                    window.requestFileSystem(
-                        LocalFileSystem.TEMPORARY,
-                        0,
-                        function (fileSystem) {
-                            urlfilesystem = fileSystem.root.toURL();
-                            /* hohohla */
-                            urlfilesystem = urlfilesystem.slice(7);
-                            myMedia = new Media(urlfilesystem + audioRecord);
-                            myMedia.startRecord();
-                        },
-                        function (error) {
-                            alert('Error getting file system');
-                        }
-                    );
-                } else {
-                    myMedia = new Media(urlfilesystem + audioRecord);
-                    myMedia.startRecord();
+            if (!urlfilesystem) {
+                window.requestFileSystem(
+                    LocalFileSystem.TEMPORARY,
+                    0,
+                    function (fileSystem) {
+                        urlfilesystem = fileSystem.root.toURL();
+                        /* hohohla */
+                        urlfilesystem = urlfilesystem.slice(7);
+                        myMedia = new Media(urlfilesystem + audioRecord);
+                        myMedia.startRecord();
+                    },
+                    function (error) {
+                        alert('Error getting file system');
+                    }
+                );
+            } else {
+                myMedia = new Media(urlfilesystem + audioRecord);
+                myMedia.startRecord();
 
-                }
-            },
+            }
+        },
 
-            function mediaFailure(err) {
-                console.log("An error occurred: " + err.code);
-            },
+                                   function mediaFailure(err) {
+            console.log("An error occurred: " + err.code);
+        },
 
-            function mediaStatus(status) {
-                console.log("A status change occurred: " + status.code);
-            });
+                                   function mediaStatus(status) {
+            console.log("A status change occurred: " + status.code);
+        });
 
         introsound.play();
     }

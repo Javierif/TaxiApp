@@ -1,6 +1,6 @@
 angular.module('starter.controllers.clientes', [])
 
-.controller('ClienteMapaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails, FileUploader, $q, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal, $sce) {
+    .controller('ClienteMapaCtrl', function ($scope, $stateParams, $state, Ofertas, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails, FileUploader, $q, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal, $sce) {
     //screen.lockOrientation('landscape');
     var usuario = Usuario.usuario();
     $scope.recordImg = "./img/record.png";
@@ -73,12 +73,10 @@ angular.module('starter.controllers.clientes', [])
             mascota: mascota
         });
         esperandoTaxi();
-
-
     }
 
     var esperandoTaxi = function() {
-            $timeout(function() {
+        $timeout(function() {
             var hours   = Math.floor(timeRespuesta / 3600);
             var minutes = Math.floor((timeRespuesta - (hours * 3600)) / 60);
             var seconds = timeRespuesta - (hours * 3600) - (minutes * 60);
@@ -87,12 +85,13 @@ angular.module('starter.controllers.clientes', [])
             if (seconds < 10) {seconds = "0"+seconds;}
             var time    = minutes+':'+seconds;
             timeRespuesta = timeRespuesta + 1;
-               $ionicLoading.show({
-                    template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Conectandonos con los taxistas.<br> tiempo estimado: 02:00 <br> tiempo espera: '+time
-                });
+            $ionicLoading.show({
+                template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Conectandonos con los taxistas.<br> tiempo estimado: 02:00 <br> tiempo espera: '+time
+            });
             esperandoTaxi();
         },1000);
     }
+
     $scope.itemOnLongPress = function () {
         $scope.recordImg = "./img/recording.png";
         record();
@@ -142,7 +141,7 @@ angular.module('starter.controllers.clientes', [])
             disableDefaultUI: true
         };
         $scope.map = new google.maps.Map(document.getElementById("mapa"),
-            mapOptions);
+                                         mapOptions);
         return $scope.map;
     }
 
@@ -190,6 +189,7 @@ angular.module('starter.controllers.clientes', [])
     $sails.get("/cliente/conectarse/" + usuario.id + "/1");
 
     $sails.on("Aceptado", function (resp) {
+        $timeout.cancel(timeRespuesta);
         $scope.estiloAceptado = true;
     });
 
@@ -214,35 +214,35 @@ angular.module('starter.controllers.clientes', [])
     var record = function () {
 
         var introsound = new Media("./img/record.wav", function mediaSuccess() {
-                if (!urlfilesystem) {
-                    window.requestFileSystem(
-                        LocalFileSystem.TEMPORARY,
-                        0,
-                        function (fileSystem) {
-                            urlfilesystem = fileSystem.root.toURL();
-                            /* hohohla */
-                            urlfilesystem = urlfilesystem.slice(7);
-                            myMedia = new Media(urlfilesystem + audioRecord);
-                            myMedia.startRecord();
-                        },
-                        function (error) {
-                            alert('Error getting file system');
-                        }
-                    );
-                } else {
-                    myMedia = new Media(urlfilesystem + audioRecord);
-                    myMedia.startRecord();
+            if (!urlfilesystem) {
+                window.requestFileSystem(
+                    LocalFileSystem.TEMPORARY,
+                    0,
+                    function (fileSystem) {
+                        urlfilesystem = fileSystem.root.toURL();
+                        /* hohohla */
+                        urlfilesystem = urlfilesystem.slice(7);
+                        myMedia = new Media(urlfilesystem + audioRecord);
+                        myMedia.startRecord();
+                    },
+                    function (error) {
+                        alert('Error getting file system');
+                    }
+                );
+            } else {
+                myMedia = new Media(urlfilesystem + audioRecord);
+                myMedia.startRecord();
 
-                }
-            },
+            }
+        },
 
-            function mediaFailure(err) {
-                console.log("An error occurred: " + err.code);
-            },
+                                   function mediaFailure(err) {
+            console.log("An error occurred: " + err.code);
+        },
 
-            function mediaStatus(status) {
-                console.log("A status change occurred: " + status.code);
-            });
+                                   function mediaStatus(status) {
+            console.log("A status change occurred: " + status.code);
+        });
 
         introsound.play();
     }

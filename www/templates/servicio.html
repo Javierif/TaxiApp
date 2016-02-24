@@ -35,11 +35,10 @@
             <div class="progress">
               <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{progressValue}}"
               aria-valuemin="0" aria-valuemax="10" style="{{progresstyle}}">
-
               </div>
             </div>
-            <button class="button midbutton button-assertive" ng-click="confirmarTaxi(destino,datetimeValue,opcion.discapacitado,opcion.mascota)">Rechazar</button>
-            <button class="button midbutton button-energized" ng-click="confirmarTaxi(destino,datetimeValue,opcion.discapacitado,opcion.mascota)">Aceptar</button>
+            <button class="button midbutton button-assertive" ng-click="rechazar()">Rechazar</button>
+            <button class="button midbutton button-energized" ng-click="aceptar()">Aceptar</button>
         </div>
     </content>
 </div>
