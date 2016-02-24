@@ -2,7 +2,7 @@
     <ion-content bindonce scroll="false">
         <!-- End controls-->
         <div id="mapa"></div>
-        <div class="row bar-header head">
+        <div class="row bar-header head" ng-if="!ocupado">
             <div class="col-xs-3 col-md-3">
                 <button id="" class="button button-light radius" ng-click="toggleLeft()"><i class="ion-navicon-round"></i></button>
             </div>
@@ -16,8 +16,14 @@
                 <button class="button button-light right radius" ng-click="modal()"><i class="ion-person"></i></button>
             </div>
         </div>
+
+
         <div id="mic">
             <button class="button button-block button-assertive"><i class="ion-mic-a"></i></button>
+            <div ng-if="ocupado">
+                <button class="button button-block button-energized"><i class="ion-mic-a"> Hablarle al cliente</i></button>
+                <button class="button button-block button-balanced">Resolver Servicio</button>
+            </div>
         </div>
     </ion-content>
 </ion-view>

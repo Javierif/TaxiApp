@@ -41,6 +41,9 @@ angular.module('starter.controllers.taxista', [])
         discapacitado: false
     };
     $scope.progressValue = 0;
+    $scope.ultimo = false;
+
+    $scope.ocupado = false;
 
     $scope.toggleLeft = function () {
         $ionicSideMenuDelegate.toggleLeft();
@@ -101,12 +104,38 @@ angular.module('starter.controllers.taxista', [])
         }
     }
 
-    $scope.aceptar = function() {
-        postAceptar();
+    $scope.aceptar = function(recogida,destino,mascota,discapacitado,fecha) {
+        var latdestino;
+        var lngdestino;
+        if (destino) {
+            latdestino = destino.geometry.location.lat();
+            lngdestino = destino.geometry.location.lng();
+        }
+        var latrecogida = recogida.geometry.location.lat();
+        var lngrecogida = recogida.geometry.location.lng();
+        $scope.modalPedir.hide();
+        $scope.estiloServicio = true;
+        postAceptar(latdestino,lngdestino,latrecogida,lngrecogida,fecha,mascota,discapacitado);
     }
 
     $scope.rechazar = function() {
+        var latdestino;
+        var lngdestino;
+        if (destino) {
+            latdestino = destino.geometry.location.lat();
+            lngdestino = destino.geometry.location.lng();
+        }
+        var latrecogida = recogida.geometry.location.lat();
+        var lngrecogida = recogida.geometry.location.lng();
+        $scope.modalPedir.hide();
+        $scope.estiloServicio = false;
+        if($scope.ultimo) {
+            postRechazarUltimo(latrecogida,lngrecogida,latdestino,lngdestino,fecha,$scope.servicioid,mascota,dispacitado,usuario.id);
 
+        } else {
+            postRechazar(latrecogida,lngrecogida,latdestino,lngdestino,fecha,$scope.servicioid,mascota,dispacitado,usuario.id);
+
+        }
     }
 
     var valorarUbicacion = function (latitud, longitud) {
@@ -221,57 +250,70 @@ angular.module('starter.controllers.taxista', [])
         return dist
     }
 
-    var checkTurno = function (latitud, longitud, latdestino, lngdestino, fechaRecogida, servicioid,mascota,discapacitado,socioid) {
+    var checkTurno = function (latitud, longitud, latdestino, lngdestino, fechaRecogida, servicioid,mascota,discapacitado,socioid,ultimo) {
         var puesto = 0;
         var ubicados = 0;
-        if(socioid) {
-            var servicioObtenido = $filter('Object')(servicioTimeOut,{servicioid:servicioid});
-            $timeout.cancel(servicioObtenido.timeout);
-        }
-        for (parada in $scope.paradas) {
-            console.log("Paradas 1" + $scope.paradas[parada].parada);
-            $scope.paradas[parada].distanciaservicio = calculaDistancia(latitud, longitud, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
-            for(ubicado in $scope.paradas[parada].ubicados) {
-                ubicados = ubicados +1;
+        if(socioid)
+            if(socioid == usuario.id)
+                return;
+        /*
+        * Si el taxista esta ocupado rechaza directamente el servicio y lo pasa al siguiente para que no se creen conflictos
+        */
+        if($scope.ocupado || socioid) {
+            if(socioid) {
+                var servicioObtenido = $filter('Object')(servicioTimeOut,{servicioid:servicioid});
+                $timeout.cancel(servicioObtenido.timeout);
             }
-        }
-        $scope.paradasFiltradas = $filter('orderBy')($scope.paradas, 'distanciaservicio');
-        for(filtrado in $scope.paradasFiltradas) {
-            var breaker = false;
-            var encontrado = false;
-            for(ubicado in $scope.paradasFiltradas[filtrado].ubicados) {
-                if($scope.paradasFiltradas[filtrado].ubicados[ubicado].id == usuario.id) {
-                    breaker = true;
-                    break;
-                } else {
-                    if(socioid) {
-                        if(encontrado) {
-                            puesto = puesto+1;
-                        }
-                        if(socioid == $scope.paradasFiltradas[filtrado].ubicados[ubicado].id) {
-                            encontrado = true;
-                        }
-
-                    } else {
-                        console.log("socio " + $scope.paradasFiltradas[filtrado].ubicados[ubicado].id);
-                        puesto = puesto+1;
-                    }
+            for (parada in $scope.paradas) {
+                console.log("Paradas 1" + $scope.paradas[parada].parada);
+                $scope.paradas[parada].distanciaservicio = calculaDistancia(latitud, longitud, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
+                for(ubicado in $scope.paradas[parada].ubicados) {
+                    ubicados = ubicados +1;
                 }
             }
-            if(breaker) {
-                break;
+            $scope.paradasFiltradas = $filter('orderBy')($scope.paradas, 'distanciaservicio');
+            for(filtrado in $scope.paradasFiltradas) {
+                var breaker = false;
+                var encontrado = false;
+                for(ubicado in $scope.paradasFiltradas[filtrado].ubicados) {
+                    if($scope.paradasFiltradas[filtrado].ubicados[ubicado].id == usuario.id) {
+                        breaker = true;
+                        break;
+                    } else {
+                        if(socioid) {
+                            if(encontrado) {
+                                puesto = puesto+1;
+                            }
+                            if(socioid == $scope.paradasFiltradas[filtrado].ubicados[ubicado].id) {
+                                encontrado = true;
+                            }
+
+                        } else {
+                            console.log("socio " + $scope.paradasFiltradas[filtrado].ubicados[ubicado].id);
+                            puesto = puesto+1;
+                        }
+                    }
+                }
+                if(breaker) {
+                    break;
+                }
             }
+            $scope.ultimo = false;
+            if(puesto+1 == ubicados) {
+                $scope.ultimo = true;
+            }
+            var tiempo = puesto * 10000;
+            var timeout = $timeout(function() {
+                alert("TE TOCA!");
+                $scope.servicioid=servicioid;
+                servicio(latitud,longitud,latdestino,lngdestino,fechaRecogida,mascota,discapacitado);
+                $scope.ocupado = true;
+            },tiempo)
+            servicioTimeOut.push({servicioid:servicioid,timeout:timeout,ultimo:$scope.ultimo});
+        } else {
+            if(ultimo){}
+            postRechazar(latitud, longitud, latdestino, lngdestino, fechaRecogida, servicioid,mascota,discapacitado,usuario.id);
         }
-        var ultimo = false;
-        if(puesto+1 == ubicados) {
-            ultimo = true;
-        }
-        var tiempo = puesto * 10000;
-        var timeout = $timeout(function() {
-            alert("TE TOCA!");
-            servicio(latitud,longitud,latdestino,lngdestino,fechaRecogida,mascota,discapacitado);
-        },tiempo)
-        servicioTimeOut.push({servicioid:servicioid,timeout:timeout,ultimo:ultimo});
     }
 
     var servicio = function(latrecogida,lngrecogida,latdestino,lngdestino,fecha,mascota,discapacitado) {
@@ -328,6 +370,7 @@ angular.module('starter.controllers.taxista', [])
             } else {
                 $scope.progressValue = 0;
                 $scope.modalPedir.hide();
+                $scope.ocupado = false;
             }
         }, 1000);
     }
@@ -397,6 +440,10 @@ angular.module('starter.controllers.taxista', [])
     $sails.on('ServicioRechazado', function (resp) {
         console.log("Rechazado SERVICIO");
         checkTurno(resp.latRecogida, resp.lngRecogida,resp.latDestino,resp.lngDestino,resp.fechaRecogida,resp.id, resp.animal,resp.dispacitado,resp.idSocio);
+    });
+    $sails.on('ServicioUltimoRechazado', function (resp) {
+        console.log("Rechazado SERVICIO");
+        checkTurno(resp.latRecogida, resp.lngRecogida,resp.latDestino,resp.lngDestino,resp.fechaRecogida,resp.id, resp.animal,resp.dispacitado,resp.idSocio,true);
     });
 
 
