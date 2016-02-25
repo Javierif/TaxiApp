@@ -5,6 +5,7 @@ angular.module('starter.controllers.clientes', [])
     var usuario = Usuario.usuario();
     $scope.recordImg = "./img/record.png";
     var geocoder = new google.maps.Geocoder();
+    var directionsService = new google.maps.DirectionsService();
     $scope.datetimeValue = new Date();
     $scope.opcion = {
         mascota: false,
@@ -141,8 +142,7 @@ angular.module('starter.controllers.clientes', [])
             getCurrentPosition();
         }, {
             maximumAge: 600000,
-            timeout: 5000,
-            enableHighAccuracy: true
+            timeout: 5000
         });
     }
 
@@ -198,16 +198,47 @@ angular.module('starter.controllers.clientes', [])
                 }
             });
         }, 100);
-    }
+    };
+
+
+    var generaRuta = function(from,to){
+        if($scope.ruta)
+            $scope.ruta.setMap(null);
+        var directionsRequest = {
+            origin: from,
+            destination: to,
+            travelMode: google.maps.DirectionsTravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC
+        };
+
+        $scope.ruta = directionsService.route(
+            directionsRequest,
+            function(response, status)
+            {
+                if (status == google.maps.DirectionsStatus.OK)
+                {
+                    new google.maps.DirectionsRenderer({
+                        map: $scope.map,
+                        directions: response
+                    });
+                }
+            }
+        );;
+    };
 
     $sails.get("/cliente/conectarse/" + usuario.id + "/1");
 
     $sails.on("Aceptado", function (resp) {
-        console.log("ME LLEGO QUE ME ACEPTO!")
-        timeRespuesta=1000;
-        $scope.estiloAceptado = true;
-        $scope.trackear  = resp.taxista;
-        $scope.servicio = resp.cliente
+        console.log("ME LLEGO QUE ME ACEPTO! " + resp.cliente +" yo " + usuario.id);
+        console.log(" TODO " + JSON.stringify(resp))
+        if(resp.cliente == usuario.id) {
+            timeRespuesta=1000;
+            $scope.estiloAceptado = true;
+            $scope.trackear  = resp.taxista;
+            $scope.servicio = resp.cliente;
+            $scope.recogida = new google.maps.LatLng(resp.latRecogida,resp.lngRecogida)
+            $scope.rutaOrigen = generaRuta($scope.recogida ,new google.maps.LatLng(resp.latitud,resp.longitud));
+        }
     });
 
     $sails.on('movimiento', function (resp) {
@@ -215,6 +246,7 @@ angular.module('starter.controllers.clientes', [])
             //aqui en vez de poner un simple marcador ponemos una ruta que venga hacia la recogida pintada, todo chula
             var posicion = new google.maps.LatLng(resp.latitud, resp.longitud);
             $scope.socios[socio].marcador.setPosition(posicion);
+            generaRuta(posicion,$scope.recogida )
         }
     });
 

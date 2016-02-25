@@ -41,6 +41,7 @@ angular.module('starter.controllers.taxista', [])
         mascota: false,
         discapacitado: false
     };
+    $scope.clienteActual;
     $scope.progressValue = 0;
     $scope.ultimo = false;
 
@@ -109,10 +110,10 @@ angular.module('starter.controllers.taxista', [])
         $scope.modalPedir.hide();
         $scope.estiloServicio = true;
         $scope.progressValue = 1000;
-        postAceptar($scope.servicioid,usuario.id,usuario.latitud,usuario.longitud);
-        generaRuta(new google.maps.LatLng(usuario.latitud,usuario.longitud),$scope.recogida);
+        postAceptar(usuario.id,$scope.servicioid,usuario.latitud,usuario.longitud);
+        $scope.rutaOrigen = generaRuta(new google.maps.LatLng(usuario.latitud,usuario.longitud),$scope.recogida);
         if($scope.destino) {
-            generaRuta($scope.recogida,$scope.destino,new google.maps.Polyline({
+            $scope.rutaDestino = generaRuta($scope.recogida,$scope.destino,new google.maps.Polyline({
                 strokeColor: '#6FCB8E',
                 strokeOpacity: 0.8,
                 strokeWeight: 10
@@ -149,7 +150,7 @@ angular.module('starter.controllers.taxista', [])
             unitSystem: google.maps.UnitSystem.METRIC
         };
 
-        directionsService.route(
+        var ruta = directionsService.route(
             directionsRequest,
             function(response, status)
             {
@@ -163,6 +164,7 @@ angular.module('starter.controllers.taxista', [])
                 }
             }
         );
+        return ruta;
     }
 
     var valorarUbicacion = function (latitud, longitud) {
@@ -470,6 +472,7 @@ angular.module('starter.controllers.taxista', [])
 
     $sails.on('Servicio', function (resp) {
         console.log("RECIBIDO SERVICIO "+JSON.stringify(resp));
+        $scope.clienteActivo = resp.datosCliente;
         checkTurno(resp.latRecogida, resp.lngRecogida, resp.latDestino,resp.lngDestino,resp.fechaRecogida,resp.id,resp.animal,resp.dispacitado);
     });
 
@@ -482,6 +485,11 @@ angular.module('starter.controllers.taxista', [])
         checkTurno(resp.latRecogida, resp.lngRecogida,resp.latDestino,resp.lngDestino,resp.fechaRecogida,resp.id, resp.animal,resp.dispacitado,resp.idSocio,true);
     });
 
+    $sails.on('AudioInterno', function(resp) {
+        var introsound = new Media(resp.url)
+        introsound.play()
+    })
+
     var postResolver = function(estado,servicioid,taxistaid) {
         $sails.post('/taxista/resolver', {
             taxistaid: taxistaid,
@@ -490,10 +498,11 @@ angular.module('starter.controllers.taxista', [])
         });
     }
 
-    var postAceptar = function(taxistaid,servicioid,latitud,longitud) {
+    var postAceptar = function(taxistaid,servicioid,latitud,longitud,clienteid) {
         $sails.post('/taxista/aceptarServicio', {
             taxistaid: taxistaid,
             servicioid:servicioid,
+            cliente:clienteid,
             latitud:latitud,
             longitud:longitud,
             grupo:1
