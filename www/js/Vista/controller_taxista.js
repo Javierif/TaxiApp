@@ -36,6 +36,7 @@ angular.module('starter.controllers.taxista', [])
     $scope.route = [];
     var servicioTimeOut=[];
     var geocoder = new google.maps.Geocoder();
+    var directionsService = new google.maps.DirectionsService();
     $scope.opcion = {
         mascota: false,
         discapacitado: false
@@ -104,38 +105,64 @@ angular.module('starter.controllers.taxista', [])
         }
     }
 
-    $scope.aceptar = function(recogida,destino,mascota,discapacitado,fecha) {
-        var latdestino;
-        var lngdestino;
-        if (destino) {
-            latdestino = destino.geometry.location.lat();
-            lngdestino = destino.geometry.location.lng();
-        }
-        var latrecogida = recogida.geometry.location.lat();
-        var lngrecogida = recogida.geometry.location.lng();
+    $scope.aceptar = function(recogida,destino) {
         $scope.modalPedir.hide();
         $scope.estiloServicio = true;
-        postAceptar(latdestino,lngdestino,latrecogida,lngrecogida,fecha,mascota,discapacitado);
+        $scope.progressValue = 1000;
+        postAceptar($scope.servicioid,usuario.id,usuario.latitud,usuario.longitud);
+        generaRuta(new google.maps.LatLng(usuario.latitud,usuario.longitud),$scope.recogida);
+        if($scope.destino) {
+            generaRuta($scope.recogida,$scope.destino,new google.maps.Polyline({
+                strokeColor: '#6FCB8E',
+                strokeOpacity: 0.8,
+                strokeWeight: 10
+            }));
+        }
+
     }
 
-    $scope.rechazar = function() {
-        var latdestino;
-        var lngdestino;
-        if (destino) {
-            latdestino = destino.geometry.location.lat();
-            lngdestino = destino.geometry.location.lng();
-        }
-        var latrecogida = recogida.geometry.location.lat();
+    $scope.rechazar = function(recogida,destino,mascota,discapacitado,fecha) {
         var lngrecogida = recogida.geometry.location.lng();
         $scope.modalPedir.hide();
         $scope.estiloServicio = false;
+        $scope.ocupado = false;
+        var latdestino;
+        var lngdestino;
+        if($scope.destino) {
+            latdestino = $scope.destino.lat();
+            lngdestino = $scope.destino.lng();
+        }
         if($scope.ultimo) {
-            postRechazarUltimo(latrecogida,lngrecogida,latdestino,lngdestino,fecha,$scope.servicioid,mascota,dispacitado,usuario.id);
+            postRechazarUltimo($scope.recogida.lat(),$scope.recogida.lng(),latdestino,lngdestino,fecha,$scope.servicioid,mascota,dispacitado,usuario.id);
 
         } else {
-            postRechazar(latrecogida,lngrecogida,latdestino,lngdestino,fecha,$scope.servicioid,mascota,dispacitado,usuario.id);
+            postRechazar($scope.recogida.lat(),$scope.recogida.lng(),latdestino,lngdestino,fecha,$scope.servicioid,mascota,dispacitado,usuario.id);
 
         }
+    }
+
+    var generaRuta = function(from,to,color){
+        var directionsRequest = {
+            origin: from,
+            destination: to,
+            travelMode: google.maps.DirectionsTravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC
+        };
+
+        directionsService.route(
+            directionsRequest,
+            function(response, status)
+            {
+                if (status == google.maps.DirectionsStatus.OK)
+                {
+                    new google.maps.DirectionsRenderer({
+                        map: $scope.map,
+                        directions: response,
+                        polylineOptions: color
+                    });
+                }
+            }
+        );
     }
 
     var valorarUbicacion = function (latitud, longitud) {
@@ -259,7 +286,7 @@ angular.module('starter.controllers.taxista', [])
         /*
         * Si el taxista esta ocupado rechaza directamente el servicio y lo pasa al siguiente para que no se creen conflictos
         */
-        if($scope.ocupado || socioid) {
+        if(!$scope.ocupado || socioid) {
             if(socioid) {
                 var servicioObtenido = $filter('Object')(servicioTimeOut,{servicioid:servicioid});
                 $timeout.cancel(servicioObtenido.timeout);
@@ -330,6 +357,7 @@ angular.module('starter.controllers.taxista', [])
             if (status === google.maps.GeocoderStatus.OK) {
                 if (results[1]) {
                     $scope.recogidaText = results[0].formatted_address;
+                    $scope.recogida =  new google.maps.LatLng(latrecogida,lngrecogida);
                 } else {
                     alert('No results found');
                 }
@@ -339,12 +367,14 @@ angular.module('starter.controllers.taxista', [])
         });
         if(latdestino) {
             $scope.localizacion =  $scope.localizacion + "8&markers=color:0x4592ba|"+latdestino + "%2C" +lngdestino;
+            $scope.destino =null;
             geocoder.geocode({
                 'latLng': new google.maps.LatLng(latdestino,lngdestino)
             }, function (results, status) {
                 if (status === google.maps.GeocoderStatus.OK) {
                     if (results[1]) {
                         $scope.destinoText =  results[0].formatted_address;
+                        $scope.destino = new google.maps.LatLng(latdestino,lngdestino);
                     } else {
                         alert('No results found');
                     }
@@ -362,15 +392,21 @@ angular.module('starter.controllers.taxista', [])
 
     var cuenta = function() {
         $timeout(function(){
-            $scope.progressValue = $scope.progressValue + 1;
-            var total =  $scope.progressValue * 10;
-            $scope.progresstyle = "width:"+total+"%";
-            if($scope.progressValue != 10) {
-                cuenta();
+            if($scope.progressValue != 1000) {
+                $scope.progressValue = $scope.progressValue + 1;
+                var total =  $scope.progressValue * 10;
+                $scope.progresstyle = "width:"+total+"%";
+                if($scope.progressValue != 10) {
+                    cuenta();
+                } else {
+                    $scope.progressValue = 0;
+                    $scope.modalPedir.hide();
+                    $scope.ocupado = false;
+                }
             } else {
                 $scope.progressValue = 0;
                 $scope.modalPedir.hide();
-                $scope.ocupado = false;
+                $scope.ocupado = true;
             }
         }, 1000);
     }
@@ -446,12 +482,21 @@ angular.module('starter.controllers.taxista', [])
         checkTurno(resp.latRecogida, resp.lngRecogida,resp.latDestino,resp.lngDestino,resp.fechaRecogida,resp.id, resp.animal,resp.dispacitado,resp.idSocio,true);
     });
 
+    var postResolver = function(estado,servicioid,taxistaid) {
+        $sails.post('/taxista/resolver', {
+            taxistaid: taxistaid,
+            servicioid:servicioid,
+            estado:estado
+        });
+    }
 
-    var postAceptar = function() {
+    var postAceptar = function(taxistaid,servicioid,latitud,longitud) {
         $sails.post('/taxista/aceptarServicio', {
-            user: usuario.id,
-            latitud: usuario.latitud,
-            longitud: usuario.longitud
+            taxistaid: taxistaid,
+            servicioid:servicioid,
+            latitud:latitud,
+            longitud:longitud,
+            grupo:1
         });
     }
 
@@ -465,7 +510,7 @@ angular.module('starter.controllers.taxista', [])
             fechaRecogida: fechaRecogida,
             id:id,
             animal:animal,
-            discapacitado: discapacitado
+            discapacitado: dispacitado
         });
     }
 

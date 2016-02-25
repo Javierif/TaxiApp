@@ -2,7 +2,7 @@
     <ion-content bindonce scroll="false">
         <!-- End controls-->
         <div id="mapa" class="mapacliente"></div>
-        <div ng-if="!estiloAceptado">
+        <div ng-if="!estiloAceptado" class="fullh">
             <div class="row bar-header head">
                 <div class="col-xs-3 col-md-3">
                     <button class="button button-light radius" ng-click="modal()"><i class="ion-person"></i></button>
@@ -25,7 +25,18 @@
                 <button class="button button-energized" ng-click="pedirTaxi()">Pedir un Taxi</button>
             </div>
         </div>
-        <div ng-if="!estiloAceptado">
+        <div ng-if="estiloAceptado">
+                <div class="row bar-header head">
+                <div class="col-xs-3 col-md-3">
+
+
+                </div>
+                <div class="col-xs-6 col-md-6 ubicacionspace">
+                </div>
+                <div class="col-xs-3 col-md-3">
+                    <a ng-click="cancelarSevicio()"><i class="icon ion-close assertive"></i></a>
+                </div>
+            </div>
             <div id="seccionmapa">
                 <button class="button button-balanced" ng-click="pedirTaxi()">Recogido</button>
                 <button class="button button-assertive" ng-click="pedirTaxi()">Hablarle al Taxista</button>

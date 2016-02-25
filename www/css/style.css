@@ -703,6 +703,10 @@
     padding: 15px;
 }
 
+.icon {
+    font-size: 30px;
+}
+
 .paradaheader {
     background: #FFF0B8 !important;
 }

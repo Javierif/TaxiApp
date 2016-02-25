@@ -10,7 +10,7 @@ angular.module('starter.controllers.clientes', [])
         mascota: false,
         discapacitado: false
     };
-    $scope.estiloAceptado = true;
+    $scope.estiloAceptado = false;
     var timerRespuesta = false;
     var timeRespuesta = 0;
 
@@ -75,6 +75,7 @@ angular.module('starter.controllers.clientes', [])
         esperandoTaxi();
     }
 
+
     var esperandoTaxi = function() {
         $timeout(function() {
             var hours   = Math.floor(timeRespuesta / 3600);
@@ -88,7 +89,20 @@ angular.module('starter.controllers.clientes', [])
             $ionicLoading.show({
                 template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Conectandonos con los taxistas.<br> tiempo estimado: 02:00 <br> tiempo espera: '+time
             });
-            esperandoTaxi();
+            if(timeRespuesta >200){
+                $ionicLoading.hide();
+                $scope.modalPedir.hide();
+                if(timeRespuesta < 600) {
+                    window.plugins.toast.showShortBottom("Todos los taxis esta ocupados, prueba en 5 minutos",
+                                                         function (a) {},
+                                                         function (b) {});
+                }
+
+                timeRespuesta =0;
+            } else {
+                esperandoTaxi();
+            }
+
         },1000);
     }
 
@@ -189,9 +203,27 @@ angular.module('starter.controllers.clientes', [])
     $sails.get("/cliente/conectarse/" + usuario.id + "/1");
 
     $sails.on("Aceptado", function (resp) {
-        $timeout.cancel(timeRespuesta);
+        console.log("ME LLEGO QUE ME ACEPTO!")
+        timeRespuesta=1000;
         $scope.estiloAceptado = true;
+        $scope.trackear  = resp.taxista;
+        $scope.servicio = resp.cliente
     });
+
+    $sails.on('movimiento', function (resp) {
+        if ($scope.trackear == resp.user) {
+            //aqui en vez de poner un simple marcador ponemos una ruta que venga hacia la recogida pintada, todo chula
+            var posicion = new google.maps.LatLng(resp.latitud, resp.longitud);
+            $scope.socios[socio].marcador.setPosition(posicion);
+        }
+    });
+
+    var postRecogido = function() {
+        $sails.post('/cliente/recogido', {
+            taxistaid: taxistaid,
+            servicioid:servicioid,
+        });
+    }
 
     //Prepares File System for Audio Recording
     audioRecord = 'recorded.wav';
