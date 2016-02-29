@@ -1,0 +1,30 @@
+<ion-view class="overlightblue" view-title="Listado de reservas">
+    <ion-content>
+        <div class="list seccionoferta">
+            <div class="" ng-repeat="reserva in reservas">
+                <a class="item lightblue seccionoferta item-text-wrap" ng-click="detalle(reserva)">
+                    <div class="relleno"></div>
+                    <div class="imgofertamostrador">
+                        <ul rn-carousel rn-carousel-auto-slide class="carrusel">
+                            <li ng-repeat="image in reserva.imagenescargar">
+                                <div class="carrusel"><img class="carrusel" ng-src="http://localhost:1337{{image.url}}"></div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="secciontexto">
+                        <span ng-bind="reserva.titulo"></span>
+                        <div class="rojomostrador">
+                            <span class="verticalcenter"><span ng-bind="reserva.descuento"></span>
+                            <span class="simbolodescuento">€</span> DESCUENTO
+                            </span>
+                            <img src="./img/final_bandera.png">
+                        </div>
+                        <span class="caducidad">
+                        Este descuento caduca el <i class="icon ion-clock"><span ng-bind="reserva.fechaCaducidad | date:'dd/MM/yyyy'"></span></i>
+                        </span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>
