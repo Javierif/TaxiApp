@@ -547,6 +547,7 @@ angular.module('starter.controllers.taxista', [])
     }
 
     var postUbicar = function (paradaId, grupo, latitud, longitud, taxistaId) {
+        console.log("UBICAnDO " + paradaId + " g " + grupo + " lat " + latitud +" lng " +longitud+" tax " + taxistaId)
         $sails.post('/taxista/ubicar', {
             parada: paradaId,
             grupo: grupo,

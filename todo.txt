@@ -1,11 +1,18 @@
-+ Guardar comercios para geolocalizarlos en el mapa segun la oferta
-+ Una vez guardado los comercios ponerlos en el mapa segun la oferta
-+ Guardar las ofertas para saber si es de un comercio en el futuro
-+ Pedir los comercios
-+ Guardar la fecha en el que fue guardado el comercio
-+ Geolocalizar donde estoy actualmente
-+ sacar las 4 farmacias mas cercanas y que sean activas
+# TaxiApp - General
+- Mejorar icono del cliente
+- Mejorar los iconos de las rutas y quitar el icono de la geoposicion
+- Limpiar codigo
+- cambiar aspecto taxista
+- añadir datos del cliente
+- añadir precio estimado
 
-# Versión 1.0
-- Estaría genial que cuando compre algo le avise por push que ha comprado ;D (Siguiente versión)
+# TaxiApp - PreLanzamiento
+- Que puedan hablar entre socios
+- Que puedan hablar con un cliente
+- Que se resuelva el servicio y se apunte
+- cuando le das al boton de geolocalizarte (Cliente) se te queda el icono anterior volando
+- Crear las reservas bien
+- Crear un listado de reservas
+- Arreglar lo de las paradas que no funciona bien
+- detectar si estas deconectado de sails y cerrarte la sesion o algo
 
