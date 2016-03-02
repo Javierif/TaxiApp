@@ -249,7 +249,6 @@ angular.module('starter.controllers.taxista', [])
         });
     }
 
-
     var inicializaMapa = function () {
         var mapOptions = {
             streetViewControl: false,
@@ -261,7 +260,6 @@ angular.module('starter.controllers.taxista', [])
                                          mapOptions);
         return $scope.map;
     }
-
 
     var calculaDistancia = function (lat1, lon1, lat2, lon2) {
         var radlat1 = Math.PI * lat1 / 180
@@ -480,6 +478,7 @@ angular.module('starter.controllers.taxista', [])
         console.log("Rechazado SERVICIO");
         checkTurno(resp.latRecogida, resp.lngRecogida,resp.latDestino,resp.lngDestino,resp.fechaRecogida,resp.id, resp.animal,resp.dispacitado,resp.idSocio);
     });
+
     $sails.on('ServicioUltimoRechazado', function (resp) {
         console.log("Rechazado SERVICIO");
         checkTurno(resp.latRecogida, resp.lngRecogida,resp.latDestino,resp.lngDestino,resp.fechaRecogida,resp.id, resp.animal,resp.dispacitado,resp.idSocio,true);

@@ -130,12 +130,7 @@ angular.module('starter.controllers.clientes', [])
             var posicion = new google.maps.LatLng(location.coords.latitude, location.coords.longitude);
             $scope.map.panTo(posicion);
             getGeoposicion();
-            usuario.marcador = new google.maps.Marker({
-                position: posicion,
-                icon: './img/activoicon.png',
-                animation: google.maps.Animation.DROP,
-                map: $scope.map
-            });
+            usuario.marcador.panTo(posicion);
             $ionicLoading.hide();
         }, function error(msg) {
             alert('error al obtener geo local error ' + JSON.stringify(msg));
