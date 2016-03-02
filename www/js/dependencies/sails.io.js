@@ -4487,9 +4487,8 @@
                         // '    |>    ' + '\n' +
                         // '  \\___/  '+️
                         // '\n'+
-                        '  |>    Now connected to Sails.' + '\n' +
-                        '\\___/   For help, see: http://bit.ly/1DmTvgK' + '\n' +
-                        '        (using ' + io.sails.sdk.platform + ' SDK @v' + io.sails.sdk.version + ')' + '\n' +
+                        '  |>    Now connected.' + '\n' +
+                        '\\___/   ' + '\n' +
                         '\n' +
                         '\n' +
                         // '\n'+
@@ -4503,7 +4502,7 @@
                 self.on('disconnect', function () {
                     self.connectionLostTimestamp = (new Date()).getTime();
                     consolog('====================================');
-                    consolog('Socket was disconnected from Sails.');
+                    consolog('Socket was disconnected.');
                     consolog('Usually, this is due to one of the following reasons:' + '\n' +
                         ' -> the server ' + (self.url ? self.url + ' ' : '') + 'was taken down' + '\n' +
                         ' -> your browser lost internet connectivity');
@@ -4513,7 +4512,7 @@
                 self.on('reconnecting', function (numAttempts) {
                     consolog(
                         '\n' +
-                        '        Socket is trying to reconnect to Sails...\n' +
+                        '        Socket is trying to reconnect...\n' +
                         '_-|>_-  (attempt #' + numAttempts + ')' + '\n' +
                         '\n'
                     );

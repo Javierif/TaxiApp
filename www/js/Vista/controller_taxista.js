@@ -411,7 +411,15 @@ angular.module('starter.controllers.taxista', [])
         }, 1000);
     }
 
-    $sails.get("/taxista/conectarse/" + usuario.id + "/" + usuario.grupo);
+    $sails.on('connect', function socketConnected() {
+        $sails.get("/taxista/conectarse/" + usuario.id + "/" + usuario.grupo);
+        alert("CONECTADO");
+    });
+
+
+    $sails.on('reconnect', function (transport, numAttempts) {
+        alert("RECONECTADO");
+    });
 
     $sails.on("Web_Usuario", function (resp) {
         for (socio in $scope.socios) {
