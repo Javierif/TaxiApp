@@ -15,4 +15,5 @@
 - Crear un listado de reservas
 + Arreglar lo de las paradas que no funciona bien
 + detectar si estas deconectado de sails y cerrarte la sesion o algo
++ Que el taxista cuando llega un servicio no pueda cambiar las especificaciones del servicio
 
