@@ -76,6 +76,13 @@ angular.module('starter.controllers.clientes', [])
         esperandoTaxi();
     }
 
+    $scope.recogido = function () {
+        console.log("RECOGIDO");
+        postRecogido();
+        if($scope.ruta){
+            $scope.ruta.setMap(null);
+        }
+    }
 
     var esperandoTaxi = function() {
         $timeout(function() {
@@ -118,10 +125,10 @@ angular.module('starter.controllers.clientes', [])
     }
 
     $scope.geolocation = function () {
-        getCurrentPosition();
+        getCurrentPosition(true);
     }
 
-    var getCurrentPosition = function () {
+    var getCurrentPosition = function (marcador) {
         $ionicLoading.show({
             template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Obteniendo tu geoposición…'
         });
@@ -130,7 +137,17 @@ angular.module('starter.controllers.clientes', [])
             var posicion = new google.maps.LatLng(location.coords.latitude, location.coords.longitude);
             $scope.map.panTo(posicion);
             getGeoposicion();
-            usuario.marcador.panTo(posicion);
+            if(!marcador) {
+                usuario.marcador = new google.maps.Marker({
+                    position: posicion,
+                    icon: './img/activoicon.png',
+                    animation: google.maps.Animation.DROP,
+                    map: $scope.map
+                });
+            }  else {
+                usuario.marcador.panTo(posicion);
+            }
+
             $ionicLoading.hide();
         }, function error(msg) {
             alert('error al obtener geo local error ' + JSON.stringify(msg));
@@ -231,9 +248,9 @@ angular.module('starter.controllers.clientes', [])
             timeRespuesta=1000;
             $scope.estiloAceptado = true;
             $scope.trackear  = resp.taxista;
-            $scope.servicio = resp.cliente;
+            $scope.servicioid = resp.servicioid;
             $scope.recogida = new google.maps.LatLng(resp.latRecogida,resp.lngRecogida)
-            $scope.rutaOrigen = generaRuta($scope.recogida ,new google.maps.LatLng(resp.latitud,resp.longitud));
+            generaRuta($scope.recogida ,new google.maps.LatLng(resp.latitud,resp.longitud));
         }
     });
 
@@ -248,8 +265,8 @@ angular.module('starter.controllers.clientes', [])
 
     var postRecogido = function() {
         $sails.post('/cliente/recogido', {
-            taxistaid: taxistaid,
-            servicioid:servicioid,
+            taxistaid: $scope.trackear,
+            servicioid:$scope.servicioid,
         });
     }
 

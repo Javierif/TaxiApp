@@ -9,11 +9,13 @@
 # TaxiApp - PreLanzamiento
 - Que puedan hablar entre socios
 - Que puedan hablar con un cliente
-- Que se resuelva el servicio y se apunte
++ Que se resuelva el servicio y se apunte [cliente]
 + cuando le das al boton de geolocalizarte (Cliente) se te queda el icono anterior volando
 - Crear las reservas bien
 - Crear un listado de reservas
 + Arreglar lo de las paradas que no funciona bien
 + detectar si estas deconectado de sails y cerrarte la sesion o algo
 + Que el taxista cuando llega un servicio no pueda cambiar las especificaciones del servicio
+- Bloquear pantalla en servicio
+- Que se resuelva el servicio y se apunte [servidor]
 
