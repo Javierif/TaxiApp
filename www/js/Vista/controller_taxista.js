@@ -26,7 +26,7 @@ angular.module('starter.controllers.taxista', [])
     });
 })
 
-    .controller('MapaTaxistaCtrl', function ($scope, Ofertas, $ionicLoading, Peticiones, server_constantes, Usuario, $timeout, $sails, FileUploader, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal, $filter) {
+    .controller('MapaTaxistaCtrl', function ($scope, Ofertas, $ionicLoading, $ionicPopup, Peticiones, server_constantes, Usuario, $timeout, $sails, FileUploader, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal, $filter) {
     //screen.lockOrientation('landscape');
     var usuario = Usuario.usuario();
     $scope.ubicarDisponible = {};
@@ -41,7 +41,7 @@ angular.module('starter.controllers.taxista', [])
         mascota: false,
         discapacitado: false
     };
-    $scope.clienteActual;
+    $scope.servicioActual;
     $scope.progressValue = 0;
     $scope.ultimo = false;
 
@@ -111,15 +111,53 @@ angular.module('starter.controllers.taxista', [])
         $scope.estiloServicio = true;
         $scope.progressValue = 1000;
         postAceptar(usuario.id,$scope.servicioid,usuario.latitud,usuario.longitud);
-        $scope.rutaOrigen = generaRuta(new google.maps.LatLng(usuario.latitud,usuario.longitud),$scope.recogida);
-        if($scope.destino) {
-            $scope.rutaDestino = generaRuta($scope.recogida,$scope.destino,new google.maps.Polyline({
-                strokeColor: '#6FCB8E',
-                strokeOpacity: 0.8,
-                strokeWeight: 10
-            }));
-        }
+        var directionsRequest = {
+            origin: new google.maps.LatLng(usuario.latitud,usuario.longitud),
+            destination:$scope.recogida,
+            travelMode: google.maps.DirectionsTravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC
+        };
 
+        directionsService.route(
+            directionsRequest,
+            function(response, status)
+            {
+                if (status == google.maps.DirectionsStatus.OK)
+                {
+                    $scope.rutaOrigen = new google.maps.DirectionsRenderer({
+                        map: $scope.map,
+                        directions: response,
+                        suppressMarkers: true
+                    });
+                }
+            });
+        if($scope.destino) {
+            var directionsRequest = {
+                origin: $scope.recogida,
+                destination: $scope.destino,
+                travelMode: google.maps.DirectionsTravelMode.DRIVING,
+                unitSystem: google.maps.UnitSystem.METRIC
+            };
+
+            directionsService.route(
+                directionsRequest,
+                function(response, status)
+                {
+                    if (status == google.maps.DirectionsStatus.OK)
+                    {
+                        $scope.rutaDestino = new google.maps.DirectionsRenderer({
+                            map: $scope.map,
+                            directions: response,
+                            polylineOptions: new google.maps.Polyline({
+                                strokeColor: '#6FCB8E',
+                                strokeOpacity: 0.8,
+                                strokeWeight: 10
+                            }),
+                            suppressMarkers: true
+                        });
+                    }
+                });
+        }
     }
 
     $scope.rechazar = function(recogida,destino,mascota,discapacitado,fecha) {
@@ -142,29 +180,45 @@ angular.module('starter.controllers.taxista', [])
         }
     }
 
-    var generaRuta = function(from,to,color){
-        var directionsRequest = {
-            origin: from,
-            destination: to,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING,
-            unitSystem: google.maps.UnitSystem.METRIC
-        };
-
-        var ruta = directionsService.route(
-            directionsRequest,
-            function(response, status)
-            {
-                if (status == google.maps.DirectionsStatus.OK)
+    $scope.resolver = function(){
+        var myPopup = $ionicPopup.show({
+            template: '<select ng-model="opcion.opcion"><option>Servicio resuelto correctamente</option><option>Cliente no presente</option></select>',
+            title: 'Seleccione una de las opciones',
+            scope: $scope,
+            buttons: [
                 {
-                    new google.maps.DirectionsRenderer({
-                        map: $scope.map,
-                        directions: response,
-                        polylineOptions: color
-                    });
+                    text: 'Cancelar',
+                    type: 'button button-outline button-energized'
+                },
+                {
+                    text: 'Resolver',
+                    type: 'button button-energized',
+                    scope: $scope,
+                    onTap: function (e) {
+                        return $scope.opcion.opcion
+                    }
                 }
+            ]
+        });
+        myPopup.then(function (res) {
+            if (!(angular.isUndefined(res)) && !(res == null)) {
+                $scope.rutaOrigen.setMap(null);
+                if($scope.rutaDestino)
+                $scope.rutaDestino.setMap(null);
+                $scope.estiloServicio = false;
+                postResolverServicio(res);
+
+            } else {
+                window.plugins.toast.showShortBottom("Selecciona una de las opciones",
+                                                     function (a) {},
+                                                     function (b) {});
             }
-        );
-        return ruta;
+        });
+    }
+
+
+    var generaRuta = function(from,to,color,origen){
+
     }
 
     var valorarUbicacion = function (latitud, longitud) {
@@ -569,6 +623,13 @@ angular.module('starter.controllers.taxista', [])
             parada: paradaId,
             taxista: taxistaId,
             grupo: grupo
+        });
+    }
+
+    var postResolverServicio = function (res) {
+        $sails.post('/taxista/resolver', {
+            servicioid: $scope.servicioid,
+            resultado: res
         });
     }
 

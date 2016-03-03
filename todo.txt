@@ -17,5 +17,5 @@
 + detectar si estas deconectado de sails y cerrarte la sesion o algo
 + Que el taxista cuando llega un servicio no pueda cambiar las especificaciones del servicio
 - Bloquear pantalla en servicio
-- Que se resuelva el servicio y se apunte [servidor]
++ Que se resuelva el servicio y se apunte [servidor]
 

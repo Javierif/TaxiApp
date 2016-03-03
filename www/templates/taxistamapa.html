@@ -18,11 +18,11 @@
         </div>
 
 
-        <div id="mic">
-            <button class="button button-block button-assertive" on-hold="itemOnLongPress()" on-release="itemOnTouchEnd()"><i class="ion-mic-a"></i></button>
+        <div id="seccionmapa">
+            <button class="button button-assertive" on-hold="itemOnLongPress()" on-release="itemOnTouchEnd()"><i class="ion-mic-a"></i></button>
             <div ng-if="ocupado">
-                <button class="button button-block button-energized icon-left ion-mic-a">Hablarle al cliente</button>
-                <button class="button button-block button-balanced icon-left ion-compose">Resolver Servicio</button>
+                <button class="button button-energized midbutton">Hablarle al cliente</button>
+                <button class="button button-balanced midbutton" ng-click="resolver()">Resolver Servicio</button>
             </div>
         </div>
     </ion-content>
