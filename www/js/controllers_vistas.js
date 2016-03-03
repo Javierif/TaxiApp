@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('loginCtrl', function ($scope, Peticiones, $state, $ionicLoading, Usuario, Comercios, Ofertas, $compile) {
+.controller('loginCtrl', function ($scope, Peticiones, $state, $ionicLoading, Usuario, $compile) {
     //screen.lockOrientation('portrait');
     $scope.taxista = false;
     Usuario.loadusuario()

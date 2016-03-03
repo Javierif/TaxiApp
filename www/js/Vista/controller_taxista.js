@@ -26,7 +26,7 @@ angular.module('starter.controllers.taxista', [])
     });
 })
 
-    .controller('MapaTaxistaCtrl', function ($scope, Ofertas, $ionicLoading, $ionicPopup, Peticiones, server_constantes, Usuario, $timeout, $sails, FileUploader, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal, $filter) {
+    .controller('MapaTaxistaCtrl', function ($scope, $ionicLoading, $ionicPopup, Peticiones, server_constantes, Usuario, $timeout, $sails, FileUploader, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal, $filter, Servicio) {
     //screen.lockOrientation('landscape');
     var usuario = Usuario.usuario();
     $scope.ubicarDisponible = {};
@@ -77,6 +77,7 @@ angular.module('starter.controllers.taxista', [])
                 getCurrentPosition();
                 MapaControl.borraUbicacion($scope.paradas, $scope.socios, 1, usuario.id);
                 MapaControl.ubica($scope.paradas, $scope.socios, 1, usuario.id);
+
             });
         });
     }
@@ -111,6 +112,7 @@ angular.module('starter.controllers.taxista', [])
         $scope.estiloServicio = true;
         $scope.progressValue = 1000;
         postAceptar(usuario.id,$scope.servicioid,usuario.latitud,usuario.longitud);
+        Servicio.guardarServicio($scope.servicioid,$scope.recogida,$scope.destino);
         var directionsRequest = {
             origin: new google.maps.LatLng(usuario.latitud,usuario.longitud),
             destination:$scope.recogida,
@@ -203,11 +205,12 @@ angular.module('starter.controllers.taxista', [])
         myPopup.then(function (res) {
             if (!(angular.isUndefined(res)) && !(res == null)) {
                 $scope.rutaOrigen.setMap(null);
-                if($scope.rutaDestino)
-                $scope.rutaDestino.setMap(null);
-                $scope.estiloServicio = false;
+                if($scope.rutaDestino) {
+                    $scope.rutaDestino.setMap(null)
+                }
+                Servicio.resuelveServicio();
                 postResolverServicio(res);
-
+                $scope.ocupado = false;
             } else {
                 window.plugins.toast.showShortBottom("Selecciona una de las opciones",
                                                      function (a) {},
@@ -276,6 +279,71 @@ angular.module('starter.controllers.taxista', [])
         });
     }
 
+    var compruebaServicios = function () {
+        if(Servicio.compruebaServicio()) {
+            console.log("PARECER SER QUE SERVICIO DIJO QUE SI")
+            $scope.ocupado = true;
+            $scope.estiloServicio = true;
+            var servicio = Servicio.getServicio();
+            console.log("EL SERVICIO CARGADO ES " + JSON.stringify(servicio));
+            $scope.servicioid = servicio.servicioid;
+            $scope.recogida = new google.maps.LatLng(servicio.recogidaLat,servicio.recogidaLng);
+            console.log("RECOGIDA ES " + JSON.stringify($scope.recogida));
+            console.log("USUARIO LA" + JSON.stringify(usuario));
+            var directionsRequest = {
+                origin: new google.maps.LatLng(usuario.latitud,usuario.longitud),
+                destination:$scope.recogida,
+                travelMode: google.maps.DirectionsTravelMode.DRIVING,
+                unitSystem: google.maps.UnitSystem.METRIC
+            };
+
+            directionsService.route(
+                directionsRequest,
+                function(response, status)
+                {
+                    console.log("IN");
+                    if (status == google.maps.DirectionsStatus.OK)
+                    {
+                        console.log("ON")
+                        $scope.rutaOrigen = new google.maps.DirectionsRenderer({
+                            map: $scope.map,
+                            directions: response,
+                            suppressMarkers: true
+                        });
+                    }
+                });
+
+            if(servicio.latdestino) {
+                $scope.destino = new google.maps.LatLng(servicio.destinoLat,servicio.destinoLng);
+                var directionsRequest = {
+                    origin: $scope.recogida,
+                    destination: $scope.destino,
+                    travelMode: google.maps.DirectionsTravelMode.DRIVING,
+                    unitSystem: google.maps.UnitSystem.METRIC
+                };
+
+                directionsService.route(
+                    directionsRequest,
+                    function(response, status)
+                    {
+                        if (status == google.maps.DirectionsStatus.OK)
+                        {
+                            $scope.rutaDestino = new google.maps.DirectionsRenderer({
+                                map: $scope.map,
+                                directions: response,
+                                polylineOptions: new google.maps.Polyline({
+                                    strokeColor: '#6FCB8E',
+                                    strokeOpacity: 0.8,
+                                    strokeWeight: 10
+                                }),
+                                suppressMarkers: true
+                            });
+                        }
+                    });
+            }
+        }
+    }
+
     var getCurrentPosition = function () {
 
         window.navigator.geolocation.getCurrentPosition(function (location) {
@@ -285,6 +353,7 @@ angular.module('starter.controllers.taxista', [])
                 $ionicLoading.hide();
                 //comenzamos a observar si te mueves
                 observaPosicion();
+                compruebaServicios();
             } else {
                 $ionicLoading.show({
                     template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Estamos intentando conseguir una precisión minima de 150m de tu posición, actualmente recibimos ' + location.coords.accuracy + 'm'
