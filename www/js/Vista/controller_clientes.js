@@ -1,6 +1,6 @@
 angular.module('starter.controllers.clientes', [])
 
-    .controller('ClienteMapaCtrl', function ($scope, $stateParams, $state, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, $compile, $timeout, $sails, FileUploader, $q, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal, $sce) {
+    .controller('ClienteMapaCtrl', function ($scope, $stateParams, $state, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, Servicio, $compile, $timeout, $sails, FileUploader, $q, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal, $sce) {
     //screen.lockOrientation('landscape');
     var usuario = Usuario.usuario();
     $scope.recordImg = "./img/record.png";
@@ -37,16 +37,14 @@ angular.module('starter.controllers.clientes', [])
         });
         inicializaMapa();
         google.maps.event.addListenerOnce($scope.map, 'idle', function () {
-            getCurrentPosition();
+            getCurrentPosition(false);
             mapaeventos();
-
         });
     }
 
     var preparaPedido = function () {
         var center = $scope.map.getCenter();
         $scope.localizacion = "http://maps.googleapis.com/maps/api/staticmap?size=640x320&sensor=false&zoom=18&markers=" + center.lat() + "%2C" + center.lng();
-
     }
 
     $scope.pedirTaxi = function () {
@@ -77,11 +75,34 @@ angular.module('starter.controllers.clientes', [])
     }
 
     $scope.recogido = function () {
-        console.log("RECOGIDO");
-        postRecogido();
-        if($scope.ruta){
-            $scope.ruta.setMap(null);
-        }
+        var myPopup = $ionicPopup.show({
+            template: '',
+            title: '¿Ya se ha montado en el taxi?',
+            scope: $scope,
+            buttons: [
+                {
+                    text: 'NO',
+                    type: 'button button-outline button-energized'
+                },
+                {
+                    text: 'SI',
+                    type: 'button button-energized',
+                    scope: $scope,
+                    onTap: function (e) {
+                        return
+                    }
+                }
+            ]
+        });
+        myPopup.then(function (res) {
+            console.log("RECOGIDO");
+            postRecogido();
+            if($scope.ruta){
+                $scope.ruta.setMap(null);
+            }
+            $scope.estiloAceptado = false;
+            Servicio.resuelveServicio();
+        });
     }
 
     var esperandoTaxi = function() {
@@ -128,6 +149,19 @@ angular.module('starter.controllers.clientes', [])
         getCurrentPosition(true);
     }
 
+    var compruebaServicio = function() {
+        if(Servicio.compruebaServicio()){
+            console.log("PARECE SER QUE SI...")
+            var servicio = Servicio.getServicio();
+            console.log("SERVICIO " + JSON.stringify(servicio));
+            $scope.estiloAceptado = true;
+            $scope.trackear  = servicio.taxistaid;
+            $scope.servicioid = servicio.servicioid;
+            $scope.recogida = new google.maps.LatLng(servicio.recogidaLat,servicio.recogidaLng);
+            generaRuta($scope.recogida ,new google.maps.LatLng(servicio.destinoLat,servicio.destinoLng));
+        }
+    }
+
     var getCurrentPosition = function (marcador) {
         $ionicLoading.show({
             template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Obteniendo tu geoposición…'
@@ -144,6 +178,7 @@ angular.module('starter.controllers.clientes', [])
                     animation: google.maps.Animation.DROP,
                     map: $scope.map
                 });
+                compruebaServicio();
             }  else {
                 usuario.marcador.panTo(posicion);
             }
@@ -224,13 +259,13 @@ angular.module('starter.controllers.clientes', [])
             unitSystem: google.maps.UnitSystem.METRIC
         };
 
-        $scope.ruta = directionsService.route(
+        directionsService.route(
             directionsRequest,
             function(response, status)
             {
                 if (status == google.maps.DirectionsStatus.OK)
                 {
-                    new google.maps.DirectionsRenderer({
+                    $scope.ruta = new google.maps.DirectionsRenderer({
                         map: $scope.map,
                         directions: response
                     });
@@ -249,7 +284,8 @@ angular.module('starter.controllers.clientes', [])
             $scope.estiloAceptado = true;
             $scope.trackear  = resp.taxista;
             $scope.servicioid = resp.servicioid;
-            $scope.recogida = new google.maps.LatLng(resp.latRecogida,resp.lngRecogida)
+            $scope.recogida = new google.maps.LatLng(resp.latRecogida,resp.lngRecogida);
+            Servicio.guardarServicioCliente($scope.trackear,$scope.servicioid,resp.latRecogida,resp.lngRecogida,resp.latitud,resp.longitud);
             generaRuta($scope.recogida ,new google.maps.LatLng(resp.latitud,resp.longitud));
         }
     });

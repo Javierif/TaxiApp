@@ -80,9 +80,13 @@ angular.module("starter.servicies_modelos", [])
             servicio = {servicioid:servicioid,recogidaLat:rlat,recogidaLng:rlng,destinoLat:dlat,destinoLng:dlng};
             window.localStorage["servicio"] = JSON.stringify(servicio);
         },
+        guardarServicioCliente:function(trackear,servicioid,latRecogida,lngRecogida,latitud,longitud){
+            servicio = {servicioid:servicioid,taxistaid:trackear,recogidaLat:latRecogida,recogidaLng:lngRecogida,destinoLat:latitud,destinoLng:longitud};
+            window.localStorage["servicio"] = JSON.stringify(servicio);
+        },
         compruebaServicio: function() {
             var cargado = window.localStorage["servicio"];
-            if (cargado != undefined && cargado != "vacio") {
+            if (cargado != undefined && cargado != "false") {
                 console.log(JSON.stringify(cargado));
                 servicio = JSON.parse(cargado);
                 return true;
