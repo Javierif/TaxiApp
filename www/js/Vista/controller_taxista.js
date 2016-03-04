@@ -44,6 +44,7 @@ angular.module('starter.controllers.taxista', [])
     $scope.servicioActual;
     $scope.progressValue = 0;
     $scope.ultimo = false;
+    $scope.especial = [];
 
     $scope.ocupado = false;
 
@@ -606,8 +607,17 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $sails.on('ServicioRechazado', function (resp) {
-        console.log("Rechazado SERVICIO");
-        checkTurno(resp.latRecogida, resp.lngRecogida,resp.latDestino,resp.lngDestino,resp.fechaRecogida,resp.id, resp.animal,resp.dispacitado,resp.idSocio);
+        $scope.especial.push({taxista:resp.taxista})
+        if(usuario.id == resp.taxista) {
+                $scope.rutaOrigen.setMap(null);
+                if($scope.rutaDestino) {
+                    $scope.rutaDestino.setMap(null)
+                }
+                Servicio.resuelveServicio();
+                postResolverServicio(res);
+                $scope.ocupado = false;
+        }
+
     });
 
     $sails.on('ServicioUltimoRechazado', function (resp) {
@@ -619,6 +629,7 @@ angular.module('starter.controllers.taxista', [])
         var introsound = new Media(resp.url)
         introsound.play()
     })
+
 
     var postResolver = function(estado,servicioid,taxistaid) {
         $sails.post('/taxista/resolver', {

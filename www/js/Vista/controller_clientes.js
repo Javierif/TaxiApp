@@ -105,6 +105,39 @@ angular.module('starter.controllers.clientes', [])
         });
     }
 
+     $scope.rechazaServicio = function () {
+        var myPopup = $ionicPopup.show({
+            template: 'Tenga en cuenta que el taxista puede estar ya en camino, solo rechace el servicio si es estrictamente necesario.',
+            title: '¿Está usted segur@?',
+            scope: $scope,
+            buttons: [
+                {
+                    text: 'NO',
+                    type: 'button button-outline button-energized'
+                },
+                {
+                    text: 'SI',
+                    type: 'button button-energized',
+                    scope: $scope,
+                    onTap: function (e) {
+                        return
+                    }
+                }
+            ]
+        });
+        myPopup.then(function (res) {
+            console.log("RECOGIDO");
+            postRechazar();
+            if($scope.ruta){
+                $scope.ruta.setMap(null);
+            }
+            $scope.estiloAceptado = false;
+            Servicio.resuelveServicio();
+        });
+    }
+
+
+
     var esperandoTaxi = function() {
         $timeout(function() {
             var hours   = Math.floor(timeRespuesta / 3600);
@@ -301,6 +334,12 @@ angular.module('starter.controllers.clientes', [])
 
     var postRecogido = function() {
         $sails.post('/cliente/recogido', {
+            taxistaid: $scope.trackear,
+            servicioid:$scope.servicioid,
+        });
+    }
+    var postRechazar = function() {
+        $sails.post('/cliente/rechazar', {
             taxistaid: $scope.trackear,
             servicioid:$scope.servicioid,
         });

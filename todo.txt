@@ -5,6 +5,7 @@
 - cambiar aspecto taxista
 - añadir datos del cliente
 - añadir precio estimado
+- Cuando rechazan un servicio este en un puesto preferente para coger servicios
 
 # TaxiApp - PreLanzamiento
 - Que puedan hablar entre socios
@@ -19,4 +20,5 @@
 + Bloquear pantalla en servicio [Servidor]
 + Que se resuelva el servicio y se apunte [servidor]
 + Bloquear pantalla en servicio [Cliente]
++ Crear anular servicio [Cliente]
 
