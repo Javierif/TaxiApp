@@ -21,7 +21,7 @@
         <div id="seccionmapa">
             <button class="button button-assertive" on-hold="itemOnLongPress()" on-release="itemOnTouchEnd()"><i class="ion-mic-a"></i></button>
             <div ng-if="ocupado">
-                <button class="button button-energized midbutton">Hablarle al cliente</button>
+                <button class="button button-energized midbutton" on-hold="itemOnLongPress()" on-release="OnTouchEndCliente()">Hablarle al cliente</button>
                 <button class="button button-balanced midbutton" ng-click="resolver()">Resolver Servicio</button>
             </div>
         </div>

@@ -3,7 +3,6 @@ angular.module('starter.controllers.clientes', [])
     .controller('ClienteMapaCtrl', function ($scope, $stateParams, $state, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, Servicio, $compile, $timeout, $sails, FileUploader, $q, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal, $sce) {
     //screen.lockOrientation('landscape');
     var usuario = Usuario.usuario();
-    $scope.recordImg = "./img/record.png";
     var geocoder = new google.maps.Geocoder();
     var directionsService = new google.maps.DirectionsService();
     $scope.datetimeValue = new Date();
@@ -14,8 +13,6 @@ angular.module('starter.controllers.clientes', [])
     $scope.estiloAceptado = false;
     var timerRespuesta = false;
     var timeRespuesta = 0;
-
-
 
     $scope.toggleLeft = function () {
         $ionicSideMenuDelegate.toggleLeft();
@@ -105,7 +102,7 @@ angular.module('starter.controllers.clientes', [])
         });
     }
 
-     $scope.rechazaServicio = function () {
+    $scope.rechazaServicio = function () {
         var myPopup = $ionicPopup.show({
             template: 'Tenga en cuenta que el taxista puede estar ya en camino, solo rechace el servicio si es estrictamente necesario.',
             title: '¿Está usted segur@?',
@@ -136,6 +133,17 @@ angular.module('starter.controllers.clientes', [])
         });
     }
 
+    $scope.itemOnLongPress = function () {
+        record();
+    }
+
+    $scope.itemOnTouchEnd = function () {
+        endRecord();
+    }
+
+    $scope.geolocation = function () {
+        getCurrentPosition(true);
+    }
 
 
     var esperandoTaxi = function() {
@@ -166,20 +174,6 @@ angular.module('starter.controllers.clientes', [])
             }
 
         },1000);
-    }
-
-    $scope.itemOnLongPress = function () {
-        $scope.recordImg = "./img/recording.png";
-        record();
-    }
-
-    $scope.itemOnTouchEnd = function () {
-        $scope.recordImg = "./img/record.png";
-        endRecord();
-    }
-
-    $scope.geolocation = function () {
-        getCurrentPosition(true);
     }
 
     var compruebaServicio = function() {
@@ -281,7 +275,6 @@ angular.module('starter.controllers.clientes', [])
         }, 100);
     };
 
-
     var generaRuta = function(from,to){
         if($scope.ruta)
             $scope.ruta.setMap(null);
@@ -332,17 +325,31 @@ angular.module('starter.controllers.clientes', [])
         }
     });
 
+    $sails.on('AudioCliente', function(resp) {
+         alert("SERVICIO DEL RESP ES "+resp.servicioid + " MIO "+ $scope.servicioid);
+        if(resp.servicioid == $scope.servicioid) {
+            alert("ANTES DE REPRODUCIR DIGO QUE " + JSON.stringify(resp));
+            var introsound = new Media("http://taxialcantarilla.es"+resp.url)
+            introsound.play()
+        }
+    })
+
     var postRecogido = function() {
         $sails.post('/cliente/recogido', {
             taxistaid: $scope.trackear,
             servicioid:$scope.servicioid,
         });
     }
+
     var postRechazar = function() {
         $sails.post('/cliente/rechazar', {
             taxistaid: $scope.trackear,
             servicioid:$scope.servicioid,
         });
+    }
+
+    var postEnviarRecordTaxista = function (res) {
+        $sails.post('/cliente/enviarrecord', res);
     }
 
     //Prepares File System for Audio Recording
@@ -355,6 +362,8 @@ angular.module('starter.controllers.clientes', [])
         console.log("Code = " + r.responseCode);
         console.log("Response = " + r.response);
         console.log("Sent = " + r.bytesSent);
+        var response = JSON.parse(r.response);
+        postEnviarRecordTaxista({servicioid:$scope.servicioid,urlaudio:response.url,grupo:1});
     }
 
     var fail = function (error) {
@@ -413,7 +422,7 @@ angular.module('starter.controllers.clientes', [])
         options.fileName = audioRecord;
         options.mimeType = "audio/wav";
         var ft = new FileTransfer();
-        ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/taxista/record"), win, fail, options);
+        ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/cliente/record"), win, fail, options);
     }
 
 

@@ -31,7 +31,6 @@ angular.module('starter.controllers.taxista', [])
     var usuario = Usuario.usuario();
     $scope.ubicarDisponible = {};
     $scope.ubicarDisponible.disabled = true;
-    $scope.recordImg = "./img/record.png";
     $scope.ubicadoText;
     $scope.route = [];
     var servicioTimeOut=[];
@@ -86,13 +85,15 @@ angular.module('starter.controllers.taxista', [])
 
 
     $scope.itemOnLongPress = function () {
-        $scope.recordImg = "./img/recording.png";
         record();
     }
 
     $scope.itemOnTouchEnd = function () {
-        $scope.recordImg = "./img/record.png";
         endRecord();
+    }
+
+    $scope.OnTouchEndCliente = function () {
+        endRecordCliente();
     }
 
     $scope.ubicar = function () {
@@ -609,13 +610,13 @@ angular.module('starter.controllers.taxista', [])
     $sails.on('ServicioRechazado', function (resp) {
         $scope.especial.push({taxista:resp.taxista})
         if(usuario.id == resp.taxista) {
-                $scope.rutaOrigen.setMap(null);
-                if($scope.rutaDestino) {
-                    $scope.rutaDestino.setMap(null)
-                }
-                Servicio.resuelveServicio();
-                postResolverServicio(res);
-                $scope.ocupado = false;
+            $scope.rutaOrigen.setMap(null);
+            if($scope.rutaDestino) {
+                $scope.rutaDestino.setMap(null)
+            }
+            Servicio.resuelveServicio();
+            postResolverServicio(res);
+            $scope.ocupado = false;
         }
 
     });
@@ -631,6 +632,14 @@ angular.module('starter.controllers.taxista', [])
         introsound.play()
     })
 
+    $sails.on('AudioCliente', function(resp) {
+
+        if(resp.servicioid == $scope.servicioid) {
+            alert("ANTES DE REPRODUCIR DIGO QUE " + JSON.stringify(resp));
+            var introsound = new Media("http://taxialcantarilla.es"+resp.url)
+            introsound.play()
+        }
+    })
 
     var postResolver = function(estado,servicioid,taxistaid) {
         $sails.post('/taxista/resolver', {
@@ -718,6 +727,9 @@ angular.module('starter.controllers.taxista', [])
         $sails.post('/taxista/difundirRecord', res);
     }
 
+    var postDifundirClientesRecord = function (res) {
+        $sails.post('/taxista/enviarRecordCliente', res);
+    }
 
     //Prepares File System for Audio Recording
     audioRecord = 'recorded.wav';
@@ -725,13 +737,21 @@ angular.module('starter.controllers.taxista', [])
     var urlfilesystem = false;
 
     var win = function (r) {
-
         console.log("Code = " + r.responseCode);
         console.log("Response = " + r.response);
         console.log("Sent = " + r.bytesSent);
         var response = JSON.parse(r.response);
-         alert("res " + response.url);
+       // alert("res " + response.url);
         postDifundirRecord({taxista:usuario.id,urlaudio:response.url});
+    }
+
+    var winClientes = function (r) {
+        console.log("Code = " + r.responseCode);
+        console.log("Response = " + r.response);
+        console.log("Sent = " + r.bytesSent);
+        var response = JSON.parse(r.response);
+       // alert("res " + response.url);
+        postDifundirClientesRecord({servicioid:$scope.servicioid,urlaudio:response.url});
     }
 
     var fail = function (error) {
@@ -790,6 +810,23 @@ angular.module('starter.controllers.taxista', [])
         options.mimeType = "audio/wav";
         var ft = new FileTransfer();
         ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/taxista/record"), win, fail, options);
+    }
+    var endRecordCliente = function () {
+        myMedia.stopRecord();
+        myMedia.play();
+        //alert("AQUI");
+
+        var options = new FileUploadOptions();
+        options.chunkedMode = false;
+
+        options.headers = {
+            Connection: "close"
+        };
+        options.fileKey = "file";
+        options.fileName = audioRecord;
+        options.mimeType = "audio/wav";
+        var ft = new FileTransfer();
+        ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/taxista/recordCliente"), winClientes, fail, options);
     }
 
 

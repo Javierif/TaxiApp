@@ -9,6 +9,7 @@
 - Cuando hablan que salte una notificación si esta minimizado o cerrada la app que avise de que estan hablando y se cargen cuando abra.
 - que le salga una notificacion si lo tiene minimizado avisando de que hay un servicio
 - Comprobar la duración de la grabación y si es inferior a 1 segundo no enviar nada ;D
+- Quitar el desplazamiento horizontal del menu, afecta a la grabacion de audio
 
 # TaxiApp - PreLanzamiento
 + Que puedan hablar entre socios
