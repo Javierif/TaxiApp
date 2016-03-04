@@ -6,9 +6,12 @@
 - añadir datos del cliente
 - añadir precio estimado
 - Cuando rechazan un servicio este en un puesto preferente para coger servicios
+- Cuando hablan que salte una notificación si esta minimizado o cerrada la app que avise de que estan hablando y se cargen cuando abra.
+- que le salga una notificacion si lo tiene minimizado avisando de que hay un servicio
+- Comprobar la duración de la grabación y si es inferior a 1 segundo no enviar nada ;D
 
 # TaxiApp - PreLanzamiento
-- Que puedan hablar entre socios
++ Que puedan hablar entre socios
 - Que puedan hablar con un cliente
 + Que se resuelva el servicio y se apunte [cliente]
 + cuando le das al boton de geolocalizarte (Cliente) se te queda el icono anterior volando
@@ -21,4 +24,5 @@
 + Que se resuelva el servicio y se apunte [servidor]
 + Bloquear pantalla en servicio [Cliente]
 + Crear anular servicio [Cliente]
+- Que se autoconecte a tu cuenta [ultimo]
 

@@ -455,7 +455,7 @@ angular.module('starter.controllers.taxista', [])
             }
             var tiempo = puesto * 10000;
             var timeout = $timeout(function() {
-                alert("TE TOCA!");
+                //alert("TE TOCA!");
                 $scope.servicioid=servicioid;
                 servicio(latitud,longitud,latdestino,lngdestino,fechaRecogida,mascota,discapacitado);
                 $scope.ocupado = true;
@@ -626,7 +626,8 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $sails.on('AudioInterno', function(resp) {
-        var introsound = new Media(resp.url)
+        alert("ANTES DE REPRODUCIR DIGO QUE " + JSON.stringify(resp));
+        var introsound = new Media("http://taxialcantarilla.es"+resp.url)
         introsound.play()
     })
 
@@ -713,6 +714,10 @@ angular.module('starter.controllers.taxista', [])
         });
     }
 
+    var postDifundirRecord = function (res) {
+        $sails.post('/taxista/difundirRecord', res);
+    }
+
 
     //Prepares File System for Audio Recording
     audioRecord = 'recorded.wav';
@@ -720,20 +725,22 @@ angular.module('starter.controllers.taxista', [])
     var urlfilesystem = false;
 
     var win = function (r) {
-        alert("WIN" + JSON.stringify(r));
+
         console.log("Code = " + r.responseCode);
         console.log("Response = " + r.response);
         console.log("Sent = " + r.bytesSent);
+        var response = JSON.parse(r.response);
+         alert("res " + response.url);
+        postDifundirRecord({taxista:usuario.id,urlaudio:response.url});
     }
 
     var fail = function (error) {
-        alert("FAIL " + error.code + "SORU " + error.source + " tar " + error.target);
+        //alert("FAIL " + error.code + "SORU " + error.source + " tar " + error.target);
         console.log("upload error source " + error.source);
         console.log("upload error target " + error.target);
     }
 
     var record = function () {
-
         var introsound = new Media("./img/record.wav", function mediaSuccess() {
             if (!urlfilesystem) {
                 window.requestFileSystem(
