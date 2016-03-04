@@ -86,19 +86,21 @@ angular.module('starter.controllers.clientes', [])
                     type: 'button button-energized',
                     scope: $scope,
                     onTap: function (e) {
-                        return
+                        return true;
                     }
                 }
             ]
         });
         myPopup.then(function (res) {
-            console.log("RECOGIDO");
-            postRecogido();
-            if($scope.ruta){
-                $scope.ruta.setMap(null);
+            if(res) {
+                console.log("RECOGIDO");
+                postRecogido();
+                if($scope.ruta){
+                    $scope.ruta.setMap(null);
+                }
+                $scope.estiloAceptado = false;
+                Servicio.resuelveServicio();
             }
-            $scope.estiloAceptado = false;
-            Servicio.resuelveServicio();
         });
     }
 
@@ -117,19 +119,22 @@ angular.module('starter.controllers.clientes', [])
                     type: 'button button-energized',
                     scope: $scope,
                     onTap: function (e) {
-                        return
+                        return true;
                     }
                 }
             ]
         });
         myPopup.then(function (res) {
-            console.log("RECOGIDO");
-            postRechazar();
-            if($scope.ruta){
-                $scope.ruta.setMap(null);
+            if(res) {
+                console.log("RECOGIDO");
+                postRechazar();
+                if($scope.ruta){
+                    $scope.ruta.setMap(null);
+                }
+                $scope.estiloAceptado = false;
+                Servicio.resuelveServicio();
             }
-            $scope.estiloAceptado = false;
-            Servicio.resuelveServicio();
+
         });
     }
 
@@ -326,7 +331,7 @@ angular.module('starter.controllers.clientes', [])
     });
 
     $sails.on('AudioCliente', function(resp) {
-         alert("SERVICIO DEL RESP ES "+resp.servicioid + " MIO "+ $scope.servicioid);
+        alert("SERVICIO DEL RESP ES "+resp.servicioid + " MIO "+ $scope.servicioid);
         if(resp.servicioid == $scope.servicioid) {
             alert("ANTES DE REPRODUCIR DIGO QUE " + JSON.stringify(resp));
             var introsound = new Media("http://taxialcantarilla.es"+resp.url)
