@@ -13,7 +13,7 @@
 
 # TaxiApp - PreLanzamiento
 + Que puedan hablar entre socios
-- Que puedan hablar con un cliente
++ Que puedan hablar con un cliente
 + Que se resuelva el servicio y se apunte [cliente]
 + cuando le das al boton de geolocalizarte (Cliente) se te queda el icono anterior volando
 - Crear las reservas bien
@@ -26,4 +26,5 @@
 + Bloquear pantalla en servicio [Cliente]
 + Crear anular servicio [Cliente]
 - Que se autoconecte a tu cuenta [ultimo]
++ Anular servicio [servidor]
 
