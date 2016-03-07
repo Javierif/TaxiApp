@@ -567,16 +567,17 @@ angular.module('starter.controllers.taxista', [])
                     $scope.socios[socio].marcador.setIcon('./img/activoicon.png');
                     var myMedia = new Media("./img/on.wav");
                     myMedia.play();
-                    window.plugins.toast.showShortBottom("Se ha conectado el taxi nº" + resp.id,
+                    window.plugins.toast.showShortBottom("Se ha conectado el taxi nº" + $scope.socios[socio].numerotaxi,
                                                          function (a) {},
                                                          function (b) {});
                 } else {
                     MapaControl.borraUbicacion($scope.paradas, $scope.socios, 1, resp.id);
                     $scope.socios[socio].marcador.setIcon('./img/desconectadoicon.png');
-                    window.plugins.toast.showShortBottom("Se ha desconectado el taxi nº" + resp.id,
+                    window.plugins.toast.showShortBottom("Se ha desconectado el taxi nº" + $scope.socios[socio].numerotaxi,
                                                          function (a) {},
                                                          function (b) {});
                 }
+                break;
             }
         }
     });
