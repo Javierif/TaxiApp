@@ -1,0 +1,37 @@
+<div class="modal">
+    <header class="bar bar-header bar-energized">
+        <h1 class="title">Pedir un Taxi</h1>
+        <div class="button button-clear" ng-click="modalPedir.hide()"><span class="icon ion-close"></span></div>
+    </header>
+    <content has-header="true" padding="true">
+        <div>
+            <img id="modalmapa" ng-src="{{localizacion}}">
+            <div class="list padding">
+                <label class="item item-input">
+                    <i class="icon ion-location placeholder-icon"></i>
+                    <input type="text" placeholder="Recogida" ng-model="ubicaciontext">
+                </label>
+                <label class="item item-input">
+                    <i class="icon ion-location placeholder-icon"></i>
+                    <input type="text" placeholder="Destino (Opcional)">
+                </label>
+            </div>
+            <div class="item item-icon-left" ion-datetime-picker ng-model="datetimeValue">
+                <h6>Hora de recogida:</h6>
+                <i class="ion-clock positive"></i> <strong> {{datetimeValue| date: "yyyy-MM-dd H:mm"}}</strong>
+            </div>
+
+            <div class="list margintop">
+                <a class="item item-icon-right" href="#" ng-class="{opcionactiva:opcion.discapacitado}" ng-click="opcion.discapacitado = !opcion.discapacitado">
+                                Discapacitado
+                                <i class="icon ion-ios-body"></i>
+                            </a>
+                <a class="item item-icon-right" ng-class="{opcionactiva:opcion.mascota}" href="#" ng-click="opcion.mascota = !opcion.mascota">
+                                Mascota
+                                <i class="icon ion-ios-paw"></i>
+                            </a>
+            </div>
+            <button class="button full button-energized">Confirmar recogida</button>
+        </div>
+    </content>
+</div>

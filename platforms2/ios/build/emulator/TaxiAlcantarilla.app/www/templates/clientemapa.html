@@ -1,0 +1,27 @@
+<ion-view view-title="Listado de ofertas" hide-nav-bar="true" can-swipe-back="false">
+    <ion-content bindonce scroll="false">
+        <!-- End controls-->
+        <div id="mapa" class="mapacliente"></div>
+        <div class="row bar-header head">
+            <div class="col-xs-3 col-md-3">
+                <button class="button button-light radius" ng-click="geolocation()"><i class="ion-navigate"></i></button>
+            </div>
+            <div class="col-xs-6 col-md-6 ubicacionspace">
+            </div>
+            <div class="col-xs-3 col-md-3">
+                <button class="button button-light right radius" ng-click="modal()"><i class="ion-person"></i></button>
+            </div>
+        </div>
+        <div class="fullh">
+            <button class="button centerbutton"></button>
+        </div>
+        <div id="seccionmapa">
+            <div class="input-group">
+                <div class="input-group-addon"><i class="ion-location"></i></div>
+                <input type="text" class="form-control" id="exampleInputAmount" placeholder="Mueve el marcador del mapa" ng-model="ubicaciontext" disabled>
+            </div>
+            <button class="button button-energized" ng-click="pedirTaxi()">Pedir un Taxi</button>
+
+        </div>
+    </ion-content>
+</ion-view>

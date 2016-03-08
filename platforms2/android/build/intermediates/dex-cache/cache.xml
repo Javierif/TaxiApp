@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\android\build\intermediates\exploded-aar\android\CordovaLib\unspecified\debug\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="505912fdb8197dcc53197fe4fb3e13956c554534">
+        <dex dex="C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\android\build\intermediates\pre-dexed\debug\CordovaLib-unspecified-debug_b1033ed883c19bb592b06984f8be98913d7131df.jar" />
+    </item>
+
+</items>

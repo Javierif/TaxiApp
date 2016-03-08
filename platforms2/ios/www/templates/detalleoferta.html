@@ -1,0 +1,65 @@
+<ion-view class="overlightblue" view-title="Detalle de la oferta">
+    <ion-content>
+
+        <div class="list lightblue seccionoferta">
+
+            <div class="detalleimagenproducto">
+                <ul rn-carousel rn-carousel-auto-slide class="carrusel">
+                    <li ng-repeat="image in oferta.imagenescargar">
+                        <div class="carrusel"><img class="carrusel" ng-src="http://localhost:1337{{image.url}}"></div>
+                        <p class="description">{{oferta.titulo}}</p>
+                    </li>
+                </ul>
+            </div>
+            <div class="seccionCupon">
+            </div>
+            <div class="seccionOpciones">
+
+                <ion-list>
+                    <ion-item class="item-stable opcionestitle" ng-click="toggleGroup(0)" ng-class="{active: isGroupShown(0)}">
+                        &nbsp; Descripción del descuento
+                        <i class="icon right" ng-class="isGroupShown(0) ? 'ion-chevron-up' : 'ion-chevron-down'"></i>
+                    </ion-item>
+                    <ion-item class="item-accordion opcionesdesc" ng-show="isGroupShown(0)">
+                        {{oferta.descripcion}}
+                    </ion-item>
+                    <ion-item class="item-stable opcionestitle" ng-click="toggleGroup(1)" ng-class="{active: isGroupShown(1)}">
+                        <i class="ion-android-share-alt"></i> &nbsp; ¿Dónde encontrarlo?
+                        <i class="icon right" ng-class="isGroupShown(1) ? 'ion-chevron-up' : 'ion-chevron-down'"></i>
+                    </ion-item>
+                    <ion-item class="item-accordion opcionesdesc" ng-show="isGroupShown(1)">
+                        <div id="contenedormapa">
+                            <div id="map" data-tap-disabled="true"></div>
+                        </div>
+
+                    </ion-item>
+                    <ion-item class="item-stable opcionestitle" ng-click="toggleGroup(2)" ng-class="{active: isGroupShown(2)}">
+                        <i class="ion-android-share-alt"></i> &nbsp; Compartelo con tus amigos
+                        <i class="icon right" ng-class="isGroupShown(2) ? 'ion-chevron-up' : 'ion-chevron-down'"></i>
+                    </ion-item>
+                    <ion-item class="item-accordion opcionesdesc social" ng-show="isGroupShown(2)">
+                        <button class="button button-positive ion-social-facebook-outline"></button>
+                        <button class="button button-calm ion-social-twitter-outline"></button>
+                        <button class="button button-assertive ion-social-googleplus"></button>
+                        <button class="button button-balanced"><img style="width:30px; height:30px; padding-bottom:5px;" src="./img/whatsappicon.png"></button>
+                    </ion-item>
+                </ion-list>
+                <div class="seccionacciones">
+                    <button class="button button-energized" ng-click="reserva()">
+                        Reservar
+                    </button>
+                    <button class="button button-calm" ng-click="cupon()">
+                        Obtener Cupón
+                    </button>
+                </div>
+                <div class="tabs tabs-icon-left tabsdisponi">
+                    <a class="tab-item">
+                        <i class="icon ion-home"></i> Disponibles: {{oferta.cantidadMaxUser}}
+                    </a>
+                    <a class="tab-item">
+                        <i class="icon ion-star"></i> Reservadas: {{oferta.reservadas}}
+                    </a>
+                </div>
+    </ion-content>
+
+</ion-view>
