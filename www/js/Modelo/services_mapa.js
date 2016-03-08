@@ -115,9 +115,6 @@ angular.module("starter.servicies_mapa", [])
         },
         creaTaxiMapa: function (mapa, usuario, socios, taxista, idListado) {
             var posicion = new google.maps.LatLng(taxista.latitud, taxista.longitud);
-            var infowindow = new google.maps.InfoWindow({
-                content: '<strong>Taxi nº: </strong> ' + taxista.numerotaxi
-            });
             var icon;
             if (socios[idListado].conectado || socios[idListado].id == usuario.id) {
                 icon = './img/iconmap/'+taxista.numerotaxi+'.png'
@@ -129,11 +126,6 @@ angular.module("starter.servicies_mapa", [])
                 icon: icon,
                 map: mapa
             });
-            marcador.addListener('click', function (marker) {
-                infowindow.open(mapa, socios[idListado].marcador);
-            });
-
-            infowindow.open(mapa, marcador);
             // console.log("MARCADOR " + marcador + "ID LIST " + idListado)
             socios[idListado].marcador = marcador;
         },
