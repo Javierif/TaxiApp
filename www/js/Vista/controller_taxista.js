@@ -583,8 +583,9 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $sails.on('movimiento', function (resp) {
+        console.log("SE ESTA MOVIENDO " + JSON.stringify(resp));
         for (socio in $scope.socios) {
-            if ($scope.socios[socio].id == resp.user) {
+            if ($scope.socios[socio].id == resp.id) {
                 var posicion = new google.maps.LatLng(resp.latitud, resp.longitud);
                 $scope.socios[socio].marcador.setPosition(posicion);
                 break;
