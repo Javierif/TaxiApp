@@ -120,7 +120,7 @@ angular.module("starter.servicies_mapa", [])
             });
             var icon;
             if (socios[idListado].conectado || socios[idListado].id == usuario.id) {
-                icon = './img/activoicon.png'
+                icon = './img/iconmap/'+taxista.numerotaxi+'.png'
             } else {
                 icon = './img/desconectadoicon.png'
             }
