@@ -1,0 +1,30 @@
+# TaxiApp - General
+- Mejorar icono del cliente
+- Mejorar los iconos de las rutas y quitar el icono de la geoposicion
+- Limpiar codigo
+- cambiar aspecto taxista
+- añadir datos del cliente
+- añadir precio estimado
+- Cuando rechazan un servicio este en un puesto preferente para coger servicios
+- Cuando hablan que salte una notificación si esta minimizado o cerrada la app que avise de que estan hablando y se cargen cuando abra.
+- que le salga una notificacion si lo tiene minimizado avisando de que hay un servicio
+- Comprobar la duración de la grabación y si es inferior a 1 segundo no enviar nada ;D
++ Quitar el desplazamiento horizontal del menu, afecta a la grabacion de audio
+
+# TaxiApp - PreLanzamiento
++ Que puedan hablar entre socios
++ Que puedan hablar con un cliente
++ Que se resuelva el servicio y se apunte [cliente]
++ cuando le das al boton de geolocalizarte (Cliente) se te queda el icono anterior volando
+- Crear las reservas bien
+- Crear un listado de reservas
++ Arreglar lo de las paradas que no funciona bien
++ detectar si estas deconectado de sails y cerrarte la sesion o algo
++ Que el taxista cuando llega un servicio no pueda cambiar las especificaciones del servicio
++ Bloquear pantalla en servicio [Servidor]
++ Que se resuelva el servicio y se apunte [servidor]
++ Bloquear pantalla en servicio [Cliente]
++ Crear anular servicio [Cliente]
+- Que se autoconecte a tu cuenta [ultimo]
++ Anular servicio [servidor]
+

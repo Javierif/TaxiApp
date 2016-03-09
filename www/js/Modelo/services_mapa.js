@@ -1,6 +1,6 @@
 angular.module("starter.servicies_mapa", [])
 
-.factory("MapaInstancia", function ($q, $ionicLoading, Peticiones, Usuario, MapaControl) {
+    .factory("MapaInstancia", function ($q, $ionicLoading, Peticiones, Usuario, MapaControl) {
     var usuario;
 
     var paradas;
@@ -69,6 +69,7 @@ angular.module("starter.servicies_mapa", [])
             var deferred = $q.defer();
             var sociosObtenidos = Peticiones.getSocios(usuario.grupo);
             sociosObtenidos.then(function (result) {
+                console.log("SOCIOS OBTENIDOS ES " + JSON.stringify(result));
                 socios = result;
                 for (socio in result) {
                     if (result[socio].id == usuario.id) {
@@ -96,7 +97,7 @@ angular.module("starter.servicies_mapa", [])
 
 })
 
-.factory("MapaControl", function () {
+    .factory("MapaControl", function () {
     return {
         creaParadaMapa: function (mapa, latitud, longitud) {
             var posicion = new google.maps.LatLng(latitud, longitud);
@@ -114,12 +115,9 @@ angular.module("starter.servicies_mapa", [])
         },
         creaTaxiMapa: function (mapa, usuario, socios, taxista, idListado) {
             var posicion = new google.maps.LatLng(taxista.latitud, taxista.longitud);
-            var infowindow = new google.maps.InfoWindow({
-                content: '<strong>Taxi nº: </strong> ' + taxista.numerotaxi
-            });
             var icon;
             if (socios[idListado].conectado || socios[idListado].id == usuario.id) {
-                icon = './img/activoicon.png'
+                icon = './img/iconmap/taxi'+taxista.numerotaxi+'.png'
             } else {
                 icon = './img/desconectadoicon.png'
             }
@@ -128,31 +126,27 @@ angular.module("starter.servicies_mapa", [])
                 icon: icon,
                 map: mapa
             });
-            marcador.addListener('click', function (marker) {
-                infowindow.open(mapa, socios[idListado].marcador);
-            });
-
-            infowindow.open(mapa, marcador);
             // console.log("MARCADOR " + marcador + "ID LIST " + idListado)
             socios[idListado].marcador = marcador;
         },
         ubica: function (paradas, socios, paradaRecibida, socioRecibido) {
             console.log("PRIMERA VEZ DENTRO")
             for (parada in paradas) {
-                console.log("CHECJ " + paradas[parada].id + " fj " + paradaRecibida);
                 if (paradas[parada].id == paradaRecibida) {
                     console.log("2");
                     for (socio in socios) {
                         if (socios[socio].id == socioRecibido) {
-                            console.log("Por lo menos entro")
                             paradas[parada].ubicados.push(socios[socio]);
                             if (paradas[parada].id == 1) {
                                 paradas[parada].prioridad = 10000;
                             } else {
                                 paradas[parada].prioridad = 1000;
                             }
+                            break;
                         }
+
                     }
+                    break;
                 }
             }
         },

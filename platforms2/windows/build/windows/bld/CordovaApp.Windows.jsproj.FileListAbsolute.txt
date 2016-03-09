@@ -1,0 +1,14 @@
+C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\windows\build\windows\debug\anycpu\win8.1\resources.pri
+C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\windows\build\windows\debug\anycpu\win8.1\AppxManifest.xml
+C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\windows\build\windows\bld\priconfig.xml
+C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\windows\build\windows\bld\priconfig.xml.intermediate
+C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\windows\build\windows\bld\layout.resfiles
+C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\windows\build\windows\bld\layout.resfiles.intermediate
+C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\windows\build\windows\bld\resources.resfiles
+C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\windows\build\windows\bld\resources.resfiles.intermediate
+C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\windows\build\windows\bld\pri.resfiles
+C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\windows\build\windows\bld\pri.resfiles.intermediate
+C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\windows\build\windows\bld\qualifiers.txt
+C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\windows\build\windows\bld\qualifiers.txt.intermediate
+C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\windows\build\windows\bld\MultipleQualifiersPerDimensionFound.txt
+C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\windows\build\windows\bld\ProjectArchitectures.txt

@@ -1,0 +1,38 @@
+<ion-view view-title="Listado de ofertas" hide-nav-bar="true" can-swipe-back="false">
+    <ion-content bindonce scroll="false">
+        <!-- End controls-->
+        <div id="mapa" class="mapacliente"></div>
+        <div ng-if="!estiloAceptado" class="fullh">
+            <div class="row bar-header head">
+                <div class="col-xs-3 col-md-3">
+                    <button class="button button-light radius" ng-click="modal()"><i class="ion-person"></i></button>
+
+                </div>
+                <div class="col-xs-6 col-md-6 ubicacionspace">
+                </div>
+                <div class="col-xs-3 col-md-3">
+                    <button class="button button-light right radius" ng-click="geolocation()"><i class="ion-navigate positive"></i></button>
+                </div>
+            </div>
+            <div class="fullh">
+                <button class="button centerbutton"></button>
+            </div>
+            <div id="seccionmapa">
+                <div class="input-group">
+                    <div class="input-group-addon"><i class="ion-location"></i></div>
+                    <input type="text" class="form-control" id="exampleInputAmount" placeholder="Mueve el marcador del mapa" ng-model="ubicaciontext" disabled>
+                </div>
+                <button class="button button-energized" ng-click="pedirTaxi()">Pedir un Taxi</button>
+            </div>
+        </div>
+        <div ng-if="estiloAceptado">
+
+            <div id="seccionmapa">
+                <button class="button button-energized"  on-hold="itemOnLongPress()" on-release="itemOnTouchEnd()">Hablarle al Taxista</button>
+                <button class="button midbutton button-assertive" ng-click="rechazaServicio()">Anular</button>
+                <button class="button midbutton button-balanced" ng-click="recogido()">Recogido</button>
+
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

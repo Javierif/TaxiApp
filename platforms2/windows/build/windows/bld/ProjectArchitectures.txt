@@ -1,0 +1,1 @@
+C:\Users\ordenador\Desktop\Proyectos\TaxApp\platforms\windows\CordovaApp.Windows.jsproj;neutral
