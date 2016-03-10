@@ -794,6 +794,8 @@ angular.module('starter.controllers.taxista', [])
         options.headers = {
             Connection: "close"
         };
+                alert(JSON.stringify(myMedia));
+
         options.fileKey = "file";
         options.fileName = audioRecord;
         options.mimeType = "audio/wav";
@@ -804,7 +806,6 @@ angular.module('starter.controllers.taxista', [])
         myMedia.stopRecord();
         myMedia.play();
         //alert("AQUI");
-
         var options = new FileUploadOptions();
         options.chunkedMode = false;
 
