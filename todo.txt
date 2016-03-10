@@ -28,3 +28,8 @@
 - Que se autoconecte a tu cuenta [ultimo]
 + Anular servicio [servidor]
 
+# TaxiApp - PreLanzamiento 0.0.3
+- Que no se apague el movil
+- arreglar el envio de audio
+- comprobar y arreglar lo de que te desubique
+

@@ -565,7 +565,7 @@ angular.module('starter.controllers.taxista', [])
                     MapaControl.borraUbicacion($scope.paradas, $scope.socios, 1, resp.id);
                     MapaControl.ubica($scope.paradas, $scope.socios, 1, resp.id);
                     $scope.socios[socio].marcador.setIcon('./img/iconmap/taxi'+$scope.socios[socio].numerotaxi+'.png');
-                    var myMedia = new Media("./img/on.wav");
+                    var myMedia = new Media("/android_asset/www/www/img/on.wav");
                     myMedia.play();
                     window.plugins.toast.showShortBottom("Se ha conectado el taxi nº" + $scope.socios[socio].numerotaxi,
                                                          function (a) {},
@@ -594,7 +594,7 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $sails.on('ubicado', function (resp) {
-        var myMedia = new Media("./img/ubicar.wav");
+        var myMedia = new Media("/android_asset/www/www/img/ubicar.wav");
         myMedia.play();
         MapaControl.ubica($scope.paradas, $scope.socios, resp.parada, resp.socio);
     });
@@ -743,7 +743,7 @@ angular.module('starter.controllers.taxista', [])
         console.log("Response = " + r.response);
         console.log("Sent = " + r.bytesSent);
         var response = JSON.parse(r.response);
-       // alert("res " + response.url);
+        // alert("res " + response.url);
         postDifundirRecord({taxista:usuario.id,urlaudio:response.url});
     }
 
@@ -752,7 +752,7 @@ angular.module('starter.controllers.taxista', [])
         console.log("Response = " + r.response);
         console.log("Sent = " + r.bytesSent);
         var response = JSON.parse(r.response);
-       // alert("res " + response.url);
+        // alert("res " + response.url);
         postDifundirClientesRecord({servicioid:$scope.servicioid,urlaudio:response.url});
     }
 
@@ -763,38 +763,25 @@ angular.module('starter.controllers.taxista', [])
     }
 
     var record = function () {
-        var introsound = new Media("./img/record.wav", function mediaSuccess() {
-            if (!urlfilesystem) {
-                window.requestFileSystem(
-                    LocalFileSystem.TEMPORARY,
-                    0,
-                    function (fileSystem) {
-                        urlfilesystem = fileSystem.root.toURL();
-                        /* hohohla */
-                        urlfilesystem = urlfilesystem.slice(7);
-                        myMedia = new Media(urlfilesystem + audioRecord);
-                        myMedia.startRecord();
-                    },
-                    function (error) {
-                        alert('Error getting file system');
-                    }
-                );
-            } else {
-                myMedia = new Media(urlfilesystem + audioRecord);
-                myMedia.startRecord();
-
-            }
-        },
-
-                                   function mediaFailure(err) {
-            console.log("An error occurred: " + err.code);
-        },
-
-                                   function mediaStatus(status) {
-            console.log("A status change occurred: " + status.code);
-        });
-
+        var introsound = new Media("/android_asset/www/img/record.wav");
         introsound.play();
+        if (!urlfilesystem) {
+            window.requestFileSystem(
+                LocalFileSystem.TEMPORARY,
+                0,
+                function (fileSystem) {
+                    myMedia = new Media(audioRecord);
+                    myMedia.startRecord();
+                },
+                function (error) {
+                    alert('Error getting file system');
+                }
+            );
+        } else {
+            myMedia = new Media( audioRecord);
+            myMedia.startRecord();
+
+        }
     }
 
     var endRecord = function () {
