@@ -765,23 +765,9 @@ angular.module('starter.controllers.taxista', [])
     var record = function () {
         var introsound = new Media("/android_asset/www/img/record.wav");
         introsound.play();
-        if (!urlfilesystem) {
-            window.requestFileSystem(
-                LocalFileSystem.TEMPORARY,
-                0,
-                function (fileSystem) {
-                    myMedia = new Media(audioRecord);
-                    myMedia.startRecord();
-                },
-                function (error) {
-                    alert('Error getting file system');
-                }
-            );
-        } else {
-            myMedia = new Media( audioRecord);
-            myMedia.startRecord();
+        myMedia = new Media("/storage/emulated/0/"+audioRecord);
+        myMedia.startRecord();
 
-        }
     }
 
     var endRecord = function () {
@@ -794,7 +780,7 @@ angular.module('starter.controllers.taxista', [])
         options.headers = {
             Connection: "close"
         };
-                alert(JSON.stringify(myMedia));
+        alert(JSON.stringify(myMedia));
 
         options.fileKey = "file";
         options.fileName = audioRecord;
