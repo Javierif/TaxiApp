@@ -119,7 +119,7 @@ angular.module("starter.servicies_mapa", [])
             if (socios[idListado].conectado || socios[idListado].id == usuario.id) {
                 icon = './img/iconmap/taxi'+taxista.numerotaxi+'.png'
             } else {
-                icon = './img/desconectadoicon.png'
+                icon = 'null'
             }
             var marcador = new google.maps.Marker({
                 position: new google.maps.LatLng(taxista.latitud, taxista.longitud),

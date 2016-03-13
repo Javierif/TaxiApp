@@ -572,7 +572,7 @@ angular.module('starter.controllers.taxista', [])
                                                          function (b) {});
                 } else {
                     MapaControl.borraUbicacion($scope.paradas, $scope.socios, 1, resp.id);
-                    $scope.socios[socio].marcador.setIcon('./img/desconectadoicon.png');
+                    $scope.socios[socio].marcador.setIcon(null);
                     window.plugins.toast.showShortBottom("Se ha desconectado el taxi nº" + $scope.socios[socio].numerotaxi,
                                                          function (a) {},
                                                          function (b) {});
