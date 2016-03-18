@@ -264,7 +264,9 @@
     -moz-border-radius: 15px;
     border-radius: 15px;
 }
-
+.ocupadotaxista{
+    background: rgba(223,116,1,0.4);
+}
 #taxista_login button {
     top: 30px;
     width: 49%;

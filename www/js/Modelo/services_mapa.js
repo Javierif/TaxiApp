@@ -8,6 +8,8 @@ angular.module("starter.servicies_mapa", [])
 
     var ubicadoText = "Ubicar";
     var mapa;
+
+    var ocupado = false;
     return {
         cargaMapa: function (dataUsuario, dataMapa) {
             var deferral = $q.defer();
@@ -83,6 +85,13 @@ angular.module("starter.servicies_mapa", [])
         },
 
 
+        setOcupado: function(data) {
+            ocupado = data;
+        },
+
+        getOcupado: function() {
+            return ocupado;
+        }
 
         getUbicadoText: function () {
             return ubicadoText;

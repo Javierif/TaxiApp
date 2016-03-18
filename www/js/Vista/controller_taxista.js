@@ -24,6 +24,14 @@ angular.module('starter.controllers.taxista', [])
     }, function (newValue, oldValue) {
         if (newValue !== oldValue) $scope.ubicadoText = newValue;
     });
+
+    $scope.$watch(function () {
+        return MapaInstancia.getOcupado();
+    }, function (newValue, oldValue) {
+        if (newValue !== oldValue) $scope.ocupado = newValue;
+    });
+
+
 })
 
     .controller('MapaTaxistaCtrl', function ($scope, $ionicLoading, $ionicPopup, Peticiones, server_constantes, Usuario, $timeout, $sails, FileUploader, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal, $filter, Servicio) {
@@ -51,6 +59,10 @@ angular.module('starter.controllers.taxista', [])
         $ionicSideMenuDelegate.toggleLeft();
     };
 
+    $scope.toggleOcupado = function() {
+        $scope.ocupado = !$scope.ocupado;
+        MapaInstancia.setOcupado($scope.ocupado);
+    }
 
     $ionicModal.fromTemplateUrl('templates/servicio.html', function ($ionicModal) {
         $scope.modalPedir = $ionicModal;
@@ -169,6 +181,7 @@ angular.module('starter.controllers.taxista', [])
         $scope.modalPedir.hide();
         $scope.estiloServicio = false;
         $scope.ocupado = false;
+        MapaInstancia.setOcupado($scope.ocupado)
         var latdestino;
         var lngdestino;
         if($scope.destino) {
@@ -213,6 +226,7 @@ angular.module('starter.controllers.taxista', [])
                 Servicio.resuelveServicio();
                 postResolverServicio(res);
                 $scope.ocupado = false;
+                MapaInstancia.setOcupado($scope.ocupado);
             } else {
                 window.plugins.toast.showShortBottom("Selecciona una de las opciones",
                                                      function (a) {},
@@ -285,6 +299,7 @@ angular.module('starter.controllers.taxista', [])
         if(Servicio.compruebaServicio()) {
             console.log("PARECER SER QUE SERVICIO DIJO QUE SI")
             $scope.ocupado = true;
+            MapaInstancia.setOcupado($scope.ocupado);
             $scope.estiloServicio = true;
             var servicio = Servicio.getServicio();
             console.log("EL SERVICIO CARGADO ES " + JSON.stringify(servicio));
@@ -460,6 +475,7 @@ angular.module('starter.controllers.taxista', [])
                 $scope.servicioid=servicioid;
                 servicio(latitud,longitud,latdestino,lngdestino,fechaRecogida,mascota,discapacitado);
                 $scope.ocupado = true;
+                MapaInstancia.setOcupado($scope.ocupado);
             },tiempo)
             servicioTimeOut.push({servicioid:servicioid,timeout:timeout,ultimo:$scope.ultimo});
         } else {
@@ -527,11 +543,13 @@ angular.module('starter.controllers.taxista', [])
                     $scope.progressValue = 0;
                     $scope.modalPedir.hide();
                     $scope.ocupado = false;
+                    MapaInstancia.setOcupado($scope.ocupado);
                 }
             } else {
                 $scope.progressValue = 0;
                 $scope.modalPedir.hide();
                 $scope.ocupado = true;
+                MapaInstancia.setOcupado($scope.ocupado);
             }
         }, 1000);
     }
@@ -619,6 +637,7 @@ angular.module('starter.controllers.taxista', [])
             Servicio.resuelveServicio();
             postResolverServicio(res);
             $scope.ocupado = false;
+            MapaInstancia.setOcupado($scope.ocupado);
         }
 
     });
