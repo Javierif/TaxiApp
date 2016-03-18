@@ -117,7 +117,7 @@ angular.module("starter.servicies_mapa", [])
             var posicion = new google.maps.LatLng(taxista.latitud, taxista.longitud);
             var icon;
             if (socios[idListado].conectado || socios[idListado].id == usuario.id) {
-                icon = './img/iconmap/taxi'+taxista.numerotaxi+'.png'
+                icon = './img/activo/taxi'+taxista.numerotaxi+'.png'
             } else {
                 icon = 'null'
             }

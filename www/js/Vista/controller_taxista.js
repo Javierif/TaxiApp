@@ -564,7 +564,7 @@ angular.module('starter.controllers.taxista', [])
                 if (resp.conectado) {
                     MapaControl.borraUbicacion($scope.paradas, $scope.socios, 1, resp.id);
                     MapaControl.ubica($scope.paradas, $scope.socios, 1, resp.id);
-                    $scope.socios[socio].marcador.setIcon('./img/iconmap/taxi'+$scope.socios[socio].numerotaxi+'.png');
+                    $scope.socios[socio].marcador.setIcon('./img/activo/taxi'+$scope.socios[socio].numerotaxi+'.png');
                     var myMedia = new Media("./img/on.wav");
                     myMedia.play();
                     window.plugins.toast.showShortBottom("Se ha conectado el taxi nº" + $scope.socios[socio].numerotaxi,
