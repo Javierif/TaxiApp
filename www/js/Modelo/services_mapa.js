@@ -8,6 +8,7 @@ angular.module("starter.servicies_mapa", [])
 
     var ubicadoText = "Ubicar";
     var mapa;
+    var ocupado = false;
     return {
         cargaMapa: function (dataUsuario, dataMapa) {
             var deferral = $q.defer();
@@ -61,7 +62,6 @@ angular.module("starter.servicies_mapa", [])
             })
             return deferred.promise;
         },
-
         obtenSocios: function () {
             $ionicLoading.show({
                 template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Obteniendo los socios taxistas…'
@@ -81,9 +81,12 @@ angular.module("starter.servicies_mapa", [])
             });
             return deferred.promise;
         },
-
-
-
+        setOcupado: function (data) {
+            ocupado = data;
+        },
+        getOcupado: function() {
+            return ocupado;
+        },
         getUbicadoText: function () {
             return ubicadoText;
         },

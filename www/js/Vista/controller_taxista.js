@@ -168,8 +168,7 @@ angular.module('starter.controllers.taxista', [])
         var lngrecogida = recogida.geometry.location.lng();
         $scope.modalPedir.hide();
         $scope.estiloServicio = false;
-        $scope.ocupado = false;
-        $scope.socios[usuario.posicion].marcador.setIcon('./img/activo/taxi'+$scope.socios[socio].numerotaxi+'.png')
+        ocupaTaxi(false);
         var latdestino;
         var lngdestino;
         if($scope.destino) {
@@ -213,8 +212,7 @@ angular.module('starter.controllers.taxista', [])
                 }
                 Servicio.resuelveServicio();
                 postResolverServicio(res);
-                $scope.ocupado = false;
-                $scope.socios[usuario.posicion].marcador.setIcon('./img/activo/taxi'+$scope.socios[socio].numerotaxi+'.png')
+                ocupaTaxi(false);
             } else {
                 window.plugins.toast.showShortBottom("Selecciona una de las opciones",
                                                      function (a) {},
@@ -270,6 +268,15 @@ angular.module('starter.controllers.taxista', [])
         valorarUbicacion(latitud, longitud);
     }
 
+    var ocupaTaxi = function(data) {
+        $scope.ocupado = data;
+        MapaInstancia.setOcupado($scope.ocupado);
+        if(data){
+            $scope.socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+$scope.socios[socio].numerotaxi+'.png')
+        } else {
+            $scope.socios[usuario.posicion].marcador.setIcon('./img/activo/taxi'+$scope.socios[socio].numerotaxi+'.png')
+        }
+    }
 
     var observaPosicion = function () {
         window.navigator.geolocation.watchPosition(function (location, error, options) {
@@ -286,8 +293,7 @@ angular.module('starter.controllers.taxista', [])
     var compruebaServicios = function () {
         if(Servicio.compruebaServicio()) {
             console.log("PARECER SER QUE SERVICIO DIJO QUE SI")
-            $scope.ocupado = true;
-            $scope.socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+$scope.socios[socio].numerotaxi+'.png')
+            ocupaTaxi(true);
             $scope.estiloServicio = true;
             var servicio = Servicio.getServicio();
             console.log("EL SERVICIO CARGADO ES " + JSON.stringify(servicio));
@@ -462,8 +468,7 @@ angular.module('starter.controllers.taxista', [])
                 //alert("TE TOCA!");
                 $scope.servicioid=servicioid;
                 servicio(latitud,longitud,latdestino,lngdestino,fechaRecogida,mascota,discapacitado);
-                $scope.ocupado = true;
-                $scope.socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+$scope.socios[socio].numerotaxi+'.png')
+                ocupaTaxi(true);
             },tiempo)
             servicioTimeOut.push({servicioid:servicioid,timeout:timeout,ultimo:$scope.ultimo});
         } else {
@@ -530,14 +535,12 @@ angular.module('starter.controllers.taxista', [])
                 } else {
                     $scope.progressValue = 0;
                     $scope.modalPedir.hide();
-                    $scope.ocupado = false;
-                    $scope.socios[usuario.posicion].marcador.setIcon('./img/activo/taxi'+$scope.socios[socio].numerotaxi+'.png')
+                    ocupaTaxi(false);
                 }
             } else {
                 $scope.progressValue = 0;
                 $scope.modalPedir.hide();
-                $scope.ocupado = true;
-                $scope.socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+$scope.socios[socio].numerotaxi+'.png')
+                ocupaTaxi(true);
             }
         }, 1000);
     }
@@ -624,8 +627,7 @@ angular.module('starter.controllers.taxista', [])
             }
             Servicio.resuelveServicio();
             postResolverServicio(res);
-            $scope.ocupado = false;
-            $scope.socios[usuario.posicion].marcador.setIcon('./img/activo/taxi'+$scope.socios[socio].numerotaxi+'.png')
+ocupaTaxi(false);
         }
 
     });
@@ -750,7 +752,7 @@ angular.module('starter.controllers.taxista', [])
         console.log("Response = " + r.response);
         console.log("Sent = " + r.bytesSent);
         var response = JSON.parse(r.response);
-       // alert("res " + response.url);
+        // alert("res " + response.url);
         postDifundirRecord({taxista:usuario.id,urlaudio:response.url});
     }
 
@@ -759,7 +761,7 @@ angular.module('starter.controllers.taxista', [])
         console.log("Response = " + r.response);
         console.log("Sent = " + r.bytesSent);
         var response = JSON.parse(r.response);
-       // alert("res " + response.url);
+        // alert("res " + response.url);
         postDifundirClientesRecord({servicioid:$scope.servicioid,urlaudio:response.url});
     }
 
