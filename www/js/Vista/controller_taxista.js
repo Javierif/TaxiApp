@@ -4,8 +4,13 @@ angular.module('starter.controllers.taxista', [])
     $scope.paradas = MapaInstancia.getParadas();
     $scope.socios = MapaInstancia.getSocios();
     $scope.ubicadoText = MapaInstancia.getUbicadoText();
+    $scope.ocupado = MapaInstancia.getOcupado();
 
-
+    $scope.ocupa = function() {
+        console.log("OCUPANDO")
+        $scope.ocupado = !$scope.ocupado;
+        MapaInstancia.setOcupado($scope.ocupado);
+    }
 
     $scope.$watch(function () {
         return MapaInstancia.getParadas();
@@ -23,6 +28,12 @@ angular.module('starter.controllers.taxista', [])
         return MapaInstancia.getUbicadoText();
     }, function (newValue, oldValue) {
         if (newValue !== oldValue) $scope.ubicadoText = newValue;
+    });
+
+    $scope.$watch(function () {
+        return MapaInstancia.getOcupado();
+    }, function (newValue, oldValue) {
+        if (newValue !== oldValue) $scope.ocupado = newValue;
     });
 })
 
@@ -82,7 +93,12 @@ angular.module('starter.controllers.taxista', [])
         });
     }
 
-
+    $scope.$watch(function () {
+        return MapaInstancia.getOcupado();
+    }, function (newValue, oldValue) {
+        if (newValue !== oldValue)
+             $scope.socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+$scope.socios[socio].numerotaxi+'.png')
+    });
 
     $scope.itemOnLongPress = function () {
         record();
