@@ -16,9 +16,7 @@
     </ion-side-menu-content>
 
     <ion-side-menu side="left" drag-content="false">
-        <ion-header-bar class="bar bar-header item menues">
-            <button class="button" ng-class="{'button-energized' : ocupado, 'button-assertive' : !ocupado}" ng-click="ocupado= !ocupado">Ocupado</button>
-        </ion-header-bar>
+            <button class="button button-full" ng-class="{'button-energized' : ocupado, 'button-assertive' : !ocupado}" ng-click="ocupado= !ocupado">Ocupado</button>
         <ion-content class="has-header my-menu">
             <div ng-repeat="parada in paradas | orderBy:'prioridad':true track by parada.id">
                 <ion-list>
