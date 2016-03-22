@@ -237,11 +237,6 @@ angular.module('starter.controllers.taxista', [])
         });
     }
 
-
-    var generaRuta = function(from,to,color,origen){
-
-    }
-
     var valorarUbicacion = function (latitud, longitud) {
         var radio = false;
         var limite = false;
