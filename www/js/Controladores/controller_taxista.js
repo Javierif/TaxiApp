@@ -422,72 +422,6 @@ angular.module('starter.controllers.taxista', [])
         return dist
     }
 
-    var checkTurno = function (latitud, longitud, latdestino, lngdestino, fechaRecogida, servicioid,mascota,discapacitado,socioid,ultimo) {
-        var puesto = 0;
-        var ubicados = 0;
-        if(socioid)
-            if(socioid == usuario.id)
-                return;
-        /*
-        * Si el taxista esta ocupado rechaza directamente el servicio y lo pasa al siguiente para que no se creen conflictos
-        */
-        if(!$scope.ocupado || socioid) {
-            if(socioid) {
-                var servicioObtenido = $filter('Object')(servicioTimeOut,{servicioid:servicioid});
-                $timeout.cancel(servicioObtenido.timeout);
-            }
-            for (parada in $scope.paradas) {
-                console.log("Paradas 1" + $scope.paradas[parada].parada);
-                $scope.paradas[parada].distanciaservicio = calculaDistancia(latitud, longitud, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
-                for(ubicado in $scope.paradas[parada].ubicados) {
-                    ubicados = ubicados +1;
-                }
-            }
-            $scope.paradasFiltradas = $filter('orderBy')($scope.paradas, 'distanciaservicio');
-            for(filtrado in $scope.paradasFiltradas) {
-                var breaker = false;
-                var encontrado = false;
-                for(ubicado in $scope.paradasFiltradas[filtrado].ubicados) {
-                    if($scope.paradasFiltradas[filtrado].ubicados[ubicado].id == usuario.id) {
-                        breaker = true;
-                        break;
-                    } else {
-                        if(socioid) {
-                            if(encontrado) {
-                                puesto = puesto+1;
-                            }
-                            if(socioid == $scope.paradasFiltradas[filtrado].ubicados[ubicado].id) {
-                                encontrado = true;
-                            }
-
-                        } else {
-                            console.log("socio " + $scope.paradasFiltradas[filtrado].ubicados[ubicado].id);
-                            puesto = puesto+1;
-                        }
-                    }
-                }
-                if(breaker) {
-                    break;
-                }
-            }
-            $scope.ultimo = false;
-            if(puesto+1 == ubicados) {
-                $scope.ultimo = true;
-            }
-            var tiempo = puesto * 10000;
-            var timeout = $timeout(function() {
-                //alert("TE TOCA!");
-                $scope.servicioid=servicioid;
-                servicio(latitud,longitud,latdestino,lngdestino,fechaRecogida,mascota,discapacitado);
-                ocupaTaxi(true);
-            },tiempo)
-            servicioTimeOut.push({servicioid:servicioid,timeout:timeout,ultimo:$scope.ultimo});
-        } else {
-            if(ultimo){}
-            PostSails.postRechazar(latitud, longitud, latdestino, lngdestino, fechaRecogida, servicioid,mascota,discapacitado,usuario.id);
-        }
-    }
-
     var servicio = function(latrecogida,lngrecogida,latdestino,lngdestino,fecha,mascota,discapacitado) {
         var distancia = calculaDistancia(lngrecogida, lngrecogida,latdestino,lngdestino);
         var zoom = 16;
@@ -623,9 +557,9 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $sails.on('Servicio', function (resp) {
-        console.log("RECIBIDO SERVICIO "+JSON.stringify(resp));
-        $scope.clienteActivo = resp.datosCliente;
-        checkTurno(resp.latRecogida, resp.lngRecogida, resp.latDestino,resp.lngDestino,resp.fechaRecogida,resp.id,resp.animal,resp.dispacitado);
+        if(resp.taxista == usuario.id) {
+            servicio(resp.latRecogida, resp.lngRecogida, resp.latDestino,resp.lngDestino,resp.fechaRecogida,resp.animal,resp.dispacitado)
+        }
     });
 
     $sails.on('ServicioRechazado', function (resp) {
@@ -742,6 +676,7 @@ ocupaTaxi(false);
         var ft = new FileTransfer();
         ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/taxista/record"), win, fail, options);
     }
+
     var endRecordCliente = function () {
         myMedia.stopRecord();
         myMedia.play();
