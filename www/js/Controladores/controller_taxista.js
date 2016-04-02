@@ -511,6 +511,7 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $sails.on('conexion', function (resp) {
+        console.log("LA CONIXON FUE " + JSON.stringify(resp));
         for (socio in $scope.socios) {
             if (resp.id == $scope.socios[socio].id) {
                 $scope.socios[socio].conectado = resp.conectado;

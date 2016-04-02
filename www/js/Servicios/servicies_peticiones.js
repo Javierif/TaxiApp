@@ -106,96 +106,96 @@ angular.module('starter.servicies_peticiones', [])
     }
 })
 
-    .factory('PostSails',function(){
+    .factory('PostSails',function($sails){
+    return {
+        postResolver: function(estado,servicioid,taxistaid) {
+            $sails.post('/taxista/resolver', {
+                taxistaid: taxistaid,
+                servicioid:servicioid,
+                estado:estado
+            });
+        },
 
-    var postResolver = function(estado,servicioid,taxistaid) {
-        $sails.post('/taxista/resolver', {
-            taxistaid: taxistaid,
-            servicioid:servicioid,
-            estado:estado
-        });
+        postAceptar: function(taxistaid,servicioid,latitud,longitud,clienteid) {
+            $sails.post('/taxista/aceptarServicio', {
+                taxistaid: taxistaid,
+                servicioid:servicioid,
+                cliente:clienteid,
+                latitud:latitud,
+                longitud:longitud,
+                grupo:1
+            });
+        },
+
+        postRechazar: function(latRecogida,lngRecogida,latDestino,lngDestino,fechaRecogida,id, animal,dispacitado,idSocio) {
+            $sails.post('/taxista/rechazar', {
+                idSocio: usuario.id,
+                latRecogida: latRecogida,
+                lngRecogida: lngRecogida,
+                latDestino: latDestino,
+                lngDestino: lngDestino,
+                fechaRecogida: fechaRecogida,
+                id:id,
+                animal:animal,
+                discapacitado: dispacitado
+            });
+        },
+
+        postRechazarUltimo: function(latRecogida,lngRecogida,latDestino,lngDestino,fechaRecogida,id, animal,dispacitado,idSocio) {
+            $sails.post('/taxista/rechazarUltimo', {
+                idSocio: usuario.id,
+                latRecogida: latRecogida,
+                lngRecogida: lngRecogida,
+                latDestino: latDestino,
+                lngDestino: lngDestino,
+                fechaRecogida: fechaRecogida,
+                id:id,
+                animal:animal,
+                discapacitado: discapacitado
+            });
+        },
+
+        postMoviendose: function (usuarioId, grupo, latitud, longitud) {
+            $sails.post('/taxista/moviendose', {
+                user: usuarioId,
+                grupo: grupo,
+                latitud: latitud,
+                longitud: longitud
+            });
+        },
+
+        postUbicar: function (paradaId, grupo, latitud, longitud, taxistaId) {
+            console.log("UBICAnDO " + paradaId + " g " + grupo + " lat " + latitud +" lng " +longitud+" tax " + taxistaId)
+            $sails.post('/taxista/ubicar', {
+                parada: paradaId,
+                grupo: grupo,
+                latitud: latitud,
+                longitud: longitud,
+                taxista: taxistaId
+            });
+        },
+
+        postDesUbicar: function (paradaId, taxistaId, grupo) {
+            $sails.post('/taxista/desubicar', {
+                parada: paradaId,
+                taxista: taxistaId,
+                grupo: grupo
+            });
+        },
+
+        postResolverServicio: function (res) {
+            $sails.post('/taxista/resolver', {
+                servicioid: $scope.servicioid,
+                resultado: res
+            });
+        },
+
+        postDifundirRecord: function (res) {
+            $sails.post('/taxista/difundirRecord', res);
+        },
+
+        postDifundirClientesRecord: function (res) {
+            $sails.post('/taxista/enviarRecordCliente', res);
+        }
     }
-
-    var postAceptar = function(taxistaid,servicioid,latitud,longitud,clienteid) {
-        $sails.post('/taxista/aceptarServicio', {
-            taxistaid: taxistaid,
-            servicioid:servicioid,
-            cliente:clienteid,
-            latitud:latitud,
-            longitud:longitud,
-            grupo:1
-        });
-    }
-
-    var postRechazar = function(latRecogida,lngRecogida,latDestino,lngDestino,fechaRecogida,id, animal,dispacitado,idSocio) {
-        $sails.post('/taxista/rechazar', {
-            idSocio: usuario.id,
-            latRecogida: latRecogida,
-            lngRecogida: lngRecogida,
-            latDestino: latDestino,
-            lngDestino: lngDestino,
-            fechaRecogida: fechaRecogida,
-            id:id,
-            animal:animal,
-            discapacitado: dispacitado
-        });
-    }
-
-    var postRechazarUltimo = function(latRecogida,lngRecogida,latDestino,lngDestino,fechaRecogida,id, animal,dispacitado,idSocio) {
-        $sails.post('/taxista/rechazarUltimo', {
-            idSocio: usuario.id,
-            latRecogida: latRecogida,
-            lngRecogida: lngRecogida,
-            latDestino: latDestino,
-            lngDestino: lngDestino,
-            fechaRecogida: fechaRecogida,
-            id:id,
-            animal:animal,
-            discapacitado: discapacitado
-        });
-    }
-
-    var postMoviendose = function (usuarioId, grupo, latitud, longitud) {
-        $sails.post('/taxista/moviendose', {
-            user: usuarioId,
-            grupo: grupo,
-            latitud: latitud,
-            longitud: longitud
-        });
-    }
-
-    var postUbicar = function (paradaId, grupo, latitud, longitud, taxistaId) {
-        console.log("UBICAnDO " + paradaId + " g " + grupo + " lat " + latitud +" lng " +longitud+" tax " + taxistaId)
-        $sails.post('/taxista/ubicar', {
-            parada: paradaId,
-            grupo: grupo,
-            latitud: latitud,
-            longitud: longitud,
-            taxista: taxistaId
-        });
-    }
-
-    var postDesUbicar = function (paradaId, taxistaId, grupo) {
-        $sails.post('/taxista/desubicar', {
-            parada: paradaId,
-            taxista: taxistaId,
-            grupo: grupo
-        });
-    }
-
-    var postResolverServicio = function (res) {
-        $sails.post('/taxista/resolver', {
-            servicioid: $scope.servicioid,
-            resultado: res
-        });
-    }
-
-    var postDifundirRecord = function (res) {
-        $sails.post('/taxista/difundirRecord', res);
-    }
-
-    var postDifundirClientesRecord = function (res) {
-        $sails.post('/taxista/enviarRecordCliente', res);
-    }
-
-    });
+});
