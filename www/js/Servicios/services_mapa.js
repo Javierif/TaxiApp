@@ -3,12 +3,12 @@ angular.module("starter.servicies_mapa", [])
     .factory("MapaInstancia", function ($q, $ionicLoading, Peticiones, Usuario, MapaControl) {
     var usuario;
 
+    var listadoGeneral;
     var paradas;
     var socios;
 
     var ubicadoText = "Ubicar";
     var mapa;
-    var ocupado = false;
     return {
         cargaMapa: function (dataUsuario, dataMapa) {
             var deferral = $q.defer();
@@ -31,33 +31,25 @@ angular.module("starter.servicies_mapa", [])
             var deferred = $q.defer();
             var paradasPeticion = Peticiones.getParadas(usuario.grupo);
             paradasPeticion.then(function (result) {
-                var ubicados = result.ubicados;
-                var paradasObtenidas = result.paradas;
-                for (parada in paradasObtenidas) {
-                    if (!paradasObtenidas[parada].ubicados) {
-                        paradasObtenidas[parada].prioridad = 0;
-                        paradasObtenidas[parada].ubicados = [];
-                    }
-                    for (ubicado in ubicados) {
-                        console.log("PARADA " + paradasObtenidas[parada].id + " == " + ubicados[ubicado].parada)
-                        if (paradasObtenidas[parada].id && paradasObtenidas[parada].id == ubicados[ubicado].parada) {
-
-                            paradasObtenidas[parada].prioridad += 1;
-                            paradasObtenidas[parada].ubicados.push(ubicados[ubicado].taxista);
-                            if (ubicados[ubicado].taxista.id == usuario.id) {
-                                if (paradasObtenidas[parada].id == 1) {
-                                    paradasObtenidas[parada].prioridad = 10000;
-                                } else {
-                                    paradasObtenidas[parada].prioridad = 1000;
-                                    ubicadoText = 'Desubicar';
-                                }
-                            }
+                var paradasConUbicados = result.paradas;
+                var listaGeneral = result.listaGeneral;
+                for(taxi in listaGeneral) {
+                    listaGeneral[taxi].marcador = MapaControl.creaTaxiMapa(mapa,listaGeneral[taxi])
+                }
+                for(parada in paradasConUbicados) {
+                    paradasConUbicados[parada].prioridad = 0;
+                    MapaControl.creaParadaMapa(mapa,paradasConUbicados[parada].latitud,paradasConUbicados[parada].longitud)
+                    for(ubicado in paradasConUbicados[parada].taxistaUbicado) {
+                        paradasConUbicados[parada].prioridad += 1;
+                        if(paradasConUbicados[parada].taxistaUbicado[ubicado].id = usuario.id) {
+                            paradasConUbicados[parada].priodidad = 1000;
                         }
                     }
-                    MapaControl.creaParadaMapa(mapa, paradasObtenidas[parada].latitud, paradasObtenidas[parada].longitud);
                 }
+
                 $ionicLoading.hide();
-                paradas = paradasObtenidas;
+                paradas = paradasConUbicados;
+                listadoGeneral = listaGeneral;
                 deferred.resolve()
             })
             return deferred.promise;
@@ -69,40 +61,12 @@ angular.module("starter.servicies_mapa", [])
             var deferred = $q.defer();
             var sociosObtenidos = Peticiones.getSocios(usuario.grupo);
             sociosObtenidos.then(function (result) {
-                console.log("SOCIOS OBTENIDOS ES " + JSON.stringify(result));
-                socios = result;
-                for (socio in result) {
-                    if (result[socio].id == usuario.id) {
-                        usuario.posicion = socio;
-                    }
-                    MapaControl.creaTaxiMapa(mapa, usuario, result, result[socio], socio);
-                }
+                socios = result.socios;
                 deferred.resolve();
             });
             return deferred.promise;
         },
-        setOcupado: function (data) {
-            ocupado = data;
-        },
-        getOcupado: function() {
-            return ocupado;
-        },
-        getUbicadoText: function () {
-            return ubicadoText;
-        },
-        getParadas: function () {
-            return paradas;
-        },
-        getSocios: function () {
-            return socios;
-        }
-    }
-
-})
-
-    .factory("MapaControl", function () {
-    return {
-        creaParadaMapa: function (mapa, latitud, longitud) {
+        creaParadaMapa: function (latitud, longitud) {
             var posicion = new google.maps.LatLng(latitud, longitud);
             var cityCircle = new google.maps.Circle({
                 strokeColor: '#2E9AFE',
@@ -116,55 +80,82 @@ angular.module("starter.servicies_mapa", [])
             });
 
         },
-        creaTaxiMapa: function (mapa, usuario, socios, taxista, idListado) {
+        creaTaxiMapa: function (taxista) {
             var posicion = new google.maps.LatLng(taxista.latitud, taxista.longitud);
             var icon;
-            if (socios[idListado].conectado || socios[idListado].id == usuario.id) {
-                icon = './img/activo/taxi'+taxista.numerotaxi+'.png'
-            } else {
-                icon = 'null'
-            }
+            icon = './img/activo/taxi'+taxista.numerotaxi+'.png'
             var marcador = new google.maps.Marker({
                 position: new google.maps.LatLng(taxista.latitud, taxista.longitud),
                 icon: icon,
                 map: mapa
             });
             // console.log("MARCADOR " + marcador + "ID LIST " + idListado)
-            socios[idListado].marcador = marcador;
+            return marcador;
         },
-        ubica: function (paradas, socios, paradaRecibida, socioRecibido) {
-            console.log("PRIMERA VEZ DENTRO")
-            for (parada in paradas) {
-                if (paradas[parada].id == paradaRecibida) {
-                    console.log("2");
-                    for (socio in socios) {
-                        if (socios[socio].id == socioRecibido) {
-                            paradas[parada].ubicados.push(socios[socio]);
-                            if (paradas[parada].id == 1) {
-                                paradas[parada].prioridad = 10000;
-                            } else {
-                                paradas[parada].prioridad = 1000;
-                            }
-                            break;
-                        }
-
+        ubica: function (taxista,parada) {
+            for(p in paradas) {
+                if(paradas[p].id == parada.id) {
+                    paradas[p].taxistaUbicado.push(taxista);
+                    paradas[p].prioridad += 1;
+                    if(taxista.id == usuario.id) {
+                        paradas[p].prioridad = 1000;
                     }
                     break;
                 }
             }
         },
-        borraUbicacion: function (paradas, socios, paradaRecibida, socioRecibido) {
-            for (parada in paradas) {
-                if (paradas[parada].id == paradaRecibida) {
-                    for (ubicado in paradas[parada].ubicados) {
-                        if (paradas[parada].ubicados[ubicado].id == socioRecibido) {
-                            paradas[parada].ubicados.splice(ubicado, 1);
-                            paradas[parada].prioridad = paradas[parada].ubicados.length;
+        borraUbicacion: function (paradaRecibida, socioRecibido) {
+            for (p in paradas) {
+                if (paradas[parada].id == paradaRecibida.id) {
+                    for (ubicado in paradas[p].taxistaUbicado) {
+                        if (paradas[p].taxistaUbicado[ubicado].id == socioRecibido) {
+                            paradas[p].taxistaUbicado.splice(ubicado, 1);
+                            paradas[p].prioridad = paradas[parada].ubicados.length;
                         }
                     }
-
                 }
             }
         },
+
+        getUbicadoText: function () {
+            return ubicadoText;
+        },
+        getListadoGeneral: function() {
+            return listadoGeneral;
+        },
+        getParadas: function () {
+            return paradas;
+        },
+        getSocios: function () {
+            return socios;
+        },
+        limpia: function(array,elemento) {
+            var encontrado = {enarray:false,posicion:0};
+            for(taxi in array) {
+                if(array[taxi].id == elemento.id) {
+                    encontrado.enarray = true;
+                    encontrado.posicion = taxi;
+                    break;
+                }
+            }
+            if(encontrado.enarray) {
+                array.splice(encontrado.posicion,1);
+            }
+        },
+        pushTaxi: function(taxi) {
+            limpia(listadoGeneral,taxi);
+            listadoGeneral.push(taxi);
+        },
+        desconectaTaxi: function(taxi) {
+            limpia(listadoGeneral,taxi);
+            MapaControl.borraUbicacion
+        },
+    }
+
+})
+
+    .factory("MapaControl", function () {
+    return {
+
     }
 })
