@@ -150,12 +150,13 @@ angular.module("starter.servicies_mapa", [])
             limpia(listadoGeneral,taxi);
             MapaControl.borraUbicacion
         },
+        ocupar:function(ocupar) {
+            usuario.ocupado = !usuario.ocupado;
+            if(usuario.ocupado){
+                var taxi = _.findWhere(listadoGeneral,{id:usuario.id});
+                taxi.marcador.setIcon('./img/ocupado/taxi'+$scope.socios[socio].numerotaxi+'.png')
+            }
+        }
     }
 
-})
-
-    .factory("MapaControl", function () {
-    return {
-
-    }
-})
+});
