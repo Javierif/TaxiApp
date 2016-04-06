@@ -44,7 +44,7 @@ angular.module('starter.controllers.taxista', [])
     var GoogleMaps = {geocoder:new google.maps.Geocoder(),directionsService:new google.maps.DirectionsService()};
 
 
-    $scope.servicio = {servicio:0,mascota: false,discapacitado: false,estiloServicio:false,progressValue:1000};
+    $scope.servicio = {id:0,mascota: false,discapacitado: false,estiloServicio:false,progressValue:1000};
     $scope.progressValue = 0;
 
 
@@ -67,6 +67,56 @@ angular.module('starter.controllers.taxista', [])
                 });
                 getCurrentPosition();
             });
+        });
+    }
+
+    var directionsOrigen = function() {
+        var directionsRequest = {
+            origin: new google.maps.LatLng(usuario.latitud,usuario.longitud),
+            destination:$scope.servicio.recogida,
+            travelMode: google.maps.DirectionsTravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC
+        };
+
+        directionsService.route(
+            directionsRequest,
+            function(response, status)
+            {
+                if (status == google.maps.DirectionsStatus.OK)
+                {
+                    $scope.rutaOrigen = new google.maps.DirectionsRenderer({
+                        map: $scope.map,
+                        directions: response,
+                        suppressMarkers: true
+                    });
+                }
+            });
+    }
+
+    var directionsDestino = function() {
+        var directionsRequest = {
+            origin: $scope.servicio.recogida,
+            destination: $scope.servicio.destino,
+            travelMode: google.maps.DirectionsTravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC
+        };
+
+        directionsService.route(directionsRequest,
+                                function(response, status)
+                                {
+            if (status == google.maps.DirectionsStatus.OK)
+            {
+                $scope.rutaDestino = new google.maps.DirectionsRenderer({
+                    map: $scope.map,
+                    directions: response,
+                    polylineOptions: new google.maps.Polyline({
+                        strokeColor: '#6FCB8E',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 10
+                    }),
+                    suppressMarkers: true
+                });
+            }
         });
     }
 
@@ -103,54 +153,11 @@ angular.module('starter.controllers.taxista', [])
         $scope.modalPedir.hide();
         $scope.servicio.estiloServicio = true;
         $scope.servicio.progressValue = 1000;
-        PostSails.postAceptar(usuario.id,$scope.servicioid,usuario.latitud,usuario.longitud);
-        Servicio.guardarServicio($scope.servicioid,$scope.recogida,$scope.destino);
-        var directionsRequest = {
-            origin: new google.maps.LatLng(usuario.latitud,usuario.longitud),
-            destination:$scope.recogida,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING,
-            unitSystem: google.maps.UnitSystem.METRIC
-        };
-
-        directionsService.route(
-            directionsRequest,
-            function(response, status)
-            {
-                if (status == google.maps.DirectionsStatus.OK)
-                {
-                    $scope.rutaOrigen = new google.maps.DirectionsRenderer({
-                        map: $scope.map,
-                        directions: response,
-                        suppressMarkers: true
-                    });
-                }
-            });
+        PostSails.postAceptar(usuario.id,$scope.servicio.id,usuario.latitud,usuario.longitud);
+        Servicio.guardarServicio($scope.servicio);
+        directionsOrigen();
         if($scope.destino) {
-            var directionsRequest = {
-                origin: $scope.recogida,
-                destination: $scope.destino,
-                travelMode: google.maps.DirectionsTravelMode.DRIVING,
-                unitSystem: google.maps.UnitSystem.METRIC
-            };
-
-            directionsService.route(
-                directionsRequest,
-                function(response, status)
-                {
-                    if (status == google.maps.DirectionsStatus.OK)
-                    {
-                        $scope.rutaDestino = new google.maps.DirectionsRenderer({
-                            map: $scope.map,
-                            directions: response,
-                            polylineOptions: new google.maps.Polyline({
-                                strokeColor: '#6FCB8E',
-                                strokeOpacity: 0.8,
-                                strokeWeight: 10
-                            }),
-                            suppressMarkers: true
-                        });
-                    }
-                });
+            directionsDestino();
         }
     }
 
