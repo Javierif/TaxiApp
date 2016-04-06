@@ -68,17 +68,18 @@ angular.module("starter.servicies_modelos", [])
         getServicio: function() {
             return servicio;
         },
-        guardarServicio:function(servicioid,recogida,destino){
-            var rlat = recogida.lat();
-            var rlng = recogida.lng();
+        guardarServicio:function(servicio){
+            var rlat = servicio.recogida.lat();
+            var rlng = servicio.recogida.lng();
             var dlat;
             var dlng;
             if(destino) {
-                dlat = destino.lat();
-                dlng = destino.lng();
+                dlat = servicio.destino.lat();
+                dlng = servicio.destino.lng();
             }
-            servicio = {servicioid:servicioid,recogidaLat:rlat,recogidaLng:rlng,destinoLat:dlat,destinoLng:dlng};
-            window.localStorage["servicio"] = JSON.stringify(servicio);
+            var servicioSave = {
+                servicioid:servicio.id,recogidaLat:rlat,recogidaLng:rlng,destinoLat:dlat,destinoLng:dlng};
+            window.localStorage["servicio"] = JSON.stringify(servicioSave);
         },
         guardarServicioCliente:function(trackear,servicioid,latRecogida,lngRecogida,latitud,longitud){
             servicio = {servicioid:servicioid,taxistaid:trackear,recogidaLat:latRecogida,recogidaLng:lngRecogida,destinoLat:latitud,destinoLng:longitud};

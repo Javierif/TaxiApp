@@ -15,10 +15,11 @@ angular.module("starter.servicies_mapa", [])
             var promise = deferral.promise;
             usuario = dataUsuario;
             mapa = dataMapa;
-            var paradamethod = this.obtenParadas();
             var sociomethod = this.obtenSocios();
+            var paradamethod = this.obtenParadas();
 
-            $q.all([paradamethod, sociomethod]).then(function () {
+
+            $q.all([sociomethod,paradamethod]).then(function () {
                 deferral.resolve();
             })
             return deferral.promise;
@@ -34,7 +35,7 @@ angular.module("starter.servicies_mapa", [])
                 var paradasConUbicados = result.paradas;
                 var listaGeneral = result.listaGeneral;
                 for(taxi in listaGeneral) {
-                    listaGeneral[taxi].marcador = MapaControl.creaTaxiMapa(mapa,listaGeneral[taxi])
+                    socios[usuario.posicion].marcador = MapaControl.creaTaxiMapa(mapa,listaGeneral[taxi]);
                 }
                 for(parada in paradasConUbicados) {
                     paradasConUbicados[parada].prioridad = 0;
@@ -62,6 +63,12 @@ angular.module("starter.servicies_mapa", [])
             var sociosObtenidos = Peticiones.getSocios(usuario.grupo);
             sociosObtenidos.then(function (result) {
                 socios = result.socios;
+                for(socio in socios) {
+                    if(socios[socio].id == usuario.id) {
+                        usuario.posicion = socio;
+                        break;
+                    }
+                }
                 deferred.resolve();
             });
             return deferred.promise;
@@ -150,12 +157,15 @@ angular.module("starter.servicies_mapa", [])
             limpia(listadoGeneral,taxi);
             MapaControl.borraUbicacion
         },
-        ocupar:function(ocupar) {
+        ocupar:function() {
             usuario.ocupado = !usuario.ocupado;
             if(usuario.ocupado){
-                var taxi = _.findWhere(listadoGeneral,{id:usuario.id});
-                taxi.marcador.setIcon('./img/ocupado/taxi'+$scope.socios[socio].numerotaxi+'.png')
+                socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+$scope.socios[socio].numerotaxi+'.png')
             }
+        },
+        actualizaMiPosicon: function(pos) {
+            socios[usuario.posicion].marcador.setPosition(pos);
+            return socios;
         }
     }
 
