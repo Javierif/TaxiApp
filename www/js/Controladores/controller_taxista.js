@@ -30,7 +30,7 @@ angular.module('starter.controllers.taxista', [])
     });
 })
 
-    .controller('MapaTaxistaCtrl', function ($scope, $ionicLoading, $ionicPopup, Peticiones, server_constantes, Usuario, $timeout, $sails, FileUploader, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal, $filter, Servicio, PostSails) {
+    .controller('MapaTaxistaCtrl', function ($scope, $ionicLoading, $ionicPopup, Peticiones, server_constantes, Usuario, $timeout, $sails, FileUploader, MapaInstancia, $ionicSideMenuDelegate, $ionicModal, $filter, Servicio, PostSails) {
 
     var usuario = Usuario.usuario();
     $scope.ubicarDisponible = {disabled:true,ubicadoText:"Ubicar"};
@@ -149,7 +149,7 @@ angular.module('starter.controllers.taxista', [])
 
         } else {
             PostSails.postDesUbicar($scope.ubicarDisponible.parada, usuario.id, usuario.grupo);
-            MapaControl.borraUbicacion(usuario);
+            MapaInstancia.borraUbicacion(usuario);
             $scope.ubicarDisponible.ubicadoText = "Ubicar";
         }
     }
