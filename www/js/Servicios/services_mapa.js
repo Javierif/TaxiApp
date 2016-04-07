@@ -193,6 +193,9 @@ angular.module("starter.servicies_mapa", [])
                 socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+socios[socio].numerotaxi+'.png')
             }
         },
+        getOcupado: function() {
+            return usuario.ocupado;
+        },
         actualizaMiPosicon: function(pos) {
             socios[usuario.posicion].marcador.setPosition(pos);
             return socios;

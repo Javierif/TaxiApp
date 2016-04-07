@@ -3,7 +3,6 @@ angular.module('starter.controllers.taxista', [])
     .controller('TaxistaCtrl', function ($scope, MapaInstancia) {
     $scope.paradas = MapaInstancia.getParadas();
     $scope.socios = MapaInstancia.getSocios();
-    $scope.ubicadoText = MapaInstancia.getUbicadoText();
     $scope.ocupado = MapaInstancia.getOcupado();
 
     $scope.ocupa = function() {
@@ -22,12 +21,6 @@ angular.module('starter.controllers.taxista', [])
         return MapaInstancia.getSocios();
     }, function (newValue, oldValue) {
         if (newValue !== oldValue) $scope.socios = newValue;
-    });
-
-    $scope.$watch(function () {
-        return MapaInstancia.getUbicadoText();
-    }, function (newValue, oldValue) {
-        if (newValue !== oldValue) $scope.ubicadoText = newValue;
     });
 
     $scope.$watch(function () {
