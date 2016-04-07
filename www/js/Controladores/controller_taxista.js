@@ -354,12 +354,12 @@ angular.module('starter.controllers.taxista', [])
         $scope.localizacion = "http://maps.googleapis.com/maps/api/staticmap?size=640x320&sensor=false&zoom="+zoom+"&markers=" + $scope.servicio.latrecogida + "%2C" + $scope.servicio.lngrecogida;
 
         geocoder.geocode({
-            'latLng': new google.maps.LatLng(latrecogida,lngrecogida)
+            'latLng': new google.maps.LatLng($scope.servicio.latrecogida,$scope.servicio.lngrecogida)
         }, function (results, status) {
             if (status === google.maps.GeocoderStatus.OK) {
                 if (results[1]) {
                     $scope.recogidaText = results[0].formatted_address;
-                    $scope.recogida =  new google.maps.LatLng(latrecogida,lngrecogida);
+                    $scope.recogida =  new google.maps.LatLng($scope.servicio.latrecogida,$scope.servicio.lngrecogida);
                 } else {
                     alert('No results found');
                 }
@@ -371,12 +371,12 @@ angular.module('starter.controllers.taxista', [])
             $scope.localizacion =  $scope.localizacion + "8&markers=color:0x4592ba|"+latdestino + "%2C" +lngdestino;
             $scope.destino =null;
             geocoder.geocode({
-                'latLng': new google.maps.LatLng(latdestino,lngdestino)
+                'latLng': new google.maps.LatLng($scope.servicio.latdestino,$scope.servicio.lngdestino)
             }, function (results, status) {
                 if (status === google.maps.GeocoderStatus.OK) {
                     if (results[1]) {
                         $scope.destinoText =  results[0].formatted_address;
-                        $scope.destino = new google.maps.LatLng(latdestino,lngdestino);
+                        $scope.destino = new google.maps.LatLng($scope.servicio.latdestino,$scope.servicio.lngdestino);
                     } else {
                         alert('No results found');
                     }
@@ -433,29 +433,30 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $sails.on('movimiento', function (resp) {
-        console.log("SE ESTA MOVIENDO " + JSON.stringify(resp));
-        for (socio in $scope.socios) {
-            if ($scope.socios[socio].id == resp.id) {
-                var posicion = new google.maps.LatLng(resp.latitud, resp.longitud);
-                $scope.socios[socio].marcador.setPosition(posicion);
-                break;
-            }
-        }
+        $scope.socios = MapaInstancia.mueve(resp);
+
     });
 
     $sails.on('ubicado', function (resp) {
         var myMedia = new Media("./img/ubicar.wav");
         myMedia.play();
-        MapaControl.ubica($scope.paradas, $scope.socios, resp.parada, resp.socio);
+        MapaInstancia.ubica(resp.parada, resp.socio);
     });
 
     $sails.on('desubicar', function (resp) {
-        MapaControl.borraUbicacion(resp.socio);
+        MapaInstancia.borraUbicacion(resp.socio);
     });
 
     $sails.on('Servicio', function (resp) {
         if(resp.taxista == usuario.id) {
-            servicio(resp.latRecogida, resp.lngRecogida, resp.latDestino,resp.lngDestino,resp.fechaRecogida,resp.animal,resp.dispacitado)
+            $scope.servicio.latRecogida = resp.latRecogida;
+            $scope.servicio.lngRecogida = resp.lngRecogida;
+            $scope.servicio.latDestino = resp.latDestino;
+            $scope.servicio.lngDestino = resp.lngDestino;
+            $scope.servicio.fechaRecogida = resp.fechaRecogida;
+            $scope.servicio.animal = resp.animal;
+            $scope.servicio.discapacitado = resp.dispacitado;
+            servicio()
         }
     });
 

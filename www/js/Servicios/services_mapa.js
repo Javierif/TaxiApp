@@ -177,16 +177,26 @@ angular.module("starter.servicies_mapa", [])
             limpia(listadoGeneral,taxi);
             MapaControl.borraUbicacion(taxi);
         },
-        ocupar:function() {
-            usuario.ocupado = !usuario.ocupado;
-            if(usuario.ocupado){
-                socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+socios[socio].numerotaxi+'.png')
+        mueve: function(taxi) {
+            for (socio in socios) {
+                if (socios[socio].id == resp.id) {
+                    var posicion = new google.maps.LatLng(resp.latitud, resp.longitud);
+                    socios[socio].marcador.setPosition(posicion);
+                    break;
+                }
             }
-        },
-        actualizaMiPosicon: function(pos) {
-            socios[usuario.posicion].marcador.setPosition(pos);
             return socios;
         }
+        ocupar:function() {
+        usuario.ocupado = !usuario.ocupado;
+        if(usuario.ocupado){
+        socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+socios[socio].numerotaxi+'.png')
     }
+},
+             actualizaMiPosicon: function(pos) {
+    socios[usuario.posicion].marcador.setPosition(pos);
+    return socios;
+}
+}
 
 });
