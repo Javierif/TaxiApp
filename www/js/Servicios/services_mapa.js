@@ -152,7 +152,7 @@ angular.module("starter.servicies_mapa", [])
             listadoGeneral.push(taxi);
         },
         conectaTaxi: function(taxi) {
-            for (socio in <socios) {
+            for (socio in socios) {
                 if (taxi.id == socios[socio].id) {
                     socios[socio].conectado = taxi.conectado;
                     if (taxi.conectado) {
@@ -186,17 +186,17 @@ angular.module("starter.servicies_mapa", [])
                 }
             }
             return socios;
-        }
+        },
         ocupar:function() {
-        usuario.ocupado = !usuario.ocupado;
-        if(usuario.ocupado){
-        socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+socios[socio].numerotaxi+'.png')
+            usuario.ocupado = !usuario.ocupado;
+            if(usuario.ocupado){
+                socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+socios[socio].numerotaxi+'.png')
+            }
+        },
+        actualizaMiPosicon: function(pos) {
+            socios[usuario.posicion].marcador.setPosition(pos);
+            return socios;
+        }
     }
-},
-             actualizaMiPosicon: function(pos) {
-    socios[usuario.posicion].marcador.setPosition(pos);
-    return socios;
-}
-}
 
 });
