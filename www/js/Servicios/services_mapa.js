@@ -152,28 +152,26 @@ angular.module("starter.servicies_mapa", [])
             listadoGeneral.push(taxi);
         },
         conectaTaxi: function(taxi) {
-            for (socio in $scope.socios) {
-                if (resp.id == $scope.socios[socio].id) {
-                    $scope.socios[socio].conectado = resp.conectado;
-                    if (resp.conectado) {
+            for (socio in <socios) {
+                if (taxi.id == socios[socio].id) {
+                    socios[socio].conectado = taxi.conectado;
+                    if (taxi.conectado) {
                         MapaControl.borraUbicacion(taxi);
-                        MapaControl.ubica($scope.paradas, $scope.socios, 1, resp.id);
-                        $scope.socios[socio].marcador.setIcon('./img/activo/taxi'+$scope.socios[socio].numerotaxi+'.png');
-                        var myMedia = new Media("./img/on.wav");
-                        myMedia.play();
-                        window.plugins.toast.showShortBottom("Se ha conectado el taxi nº" + $scope.socios[socio].numerotaxi,
-                                                             function (a) {},
-                                                             function (b) {});
+                        limpia(listadoGeneral,taxi);
+                        listadoGeneral.push[taxi];
+                        socios[usuario.posicion].marcador = MapaControl.creaTaxiMapa(mapa,taxi);
+                        socios[socio].marcador.setIcon('./img/activo/taxi'+socios[socio].numerotaxi+'.png');
+
                     } else {
                         MapaControl.borraUbicacion(taxi);
-                        $scope.socios[socio].marcador.setIcon('null');
-                        window.plugins.toast.showShortBottom("Se ha desconectado el taxi nº" + $scope.socios[socio].numerotaxi,
-                                                             function (a) {},
-                                                             function (b) {});
+                        limpia(listadoGeneral,taxi);
+                        socios[socio].marcador.setIcon('null');
+
                     }
                     break;
                 }
             }
+            return socios;
         },
         desconectaTaxi: function(taxi) {
             limpia(listadoGeneral,taxi);
@@ -182,7 +180,7 @@ angular.module("starter.servicies_mapa", [])
         ocupar:function() {
             usuario.ocupado = !usuario.ocupado;
             if(usuario.ocupado){
-                socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+$scope.socios[socio].numerotaxi+'.png')
+                socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+socios[socio].numerotaxi+'.png')
             }
         },
         actualizaMiPosicon: function(pos) {
