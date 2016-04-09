@@ -1,6 +1,6 @@
 angular.module('starter.controllers.clientes', [])
 
-    .controller('ClienteMapaCtrl', function ($scope, $stateParams, $state, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, Servicio, $compile, $timeout, $sails, FileUploader, $q, MapaInstancia, MapaControl, $ionicSideMenuDelegate, $ionicModal, $sce) {
+    .controller('ClienteMapaCtrl', function ($scope, $stateParams, $state, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, Servicio, $compile, $timeout, $sails, FileUploader, $q, MapaInstancia, $ionicSideMenuDelegate, $ionicModal, $sce) {
     //screen.lockOrientation('landscape');
     var usuario = Usuario.usuario();
     var geocoder = new google.maps.Geocoder();

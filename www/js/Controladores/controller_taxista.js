@@ -4,6 +4,7 @@ angular.module('starter.controllers.taxista', [])
     $scope.paradas = MapaInstancia.getParadas();
     $scope.socios = MapaInstancia.getSocios();
     $scope.ocupado = MapaInstancia.getOcupado();
+    $scope.listadoGeneral = MapaInstancia.getListadoGeneral();
 
     $scope.ocupa = function() {
         console.log("OCUPANDO")
@@ -15,6 +16,14 @@ angular.module('starter.controllers.taxista', [])
         return MapaInstancia.getParadas();
     }, function (newValue, oldValue) {
         if (newValue !== oldValue) $scope.paradas = newValue;
+    });
+
+    $scope.$watch(function () {
+        return MapaInstancia.getListadoGeneral();
+    }, function (newValue, oldValue) {
+        if (newValue !== oldValue)
+        $scope.listadoGeneral = newValue;
+        console.log("LISTADO CHANGED "+JSON.stringify(MapaInstancia.getListadoGeneral()));
     });
 
     $scope.$watch(function () {

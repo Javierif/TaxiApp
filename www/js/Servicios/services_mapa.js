@@ -1,6 +1,6 @@
 angular.module("starter.servicies_mapa", [])
 
-    .factory("MapaInstancia", function ($q, $ionicLoading, Peticiones, Usuario, MapaControl) {
+    .factory("MapaInstancia", function ($q, $ionicLoading, Peticiones, Usuario) {
     var usuario;
 
     var listadoGeneral;
@@ -31,15 +31,16 @@ angular.module("starter.servicies_mapa", [])
             });;
             var deferred = $q.defer();
             var paradasPeticion = Peticiones.getParadas(usuario.grupo);
+            var instancia = this;
             paradasPeticion.then(function (result) {
                 var paradasConUbicados = result.paradas;
-                var listaGeneral = result.listaGeneral;
+                var listaGeneral = result.taxistasGeneral;
                 for(taxi in listaGeneral) {
-                    socios[usuario.posicion].marcador = MapaControl.creaTaxiMapa(mapa,listaGeneral[taxi]);
+                    socios[usuario.posicion].marcador = instancia.creaTaxiMapa(listaGeneral[taxi]);
                 }
                 for(parada in paradasConUbicados) {
                     paradasConUbicados[parada].prioridad = 0;
-                    MapaControl.creaParadaMapa(mapa,paradasConUbicados[parada].latitud,paradasConUbicados[parada].longitud)
+                    instancia.creaParadaMapa(paradasConUbicados[parada].latitud,paradasConUbicados[parada].longitud)
                     for(ubicado in paradasConUbicados[parada].taxistaUbicado) {
                         paradasConUbicados[parada].prioridad += 1;
                         if(paradasConUbicados[parada].taxistaUbicado[ubicado].id = usuario.id) {
@@ -156,14 +157,14 @@ angular.module("starter.servicies_mapa", [])
                 if (taxi.id == socios[socio].id) {
                     socios[socio].conectado = taxi.conectado;
                     if (taxi.conectado) {
-                        MapaControl.borraUbicacion(taxi);
+                        borraUbicacion(taxi);
                         limpia(listadoGeneral,taxi);
                         listadoGeneral.push[taxi];
-                        socios[usuario.posicion].marcador = MapaControl.creaTaxiMapa(mapa,taxi);
+                        socios[usuario.posicion].marcador =creaTaxiMapa(mapa,taxi);
                         socios[socio].marcador.setIcon('./img/activo/taxi'+socios[socio].numerotaxi+'.png');
 
                     } else {
-                        MapaControl.borraUbicacion(taxi);
+                        borraUbicacion(taxi);
                         limpia(listadoGeneral,taxi);
                         socios[socio].marcador.setIcon('null');
 
@@ -175,12 +176,12 @@ angular.module("starter.servicies_mapa", [])
         },
         desconectaTaxi: function(taxi) {
             limpia(listadoGeneral,taxi);
-            MapaControl.borraUbicacion(taxi);
+            borraUbicacion(taxi);
         },
-        mueve: function(taxi) {
+        actualizaPosicion: function(taxi) {
             for (socio in socios) {
-                if (socios[socio].id == resp.id) {
-                    var posicion = new google.maps.LatLng(resp.latitud, resp.longitud);
+                if (socios[socio].id == taxi.id) {
+                    var posicion = new google.maps.LatLng(taxi.latitud, taxi.longitud);
                     socios[socio].marcador.setPosition(posicion);
                     break;
                 }
@@ -194,7 +195,11 @@ angular.module("starter.servicies_mapa", [])
             }
         },
         getOcupado: function() {
-            return usuario.ocupado;
+            if(usuario) {
+                return usuario.ocupado;
+            } else {
+                return false;
+            }
         },
         actualizaMiPosicon: function(pos) {
             socios[usuario.posicion].marcador.setPosition(pos);

@@ -18,6 +18,14 @@
     <ion-side-menu side="left" drag-content="false">
             <button class="button full-button button-full" ng-class="{'button-energized' : !ocupado, 'button-assertive' : ocupado}" ng-click="ocupa()">Ocupado</button>
         <ion-content class="has-header my-menu">
+                <ion-list>
+                    <ion-item class="item item-icon-left paradaheader" nav-clear menu-close>
+                        <h3>General</h3>
+                    </ion-item>
+                    <ion-item class="item item-icon-left" ng-repeat="taxi in listadoGeneral" nav-clear menu-close>
+                        <h4><i class="ion-model-s"></i> Taxi Nº{{taxi.numerotaxi}}</h4>
+                    </ion-item>
+                </ion-list>
             <div ng-repeat="parada in paradas | orderBy:'prioridad':true track by parada.id">
                 <ion-list>
                     <ion-item class="item item-icon-left paradaheader" nav-clear menu-close>
