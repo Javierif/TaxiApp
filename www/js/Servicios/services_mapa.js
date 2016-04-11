@@ -49,10 +49,10 @@ angular.module("starter.servicies_mapa", [])
                     paradasConUbicados[parada].prioridad = 0;
                     instancia.creaParadaMapa(paradasConUbicados[parada].latitud,paradasConUbicados[parada].longitud)
                     paradasConUbicados[parada].ubicados = [];
-                    for(ubicado in paradasConUbicados[parada].taxistaUbicado) {
+                    for(ubicado in paradasConUbicados[parada].taxistasUbicados) {
                         paradasConUbicados[parada].prioridad += 1;
-                        paradasConUbicados[parada].ubicados.push(this.getSocio(paradasConUbicados[parada].taxistaUbicado[ubicado]));
-                        if(paradasConUbicados[parada].taxistaUbicado[ubicado] = usuario.id) {
+                        paradasConUbicados[parada].ubicados.push(instancia.getSocio(paradasConUbicados[parada].taxistasUbicados[ubicado]));
+                        if(paradasConUbicados[parada].taxistasUbicados[ubicado] = usuario.id) {
                             paradasConUbicados[parada].priodidad = 1000;
                         }
                     }
