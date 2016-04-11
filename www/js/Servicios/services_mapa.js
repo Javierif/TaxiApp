@@ -36,7 +36,13 @@ angular.module("starter.servicies_mapa", [])
                 var paradasConUbicados = result.paradas;
                 var listaGeneral = result.taxistasGeneral;
                 for(taxi in listaGeneral) {
-                    socios[usuario.posicion].marcador = instancia.creaTaxiMapa(listaGeneral[taxi]);
+                    for(socio in socios) {
+                        if(socios[socio].id == listaGeneral[taxi].id) {
+                           socios[usuario.posicion].marcador = instancia.creaTaxiMapa(listaGeneral[taxi]);
+                            break;
+                        }
+
+                    }
                 }
                 for(parada in paradasConUbicados) {
                     paradasConUbicados[parada].prioridad = 0;
@@ -157,15 +163,15 @@ angular.module("starter.servicies_mapa", [])
                 if (taxi.id == socios[socio].id) {
                     socios[socio].conectado = taxi.conectado;
                     if (taxi.conectado) {
-                        borraUbicacion(taxi);
-                        limpia(listadoGeneral,taxi);
-                        listadoGeneral.push[taxi];
-                        socios[usuario.posicion].marcador =creaTaxiMapa(mapa,taxi);
+                        console.log("EL TAXISTA CONECTADO ES " + socios[socio]);
+                        this.borraUbicacion(socios[socio]);
+                        this.limpia(listadoGeneral,socios[socio]);
+                        listadoGeneral.push(socios[socio]);
+                        socios[socio].marcador =this.creaTaxiMapa(mapa,socios[socio]);
                         socios[socio].marcador.setIcon('./img/activo/taxi'+socios[socio].numerotaxi+'.png');
-
                     } else {
-                        borraUbicacion(taxi);
-                        limpia(listadoGeneral,taxi);
+                        this.borraUbicacion(socios[socio]);
+                        this.limpia(listadoGeneral,socios[socio]);
                         socios[socio].marcador.setIcon('null');
 
                     }
@@ -204,6 +210,14 @@ angular.module("starter.servicies_mapa", [])
         actualizaMiPosicon: function(pos) {
             socios[usuario.posicion].marcador.setPosition(pos);
             return socios;
+        },
+        mueveSocio: function(data) {
+            for(socio in socios) {
+                if(socios[socio].id == data.id && socios[socio].conectado) {
+                    var posicion = new google.maps.LatLng(data.latitud,data.longitud);
+                    socios[socio].marcador.setPosition(posicion);
+                }
+            }
         }
     }
 

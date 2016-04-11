@@ -152,12 +152,12 @@ angular.module('starter.controllers.taxista', [])
 
     $scope.ubicar = function () {
         if ($scope.ubicarDisponible) {
-            PostSails.postUbicar($scope.ubicarDisponible.parada, usuario.grupo, usuario.latitud, usuario.longitud, usuario.id)
-            MapaInstancia.ubica($scope.ubicarDisponible.parada, usuario);
+            PostSails.postUbicar($scope.ubicarDisponible.id, usuario.grupo, usuario.latitud, usuario.longitud, usuario.id)
+            MapaInstancia.ubica($scope.ubicarDisponible.id, usuario);
             $scope.ubicarDisponible.ubicadoText = "Desubicar";
 
         } else {
-            PostSails.postDesUbicar($scope.ubicarDisponible.parada, usuario.id, usuario.grupo);
+            PostSails.postDesUbicar($scope.ubicarDisponible.id, usuario.id, usuario.grupo);
             MapaInstancia.borraUbicacion(usuario);
             $scope.ubicarDisponible.ubicadoText = "Ubicar";
         }
@@ -419,6 +419,7 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $sails.on('conexion', function (resp) {
+        console.log("CONECTADO " + JSON.stringify(resp));
         $scope.socios = MapaInstancia.conectaTaxi(resp);
         if(resp.conectado) {
             var myMedia = new Media("./img/on.wav");
@@ -435,14 +436,14 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $sails.on('movimiento', function (resp) {
-        $scope.socios = MapaInstancia.mueve(resp);
+        $scope.socios = MapaInstancia.mueveSocio(resp);
 
     });
 
     $sails.on('ubicado', function (resp) {
         var myMedia = new Media("./img/ubicar.wav");
         myMedia.play();
-        MapaInstancia.ubica(resp.parada, resp.socio);
+        MapaInstancia.ubica(resp.parada, resp.taxista);
     });
 
     $sails.on('desubicar', function (resp) {
