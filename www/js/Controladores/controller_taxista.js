@@ -22,7 +22,7 @@ angular.module('starter.controllers.taxista', [])
         return MapaInstancia.getListadoGeneral();
     }, function (newValue, oldValue) {
         if (newValue !== oldValue)
-        $scope.listadoGeneral = newValue;
+            $scope.listadoGeneral = newValue;
         console.log("LISTADO CHANGED "+JSON.stringify(MapaInstancia.getListadoGeneral()));
     });
 
@@ -153,12 +153,12 @@ angular.module('starter.controllers.taxista', [])
     $scope.ubicar = function () {
         if ($scope.ubicarDisponible) {
             PostSails.postUbicar($scope.ubicarDisponible.id, usuario.grupo, usuario.latitud, usuario.longitud, usuario.id)
-            MapaInstancia.ubica($scope.ubicarDisponible.id, usuario);
+            $scope.paradas = MapaInstancia.ubica($scope.ubicarDisponible.id, usuario.id);
             $scope.ubicarDisponible.ubicadoText = "Desubicar";
 
         } else {
             PostSails.postDesUbicar($scope.ubicarDisponible.id, usuario.id, usuario.grupo);
-            MapaInstancia.borraUbicacion(usuario);
+            $scope.paradas = MapaInstancia.borraUbicacion(usuario);
             $scope.ubicarDisponible.ubicadoText = "Ubicar";
         }
     }
@@ -421,17 +421,19 @@ angular.module('starter.controllers.taxista', [])
     $sails.on('conexion', function (resp) {
         console.log("CONECTADO " + JSON.stringify(resp));
         $scope.socios = MapaInstancia.conectaTaxi(resp);
-        if(resp.conectado) {
-            var myMedia = new Media("./img/on.wav");
-            myMedia.play();
-            window.plugins.toast.showShortBottom("Se ha conectado el taxi nº" + $scope.socios[socio].numerotaxi,
-                                                 function (a) {},
-                                                 function (b) {});
-        } else {
-            window.plugins.toast.showShortBottom("Se ha desconectado el taxi nº" + $scope.socios[socio].numerotaxi,
-                                                 function (a) {},
-                                                 function (b) {});
-        }
+        try{
+            if(resp.conectado) {
+                var myMedia = new Media("./img/on.wav");
+                myMedia.play();
+                window.plugins.toast.showShortBottom("Se ha conectado el taxi nº" + $scope.socios[socio].numerotaxi,
+                                                     function (a) {},
+                                                     function (b) {});
+            } else {
+                window.plugins.toast.showShortBottom("Se ha desconectado el taxi nº" + $scope.socios[socio].numerotaxi,
+                                                     function (a) {},
+                                                     function (b) {});
+            }
+        } catch(Exception){};
 
     });
 
@@ -441,9 +443,13 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $sails.on('ubicado', function (resp) {
-        var myMedia = new Media("./img/ubicar.wav");
-        myMedia.play();
-        MapaInstancia.ubica(resp.parada, resp.taxista);
+        try{
+            var myMedia = new Media("./img/ubicar.wav");
+            myMedia.play();
+        } catch(exception) {
+        }
+        console.log("ubicado " + JSON.stringify(resp));
+        $scope.paradas = MapaInstancia.ubica(resp.parada, resp.taxista);
     });
 
     $sails.on('desubicar', function (resp) {
