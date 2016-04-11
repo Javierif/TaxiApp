@@ -42,7 +42,7 @@ angular.module('starter.controllers.taxista', [])
     .controller('MapaTaxistaCtrl', function ($scope, $ionicLoading, $ionicPopup, Peticiones, server_constantes, Usuario, $timeout, $sails, FileUploader, MapaInstancia, $ionicSideMenuDelegate, $ionicModal, $filter, Servicio, PostSails) {
 
     var usuario = Usuario.usuario();
-    $scope.ubicarDisponible = {disabled:true,ubicadoText:"Ubicar"};
+    $scope.ubicarDisponible = MapaInstancia.getUbicarDisponible();
     var GoogleMaps = {geocoder:new google.maps.Geocoder(),directionsService:new google.maps.DirectionsService()};
 
 
@@ -62,10 +62,10 @@ angular.module('starter.controllers.taxista', [])
                 $scope.paradas = MapaInstancia.getParadas();
                 $scope.socios = MapaInstancia.getSocios();
                 $scope.listadoGeneral = MapaInstancia.getListadoGeneral();
-                $scope.ubicadoText = MapaInstancia.getUbicadoText();
                 $ionicLoading.show({
                     template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Obteniendo tu geoposición…'
                 });
+                $scope.ubicarDisponible = MapaInstancia.getUbicarDisponible();
                 getCurrentPosition();
             });
         });
@@ -151,15 +151,16 @@ angular.module('starter.controllers.taxista', [])
     };
 
     $scope.ubicar = function () {
-        if ($scope.ubicarDisponible) {
+        if (!$scope.ubicarDisponible.ubicado) {
             PostSails.postUbicar($scope.ubicarDisponible.id, usuario.grupo, usuario.latitud, usuario.longitud, usuario.id)
             $scope.paradas = MapaInstancia.ubica($scope.ubicarDisponible.id, usuario.id);
             $scope.ubicarDisponible.ubicadoText = "Desubicar";
-
+            $scope.ubicarDisponible.ubicado = true;
         } else {
             PostSails.postDesUbicar($scope.ubicarDisponible.id, usuario.id, usuario.grupo);
             $scope.paradas = MapaInstancia.borraUbicacion(usuario);
             $scope.ubicarDisponible.ubicadoText = "Ubicar";
+            $scope.ubicarDisponible.ubicado = false;
         }
     }
     //revisar y quitar mi icono cuando acepto y despues poner el del cliente
@@ -297,9 +298,11 @@ angular.module('starter.controllers.taxista', [])
             if (location.coords.accuracy < 1500) {
                 $ionicLoading.hide();
                 muevete(location.coords.latitude, location.coords.longitude);
+                valorarUbicacion(location.coords.latitude, location.coords.longitude);
                 //comenzamos a observar si te mueves
                 observaPosicion();
                 compruebaServicios();
+
             } else {
                 $ionicLoading.show({
                     template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Estamos intentando conseguir una precisión minima de 150m de tu posición, actualmente recibimos ' + location.coords.accuracy + 'm'

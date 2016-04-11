@@ -7,7 +7,7 @@ angular.module("starter.servicies_mapa", [])
     var paradas;
     var socios;
 
-    var ubicadoText = "Ubicar";
+    var ubicarDisponible = {disabled:true,ubicadoText:"Ubicar",ubicado:false};
     var mapa;
     return {
         cargaMapa: function (dataUsuario, dataMapa) {
@@ -53,6 +53,8 @@ angular.module("starter.servicies_mapa", [])
                         paradasConUbicados[parada].prioridad += 1;
                         paradasConUbicados[parada].ubicados.push(instancia.getSocio(paradasConUbicados[parada].taxistasUbicados[ubicado]));
                         if(paradasConUbicados[parada].taxistasUbicados[ubicado] = usuario.id) {
+                            ubicarDisponible.ubicado = true;
+                            ubicarDisponible.ubicadoText = "Desubicar";
                             paradasConUbicados[parada].priodidad = 1000;
                         }
                     }
@@ -134,8 +136,8 @@ angular.module("starter.servicies_mapa", [])
             }
         },
 
-        getUbicadoText: function () {
-            return ubicadoText;
+        getUbicarDisponible: function () {
+            return ubicarDisponible;
         },
         getListadoGeneral: function() {
             return listadoGeneral;
