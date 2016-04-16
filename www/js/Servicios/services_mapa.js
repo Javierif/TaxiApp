@@ -39,7 +39,7 @@ angular.module("starter.servicies_mapa", [])
                 for(taxi in listaGeneral) {
                     for(socio in socios) {
                         if(socios[socio].id == listaGeneral[taxi].id) {
-                            socios[usuario.posicion].marcador = instancia.creaTaxiMapa(listaGeneral[taxi]);
+                            socios[socio].marcador = instancia.creaTaxiMapa(listaGeneral[taxi]);
                             break;
                         }
 
@@ -180,16 +180,16 @@ angular.module("starter.servicies_mapa", [])
                 if (taxi.id == socios[socio].id) {
                     socios[socio].conectado = taxi.conectado;
                     if (taxi.conectado) {
-                        console.log("EL TAXISTA CONECTADO ES " + socios[socio]);
                         this.borraUbicacion(socios[socio]);
                         this.limpia(listadoGeneral,socios[socio]);
                         listadoGeneral.push(socios[socio]);
-                        socios[socio].marcador =this.creaTaxiMapa(mapa,socios[socio]);
+                        socios[socio].marcador=this.creaTaxiMapa(mapa,socios[socio]);
                         socios[socio].marcador.setIcon('./img/activo/taxi'+socios[socio].numerotaxi+'.png');
                     } else {
+                        socios[socio].marcador.setIcon('null');
                         this.borraUbicacion(socios[socio]);
                         this.limpia(listadoGeneral,socios[socio]);
-                        socios[socio].marcador.setIcon('null');
+
 
                     }
                     break;
