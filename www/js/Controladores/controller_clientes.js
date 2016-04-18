@@ -202,6 +202,7 @@ angular.module('starter.controllers.clientes', [])
             //no importa el accuary en el cliente
             var posicion = new google.maps.LatLng(location.coords.latitude, location.coords.longitude);
             $scope.map.panTo(posicion);
+            $ionicLoading.hide();
             getGeoposicion();
             if(!marcador) {
                 usuario.marcador = new google.maps.Marker({
@@ -215,7 +216,7 @@ angular.module('starter.controllers.clientes', [])
                 usuario.marcador.panTo(posicion);
             }
 
-            $ionicLoading.hide();
+
         }, function error(msg) {
             alert('error al obtener geo local error ' + JSON.stringify(msg));
             getCurrentPosition();

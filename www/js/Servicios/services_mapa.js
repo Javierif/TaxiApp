@@ -126,6 +126,10 @@ angular.module("starter.servicies_mapa", [])
             return paradas;
         },
         borraUbicacion: function (socioRecibido) {
+            console.log("BORRANDO UBICACION DE "+ socioRecibido)
+            if(isNaN(socioRecibido)){
+                socioRecibido = socioRecibido.id;
+            }
             for (p in paradas) {
                 for (ubicado in paradas[p].ubicados) {
                     if (paradas[p].ubicados[ubicado].id == socioRecibido) {
@@ -180,14 +184,14 @@ angular.module("starter.servicies_mapa", [])
                 if (taxi.id == socios[socio].id) {
                     socios[socio].conectado = taxi.conectado;
                     if (taxi.conectado) {
-                        this.borraUbicacion(socios[socio]);
+                        this.borraUbicacion(socios[socio].id);
                         this.limpia(listadoGeneral,socios[socio]);
                         listadoGeneral.push(socios[socio]);
                         socios[socio].marcador=this.creaTaxiMapa(mapa,socios[socio]);
                         socios[socio].marcador.setIcon('./img/activo/taxi'+socios[socio].numerotaxi+'.png');
                     } else {
                         socios[socio].marcador.setIcon('null');
-                        this.borraUbicacion(socios[socio]);
+                        this.borraUbicacion(socios[socio].id);
                         this.limpia(listadoGeneral,socios[socio]);
 
 

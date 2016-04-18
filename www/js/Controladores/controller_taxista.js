@@ -9,7 +9,7 @@ angular.module('starter.controllers.taxista', [])
     $scope.ocupa = function() {
         console.log("OCUPANDO")
         $scope.ocupado = !$scope.ocupado;
-        MapaInstancia.setOcupado($scope.ocupado);
+        MapaInstancia.ocupar($scope.ocupado);
     }
 
     $scope.$watch(function () {
@@ -223,6 +223,7 @@ angular.module('starter.controllers.taxista', [])
         var limite = false;
         for (parada in $scope.paradas) {
             var distancia = calculaDistancia(latitud, longitud, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
+            console.log("LA DISTANCIA ES " + distancia);
             if (distancia < 0.15) {
                 if (!radio) {
                     radio = true;
@@ -239,7 +240,8 @@ angular.module('starter.controllers.taxista', [])
             $scope.ubicarDisponible.id = $scope.paradas[parada].id;
             $scope.ubicarDisponible.disabled = false;
         }
-        if (!radio && !limite) {
+        if (!radio && !limite && $scope.paradas && $scope.paradas.length>1) {
+            console.log("ESTAS FUERA DEL RANGO WUON! y los socios son " + JSON.stringify($scope.paradas));
             $scope.ubicarDisponible.disabled = true;
             $scope.ubicar();
         }
