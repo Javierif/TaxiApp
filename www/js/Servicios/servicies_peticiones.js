@@ -155,6 +155,14 @@ angular.module('starter.servicies_peticiones', [])
             });
         },
 
+        postOcupar: function(idUsuario,ocupado) {
+            console.log("POST " + idUsuario + " ocu " +ocupado);
+            $sails.post('/taxista/ocupartaxi', {
+                idUsuario:idUsuario,
+                ocupado:ocupado
+            });
+        },
+
         postMoviendose: function (usuarioId, grupo, latitud, longitud) {
             $sails.post('/taxista/moviendose', {
                 user: usuarioId,

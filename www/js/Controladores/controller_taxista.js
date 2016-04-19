@@ -223,7 +223,6 @@ angular.module('starter.controllers.taxista', [])
         var limite = false;
         for (parada in $scope.paradas) {
             var distancia = calculaDistancia(latitud, longitud, $scope.paradas[parada].latitud, $scope.paradas[parada].longitud);
-            console.log("LA DISTANCIA ES " + distancia);
             if (distancia < 0.15) {
                 if (!radio) {
                     radio = true;
@@ -460,6 +459,11 @@ angular.module('starter.controllers.taxista', [])
     $sails.on('desubicar', function (resp) {
         MapaInstancia.borraUbicacion(resp.socio);
     });
+
+    $sails.on('ocupado', function(resp) {
+        console.log("ALGUIEN SE OCUPO COPON " +JSON.stringify(resp));
+        MapaInstancia.ocuparTaxi(resp.taxista,resp.ocupado);
+    })
 
     $sails.on('Servicio', function (resp) {
         if(resp.taxista == usuario.id) {

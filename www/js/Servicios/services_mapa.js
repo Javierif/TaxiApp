@@ -1,6 +1,6 @@
 angular.module("starter.servicies_mapa", [])
 
-    .factory("MapaInstancia", function ($q, $ionicLoading, Peticiones, Usuario) {
+    .factory("MapaInstancia", function ($q, $ionicLoading, Peticiones, PostSails, Usuario) {
     var usuario;
 
     var listadoGeneral;
@@ -35,7 +35,8 @@ angular.module("starter.servicies_mapa", [])
             paradasPeticion.then(function (result) {
                 var paradasConUbicados = result.paradas;
                 var listaGeneral = result.taxistasGeneral;
-                console.log("PARADA CON UBICADO "+JSON.stringify(paradasConUbicados))
+                console.log("PARADA CON UBICADO "+JSON.stringify(paradasConUbicados));
+                console.log("LISTA GENERAL "+ JSON.stringify(listaGeneral));
                 for(taxi in listaGeneral) {
                     for(socio in socios) {
                         if(socios[socio].id == listaGeneral[taxi].id) {
@@ -218,7 +219,24 @@ angular.module("starter.servicies_mapa", [])
         ocupar:function() {
             usuario.ocupado = !usuario.ocupado;
             if(usuario.ocupado){
-                socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+socios[socio].numerotaxi+'.png')
+                socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+socios[usuario.posicion].numerotaxi+'.png')
+            }  else {
+                 socios[usuario.posicion].marcador.setIcon('./img/activo/taxi'+socios[usuario.posicion].numerotaxi+'.png')
+
+            }
+            console.log("PUES " + usuario.id + " Y POS " + usuario.ocupado);
+            PostSails.postOcupar(usuario.id,usuario.ocupado)
+        },
+        ocuparTaxi: function(idTaxi,ocupado) {
+            for(socio in socios) {
+                if(idTaxi == socios[socio].id) {
+                    socios[socio].ocupado = ocupado;
+                    if(ocupado) {
+                        socios[socio].marcador.setIcon('./img/ocupado/taxi'+socios[socio].numerotaxi+'.png');
+                    } else {
+                        socios[socio].marcador.setIcon('./img/activo/taxi'+socios[socio].numerotaxi+'.png');
+                    }
+                }
             }
         },
         getOcupado: function() {
