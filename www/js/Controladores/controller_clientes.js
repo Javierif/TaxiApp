@@ -1,15 +1,11 @@
 angular.module('starter.controllers.clientes', [])
 
     .controller('ClienteMapaCtrl', function ($scope, $stateParams, $state, $ionicPopup, $ionicLoading, Peticiones, server_constantes, Usuario, Servicio, $compile, $timeout, $sails, FileUploader, $q, MapaInstancia, $ionicSideMenuDelegate, $ionicModal, $sce) {
-    //screen.lockOrientation('landscape');
+
     var usuario = Usuario.usuario();
-    var geocoder = new google.maps.Geocoder();
-    var directionsService = new google.maps.DirectionsService();
-    $scope.datetimeValue = new Date();
-    $scope.opcion = {
-        mascota: false,
-        discapacitado: false
-    };
+    var googlemaps = {geocoder: new google.maps.Geocoder(),directions:new google.maps.DirectionsService()};
+    $scope.servicio = {mascota: false, discapacitado: false, estiloServicio: false};
+
     $scope.estiloAceptado = false;
     var timerRespuesta = false;
     var timeRespuesta = 0;
@@ -22,9 +18,7 @@ angular.module('starter.controllers.clientes', [])
     $ionicModal.fromTemplateUrl('templates/pedirTaxi.html', function ($ionicModal) {
         $scope.modalPedir = $ionicModal;
     }, {
-        // Use our scope for the scope of the modal to keep it simple
         scope: $scope,
-        // The animation we want to use for the modal entrance
         animation: 'slide-in-up'
     });
 
@@ -68,6 +62,7 @@ angular.module('starter.controllers.clientes', [])
             discapacitado: discapacitado,
             mascota: mascota
         });
+        //funcion pedir cuanto tiempo espero
         esperandoTaxi();
     }
 
@@ -98,7 +93,7 @@ angular.module('starter.controllers.clientes', [])
                 if($scope.ruta){
                     $scope.ruta.setMap(null);
                 }
-                $scope.estiloAceptado = false;
+                $scope.servicio.estiloServicio = false;
                 Servicio.resuelveServicio();
             }
         });
@@ -131,7 +126,7 @@ angular.module('starter.controllers.clientes', [])
                 if($scope.ruta){
                     $scope.ruta.setMap(null);
                 }
-                $scope.estiloAceptado = false;
+                $scope.servicio.estiloServicio = false;
                 Servicio.resuelveServicio();
             }
 
@@ -150,7 +145,6 @@ angular.module('starter.controllers.clientes', [])
         getCurrentPosition(true);
     }
 
-
     var esperandoTaxi = function() {
         $timeout(function() {
             var hours   = Math.floor(timeRespuesta / 3600);
@@ -162,8 +156,9 @@ angular.module('starter.controllers.clientes', [])
             var time    = minutes+':'+seconds;
             timeRespuesta = timeRespuesta + 1;
             $ionicLoading.show({
-                template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Conectandonos con los taxistas.<br> tiempo estimado: 02:00 <br> tiempo espera: '+time
+                template: '<button class="button button-clear" style="line-height: normal; min-height: 0; min-width: 0;" ng-click="$root.cancel()"><i class="ion-close-circled"></i></button><ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Conectandonos con los taxistas.<br> tiempo estimado: 02:00 <br> tiempo espera: '+time
             });
+            $rootScope.cancel = $ionicLoading.hide();
             if(timeRespuesta >200){
                 $ionicLoading.hide();
                 $scope.modalPedir.hide();
@@ -183,9 +178,7 @@ angular.module('starter.controllers.clientes', [])
 
     var compruebaServicio = function() {
         if(Servicio.compruebaServicio()){
-            console.log("PARECE SER QUE SI...")
             var servicio = Servicio.getServicio();
-            console.log("SERVICIO " + JSON.stringify(servicio));
             $scope.estiloAceptado = true;
             $scope.trackear  = servicio.taxistaid;
             $scope.servicioid = servicio.servicioid;
@@ -207,7 +200,7 @@ angular.module('starter.controllers.clientes', [])
             if(!marcador) {
                 usuario.marcador = new google.maps.Marker({
                     position: posicion,
-                    icon: './img/activoicon.png',
+                    icon: './img/esperataxi.png',
                     animation: google.maps.Animation.DROP,
                     map: $scope.map
                 });
@@ -242,20 +235,24 @@ angular.module('starter.controllers.clientes', [])
 
     var mapaeventos = function () {
         google.maps.event.addListener($scope.map, 'center_changed', function () {
-            // 0.1 seconds after the center of the map has changed,
-            // set back the marker position.
             window.setTimeout(function () {
-                var center = $scope.map.getCenter();
-                usuario.marcador.setPosition(center);
+                if(!$scope.servicio.estiloServicio){
+                    var center = $scope.map.getCenter();
+                    usuario.marcador.setPosition(center);
+                    usuario.marcdor.setIcon('./img/pedirtaxi.png');
+                }
             }, 100);
         });
         google.maps.event.addListener($scope.map, "dragstart", function (event) {
-            console.log("DRAGGINg");
+
         });
 
         google.maps.event.addListener($scope.map, "dragend", function (event) {
-            getGeoposicion();
-            usuario.marcador.setAnimation(4); // fall
+            f(!$scope.servicio.estiloServicio){
+                suario.marcdor.setIcon('./img/esperataxi.png')
+                usuario.marcador.setAnimation(4); // fall
+                getGeoposicion();
+            }
         });
     }
 
@@ -270,12 +267,11 @@ angular.module('starter.controllers.clientes', [])
                     if (results[1]) {
                         $scope.ubicaciontext = results[0].formatted_address;
                         $scope.$apply();
-                        console.log("RESULTADO " + results[0].formatted_address);
                     } else {
-                        alert('No results found');
+                        console.log('No results found');
                     }
                 } else {
-                    alert('Geocoder failed due to: ' + status);
+                    console.log('Geocoder failed due to: ' + status);
                 }
             });
         }, 100);
@@ -291,7 +287,7 @@ angular.module('starter.controllers.clientes', [])
             unitSystem: google.maps.UnitSystem.METRIC
         };
 
-        directionsService.route(
+        googlemaps.directions.route(
             directionsRequest,
             function(response, status)
             {
@@ -317,6 +313,11 @@ angular.module('starter.controllers.clientes', [])
             $scope.trackear  = resp.taxista;
             $scope.servicioid = resp.servicioid;
             $scope.recogida = new google.maps.LatLng(resp.latRecogida,resp.lngRecogida);
+            $scope.marcadorTaxista = new google.maps.Marker({
+                position: $scope.recogida,
+                icon: './img/esperataxi.png',
+                map: $scope.map
+            });
             Servicio.guardarServicioCliente($scope.trackear,$scope.servicioid,resp.latRecogida,resp.lngRecogida,resp.latitud,resp.longitud);
             generaRuta($scope.recogida ,new google.maps.LatLng(resp.latitud,resp.longitud));
         }
@@ -326,8 +327,8 @@ angular.module('starter.controllers.clientes', [])
         if ($scope.trackear == resp.user) {
             //aqui en vez de poner un simple marcador ponemos una ruta que venga hacia la recogida pintada, todo chula
             var posicion = new google.maps.LatLng(resp.latitud, resp.longitud);
-            $scope.socios[socio].marcador.setPosition(posicion);
-            generaRuta(posicion,$scope.recogida )
+            $scope.marcadorTaxista.setPosition(posicion);
+            generaRuta(posicion,$scope.recogida)
         }
     });
 
