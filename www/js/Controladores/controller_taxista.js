@@ -43,13 +43,8 @@ angular.module('starter.controllers.taxista', [])
 
     var usuario = Usuario.usuario();
     $scope.ubicarDisponible = MapaInstancia.getUbicarDisponible();
-    var GoogleMaps = {geocoder:new google.maps.Geocoder(),directionsService:new google.maps.DirectionsService()};
-
-
     $scope.servicio = Servicio.getServicio();
-
-
-
+    var GoogleMaps = {geocoder:new google.maps.Geocoder(),directionsService:new google.maps.DirectionsService()};
 
     $ionicModal.fromTemplateUrl('templates/servicio.html', function ($ionicModal) {$scope.modalPedir = $ionicModal;},
                                 {scope: $scope,animation: 'slide-in-up'});
@@ -76,7 +71,7 @@ angular.module('starter.controllers.taxista', [])
     var directionsOrigen = function() {
         var directionsRequest = {
             origin: new google.maps.LatLng(usuario.latitud,usuario.longitud),
-            destination:$scope.servicio.recogida,
+            destination: new google.maps.LatLng($scope.servicio.latrecogida,$scope.servicio.lngrecogida),
             travelMode: google.maps.DirectionsTravelMode.DRIVING,
             unitSystem: google.maps.UnitSystem.METRIC
         };
@@ -134,7 +129,8 @@ angular.module('starter.controllers.taxista', [])
             latdestino = $scope.destino.lat();
             lngdestino = $scope.destino.lng();
         }
-        PostSails.postRechazar($scope.servicio.lngrecogida, $scope.servicio.lngrecogida,$scope.servicio.latdestino,$scope.servicio.lngdestino,$scope.servicio.fechaRecogida,$scope.servicio.id,$scope.servicio.mascota,$scope.servicio.dispacitado,usuario.id,motivo);
+        PostSails.postRechazar($scope.servicio.latrecogida, $scope.servicio.lngrecogida,$scope.servicio.latdestino,$scope.servicio.lngdestino,$scope.servicio.fechaRecogida,$scope.servicio.id,$scope.servicio.mascota,$scope.servicio.dispacitado,usuario.id,motivo);
+        $scope.servicio = Servicio.limpiaServicio();
     }
 
     $scope.itemOnLongPress = function () {
