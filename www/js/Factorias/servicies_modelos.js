@@ -97,7 +97,7 @@ angular.module("starter.servicies_modelos", [])
         resuelveServicio: function() {
             window.localStorage["servicio"] = false;
         },
-        limpiaServicio = function() {
+        limpiaServicio : function() {
             return {id:0,mascota: false,discapacitado: false,estiloServicio:false,progressValue:0,progresstyle:"",atendiendo:false,latrecogida:false,lngrecogida:false,latdestino:false,lngdestino:false,fechaRecogida:false,idCliente:0};
         }
     }

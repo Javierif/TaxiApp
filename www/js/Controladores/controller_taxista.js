@@ -76,7 +76,7 @@ angular.module('starter.controllers.taxista', [])
             unitSystem: google.maps.UnitSystem.METRIC
         };
 
-        directionsService.route(
+        GoogleMaps.directionsService.route(
             directionsRequest,
             function(response, status)
             {
@@ -99,7 +99,7 @@ angular.module('starter.controllers.taxista', [])
             unitSystem: google.maps.UnitSystem.METRIC
         };
 
-        directionsService.route(directionsRequest,
+        GoogleMaps.directionsService.route(directionsRequest,
                                 function(response, status)
                                 {
             if (status == google.maps.DirectionsStatus.OK)
@@ -120,8 +120,6 @@ angular.module('starter.controllers.taxista', [])
 
     var rechazarServicio = function(motivo) {
         $scope.modalPedir.hide();
-        $scope.servicio.estiloServicio = false;
-        $scope.servicio.atendiendo = false;
         MapaInstancia.ocupar(false);
         var latdestino;
         var lngdestino;
