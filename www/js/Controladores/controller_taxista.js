@@ -46,7 +46,9 @@ angular.module('starter.controllers.taxista', [])
     var GoogleMaps = {geocoder:new google.maps.Geocoder(),directionsService:new google.maps.DirectionsService()};
 
 
-    $scope.servicio = {id:0,mascota: false,discapacitado: false,estiloServicio:false,progressValue:0,progresstyle:"",atendiendo:false};
+    $scope.servicio = Servicio.getServicio();
+
+
 
 
     $ionicModal.fromTemplateUrl('templates/servicio.html', function ($ionicModal) {$scope.modalPedir = $ionicModal;},
@@ -131,7 +133,8 @@ angular.module('starter.controllers.taxista', [])
         if($scope.destino) {
             latdestino = $scope.destino.lat();
             lngdestino = $scope.destino.lng();
-        } PostSails.postRechazar($scope.recogida.lat(),$scope.recogida.lng(),latdestino,lngdestino,fecha,$scope.servicioid,mascota,dispacitado,usuario.id,motivo);
+        }
+        PostSails.postRechazar($scope.servicio.lngrecogida, $scope.servicio.lngrecogida,$scope.servicio.latdestino,$scope.servicio.lngdestino,$scope.servicio.fechaRecogida,$scope.servicio.id,$scope.servicio.mascota,$scope.servicio.dispacitado,usuario.id,motivo);
     }
 
     $scope.itemOnLongPress = function () {
@@ -278,11 +281,8 @@ angular.module('starter.controllers.taxista', [])
     var compruebaServicios = function () {
         if(Servicio.compruebaServicio()) {
             MapaInstancia.ocupar(true);
-            $scope.servicio.estiloServicio = true;
-            var servicio = Servicio.getServicio();
+            $scope.servicio = Servicio.getServicio();
             console.log("EL SERVICIO CARGADO ES " + JSON.stringify(servicio));
-            $scope.servicio.id = servicio.id;
-            $scope.recogida = new google.maps.LatLng(servicio.recogidaLat,servicio.recogidaLng);
             directionsOrigen();
 
             if(servicio.latdestino) {
@@ -365,7 +365,6 @@ angular.module('starter.controllers.taxista', [])
             if (status === google.maps.GeocoderStatus.OK) {
                 if (results[1]) {
                     $scope.recogidaText = results[0].formatted_address;
-                    $scope.recogida =  new google.maps.LatLng($scope.servicio.latrecogida,$scope.servicio.lngrecogida);
                 } else {
                     alert('No results found');
                 }
@@ -469,6 +468,7 @@ angular.module('starter.controllers.taxista', [])
         console.log("SERVICIO " + JSON.stringify(resp));
         console.log(" USU " + usuario.id);
         if(resp.taxista == usuario.id) {
+            $scope.servicio.id = resp.id;
             $scope.servicio.latrecogida = resp.latRecogida;
             $scope.servicio.lngrecogida = resp.lngRecogida;
             $scope.servicio.latdestino = resp.latDestino;

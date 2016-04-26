@@ -62,27 +62,27 @@ angular.module("starter.servicies_modelos", [])
 
     .factory('Servicio', function (NombresGuardado) {
     // Might use a resource here that returns a JSON arra
-    var servicio = {};
+    var servicio = {
+        id:0,
+        mascota: false,
+        discapacitado: false,
+        estiloServicio:false,
+        progressValue:0,
+        progresstyle:"",
+        atendiendo:false,
+        lngrecogida:false,
+        lngrecogida:false,
+        latdestino:false,
+        lngdestino:false,
+        fechaRecogida:false,
+        idCliente:0,
+    };
     var ocupado = false;
     return {
         getServicio: function() {
             return servicio;
         },
         guardarServicio:function(servicio){
-            var rlat = servicio.recogida.lat();
-            var rlng = servicio.recogida.lng();
-            var dlat;
-            var dlng;
-            if(destino) {
-                dlat = servicio.destino.lat();
-                dlng = servicio.destino.lng();
-            }
-            var servicioSave = {
-                servicioid:servicio.id,recogidaLat:rlat,recogidaLng:rlng,destinoLat:dlat,destinoLng:dlng};
-            window.localStorage["servicio"] = JSON.stringify(servicioSave);
-        },
-        guardarServicioCliente:function(trackear,servicioid,latRecogida,lngRecogida,latitud,longitud){
-            servicio = {servicioid:servicioid,taxistaid:trackear,recogidaLat:latRecogida,recogidaLng:lngRecogida,destinoLat:latitud,destinoLng:longitud};
             window.localStorage["servicio"] = JSON.stringify(servicio);
         },
         compruebaServicio: function() {
