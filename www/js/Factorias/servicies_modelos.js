@@ -76,6 +76,8 @@ angular.module("starter.servicies_modelos", [])
         lngdestino:false,
         fechaRecogida:false,
         idCliente:0,
+        //esto es solo de cliente
+        taxiTrackear:false
     };
     var ocupado = false;
     return {

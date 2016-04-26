@@ -4,9 +4,8 @@ angular.module('starter.controllers.clientes', [])
 
     var usuario = Usuario.usuario();
     var googlemaps = {geocoder: new google.maps.Geocoder(),directions:new google.maps.DirectionsService()};
-    $scope.servicio = {mascota: false, discapacitado: false, estiloServicio: false};
+    $scope.servicio = Servicio.getServicio();;
     $scope.datetimeValue = new Date();
-    $scope.estiloAceptado = false;
     var timeRespuesta = 0;
 
     $scope.toggleLeft = function () {
@@ -32,13 +31,9 @@ angular.module('starter.controllers.clientes', [])
         });
     }
 
-    var preparaPedido = function () {
+    $scope.pedirTaxi = function () {
         var center = $scope.map.getCenter();
         $scope.localizacion = "http://maps.googleapis.com/maps/api/staticmap?size=640x320&sensor=false&zoom=18&markers=" + center.lat() + "%2C" + center.lng();
-    }
-
-    $scope.pedirTaxi = function () {
-        preparaPedido();
         $scope.modalPedir.show();
     }
 
@@ -176,12 +171,8 @@ angular.module('starter.controllers.clientes', [])
 
     var compruebaServicio = function() {
         if(Servicio.compruebaServicio()){
-            var servicio = Servicio.getServicio();
-            $scope.servicio.estiloServicio = true;
-            $scope.trackear  = servicio.taxistaid;
-            $scope.servicioid = servicio.servicioid;
-            $scope.recogida = new google.maps.LatLng(servicio.recogidaLat,servicio.recogidaLng);
-            generaRuta($scope.recogida ,new google.maps.LatLng(servicio.destinoLat,servicio.destinoLng));
+            $scope.servicio = Servicio.getServicio();
+            generaRuta(new google.maps.LatLng($scope.servicio.latrecogido,$scope.servicio.lngrecogido) ,new google.maps.LatLng($scope.servicio.latdestino,$scope.servicio.lngdestino));
         }
     }
 
@@ -308,25 +299,26 @@ angular.module('starter.controllers.clientes', [])
         if(resp.cliente == usuario.id) {
             timeRespuesta=1000;
             $scope.servicio.estiloServicio = true;
-            $scope.trackear  = resp.taxista;
-            $scope.servicioid = resp.servicioid;
-            $scope.recogida = new google.maps.LatLng(resp.latRecogida,resp.lngRecogida);
+            $scope.servicio.taxiTrackear  = resp.taxista;
+            $scope.servicio.id = resp.servicioid;
+            $scope.servicio.latrecogida = resp.latRecogida;
+            $scope.servicio.lngrecogida = resp.lngRecogida;
             $scope.marcadorTaxista = new google.maps.Marker({
-                position: $scope.recogida,
+                position: new google.maps.LatLng(resp.latRecogida,resp.lngRecogida),
                 icon: './img/esperataxi.png',
                 map: $scope.map
             });
-            Servicio.guardarServicioCliente($scope.trackear,$scope.servicioid,resp.latRecogida,resp.lngRecogida,resp.latitud,resp.longitud);
-            generaRuta($scope.recogida ,new google.maps.LatLng(resp.latitud,resp.longitud));
+            Servicio.guardarServicioCliente($scope.servicio);
+            generaRuta(new google.maps.LatLng(resp.latRecogida,resp.lngRecogida) ,new google.maps.LatLng(resp.latitud,resp.longitud));
         }
     });
 
     $sails.on('movimiento', function (resp) {
-        if ($scope.trackear&&$scope.trackear == resp.user) {
+        if ($scope.servicio.taxiTrackear&&$scope.servicio.taxiTrackear == resp.user) {
             //aqui en vez de poner un simple marcador ponemos una ruta que venga hacia la recogida pintada, todo chula
             var posicion = new google.maps.LatLng(resp.latitud, resp.longitud);
             $scope.marcadorTaxista.setPosition(posicion);
-            generaRuta(posicion,$scope.recogida)
+            generaRuta(posicion,new google.maps.LatLng($scope.servicio.latrecogida,$scope.servicio.lngrecogida));
         }
     });
 
@@ -341,14 +333,14 @@ angular.module('starter.controllers.clientes', [])
 
     var postRecogido = function() {
         $sails.post('/cliente/recogido', {
-            taxistaid: $scope.trackear,
+            taxistaid: $scope.servicio.taxiTrackear,
             servicioid:$scope.servicioid,
         });
     }
 
     var postRechazar = function() {
         $sails.post('/cliente/rechazar', {
-            taxistaid: $scope.trackear,
+            taxistaid: $scope.servicio.taxiTrackear,
             servicioid:$scope.servicioid,
         });
     }
