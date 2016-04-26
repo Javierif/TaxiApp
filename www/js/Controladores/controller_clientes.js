@@ -5,9 +5,8 @@ angular.module('starter.controllers.clientes', [])
     var usuario = Usuario.usuario();
     var googlemaps = {geocoder: new google.maps.Geocoder(),directions:new google.maps.DirectionsService()};
     $scope.servicio = {mascota: false, discapacitado: false, estiloServicio: false};
-
+    $scope.datetimeValue = new Date();
     $scope.estiloAceptado = false;
-    var timerRespuesta = false;
     var timeRespuesta = 0;
 
     $scope.toggleLeft = function () {
@@ -156,9 +155,8 @@ angular.module('starter.controllers.clientes', [])
             var time    = minutes+':'+seconds;
             timeRespuesta = timeRespuesta + 1;
             $ionicLoading.show({
-                template: '<button class="button button-clear" style="line-height: normal; min-height: 0; min-width: 0;" ng-click="$root.cancel()"><i class="ion-close-circled"></i></button><ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Conectandonos con los taxistas.<br> tiempo estimado: 02:00 <br> tiempo espera: '+time
+                template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Conectandonos con los taxistas.<br> tiempo estimado: 02:00 <br> tiempo espera: '+time
             });
-            $rootScope.cancel = $ionicLoading.hide();
             if(timeRespuesta >200){
                 $ionicLoading.hide();
                 $scope.modalPedir.hide();
@@ -179,7 +177,7 @@ angular.module('starter.controllers.clientes', [])
     var compruebaServicio = function() {
         if(Servicio.compruebaServicio()){
             var servicio = Servicio.getServicio();
-            $scope.estiloAceptado = true;
+            $scope.servicio.estiloServicio = true;
             $scope.trackear  = servicio.taxistaid;
             $scope.servicioid = servicio.servicioid;
             $scope.recogida = new google.maps.LatLng(servicio.recogidaLat,servicio.recogidaLng);
@@ -239,7 +237,7 @@ angular.module('starter.controllers.clientes', [])
                 if(!$scope.servicio.estiloServicio){
                     var center = $scope.map.getCenter();
                     usuario.marcador.setPosition(center);
-                    usuario.marcdor.setIcon('./img/pedirtaxi.png');
+                    usuario.marcador.setIcon('./img/pedirtaxi.png');
                 }
             }, 100);
         });
@@ -248,10 +246,10 @@ angular.module('starter.controllers.clientes', [])
         });
 
         google.maps.event.addListener($scope.map, "dragend", function (event) {
-            f(!$scope.servicio.estiloServicio){
-                suario.marcdor.setIcon('./img/esperataxi.png')
+            if(!$scope.servicio.estiloServicio){
                 usuario.marcador.setAnimation(4); // fall
                 getGeoposicion();
+                usuario.marcador.setIcon('./img/esperataxi.png')
             }
         });
     }
@@ -260,7 +258,7 @@ angular.module('starter.controllers.clientes', [])
         window.setTimeout(function () {
             var center = $scope.map.getCenter();
             usuario.marcador.setPosition(center);
-            geocoder.geocode({
+            googlemaps.geocoder.geocode({
                 'latLng': center
             }, function (results, status) {
                 if (status === google.maps.GeocoderStatus.OK) {
@@ -309,7 +307,7 @@ angular.module('starter.controllers.clientes', [])
         console.log(" TODO " + JSON.stringify(resp))
         if(resp.cliente == usuario.id) {
             timeRespuesta=1000;
-            $scope.estiloAceptado = true;
+            $scope.servicio.estiloServicio = true;
             $scope.trackear  = resp.taxista;
             $scope.servicioid = resp.servicioid;
             $scope.recogida = new google.maps.LatLng(resp.latRecogida,resp.lngRecogida);
@@ -324,7 +322,7 @@ angular.module('starter.controllers.clientes', [])
     });
 
     $sails.on('movimiento', function (resp) {
-        if ($scope.trackear == resp.user) {
+        if ($scope.trackear&&$scope.trackear == resp.user) {
             //aqui en vez de poner un simple marcador ponemos una ruta que venga hacia la recogida pintada, todo chula
             var posicion = new google.maps.LatLng(resp.latitud, resp.longitud);
             $scope.marcadorTaxista.setPosition(posicion);

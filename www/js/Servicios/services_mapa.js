@@ -101,6 +101,7 @@ angular.module("starter.servicies_mapa", [])
 
         },
         creaTaxiMapa: function (taxista) {
+            console.log("CREO TAXISTA " + taxista);
             var posicion = new google.maps.LatLng(taxista.latitud, taxista.longitud);
             var icon;
             icon = './img/activo/taxi'+taxista.numerotaxi+'.png'

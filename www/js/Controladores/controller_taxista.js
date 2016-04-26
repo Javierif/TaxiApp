@@ -359,7 +359,7 @@ angular.module('starter.controllers.taxista', [])
         }
         $scope.localizacion = "http://maps.googleapis.com/maps/api/staticmap?size=640x320&sensor=false&zoom="+zoom+"&markers=" + $scope.servicio.latrecogida + "%2C" + $scope.servicio.lngrecogida;
 
-        geocoder.geocode({
+        GoogleMaps.geocoder.geocode({
             'latLng': new google.maps.LatLng($scope.servicio.latrecogida,$scope.servicio.lngrecogida)
         }, function (results, status) {
             if (status === google.maps.GeocoderStatus.OK) {
@@ -373,10 +373,10 @@ angular.module('starter.controllers.taxista', [])
                 alert('Geocoder failed due to: ' + status);
             }
         });
-        if(latdestino) {
-            $scope.localizacion =  $scope.localizacion + "8&markers=color:0x4592ba|"+latdestino + "%2C" +lngdestino;
+        if($scope.servicio.latdestino) {
+            $scope.localizacion =  $scope.localizacion + "8&markers=color:0x4592ba|"+$scope.servicio.latdestino + "%2C" +$scope.servicio.lngdestino;
             $scope.destino =null;
-            geocoder.geocode({
+            GoogleMaps.geocoder.geocode({
                 'latLng': new google.maps.LatLng($scope.servicio.latdestino,$scope.servicio.lngdestino)
             }, function (results, status) {
                 if (status === google.maps.GeocoderStatus.OK) {
@@ -391,7 +391,7 @@ angular.module('starter.controllers.taxista', [])
                 }
             });
         }
-        $scope.datetimeValue = fecha;
+        $scope.datetimeValue = $scope.servicio.fechaRecogida;
         $scope.modalPedir.show();
         cuenta();
     }
@@ -466,6 +466,8 @@ angular.module('starter.controllers.taxista', [])
     })
 
     $sails.on('Servicio', function (resp) {
+        console.log("SERVICIO " + JSON.stringify(resp));
+        console.log(" USU " + usuario.id);
         if(resp.taxista == usuario.id) {
             $scope.servicio.latRecogida = resp.latRecogida;
             $scope.servicio.lngRecogida = resp.lngRecogida;
