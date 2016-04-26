@@ -469,10 +469,10 @@ angular.module('starter.controllers.taxista', [])
         console.log("SERVICIO " + JSON.stringify(resp));
         console.log(" USU " + usuario.id);
         if(resp.taxista == usuario.id) {
-            $scope.servicio.latRecogida = resp.latRecogida;
-            $scope.servicio.lngRecogida = resp.lngRecogida;
-            $scope.servicio.latDestino = resp.latDestino;
-            $scope.servicio.lngDestino = resp.lngDestino;
+            $scope.servicio.latrecogida = resp.latRecogida;
+            $scope.servicio.lngrecogida = resp.lngRecogida;
+            $scope.servicio.latdestino = resp.latDestino;
+            $scope.servicio.lngdestino = resp.lngDestino;
             $scope.servicio.fechaRecogida = resp.fechaRecogida;
             $scope.servicio.animal = resp.animal;
             $scope.servicio.discapacitado = resp.dispacitado;
