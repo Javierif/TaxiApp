@@ -209,6 +209,7 @@ angular.module('starter.controllers.taxista', [])
                 Servicio.resuelveServicio();
                 PostSails.postResolverServicio(res);
                 MapaInstancia.ocupar(false);
+                $scope.servicio = Servicio.limpiaServicio();
             } else {
                 window.plugins.toast.showShortBottom("Selecciona una de las opciones",
                                                      function (a) {},
