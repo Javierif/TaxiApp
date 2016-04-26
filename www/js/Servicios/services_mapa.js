@@ -40,7 +40,10 @@ angular.module("starter.servicies_mapa", [])
                 for(taxi in listaGeneral) {
                     for(socio in socios) {
                         if(socios[socio].id == listaGeneral[taxi].id) {
-                            socios[socio].marcador = instancia.creaTaxiMapa(listaGeneral[taxi]);
+                            socios[socio].marcador = instancia.creaTaxiMapa(listaGeneral[taxi],listaGeneral[taxi].ocupado);
+                            if(socios[socio].id == usuario.id) {
+                                usuario.ocupado = listaGeneral[taxi].ocupado;
+                            }
                             break;
                         }
 
@@ -100,11 +103,16 @@ angular.module("starter.servicies_mapa", [])
             });
 
         },
-        creaTaxiMapa: function (taxista) {
+        creaTaxiMapa: function (taxista,ocupado) {
             console.log("CREO TAXISTA " + taxista);
             var posicion = new google.maps.LatLng(taxista.latitud, taxista.longitud);
             var icon;
-            icon = './img/activo/taxi'+taxista.numerotaxi+'.png'
+            if(!ocupado) {
+                icon = './img/activo/taxi'+taxista.numerotaxi+'.png'
+            } else {
+                icon = './img/ocupado/taxi'+taxista.numerotaxi+'.png'
+            }
+
             var marcador = new google.maps.Marker({
                 position: new google.maps.LatLng(taxista.latitud, taxista.longitud),
                 icon: icon,
@@ -189,7 +197,7 @@ angular.module("starter.servicies_mapa", [])
                         this.borraUbicacion(socios[socio].id);
                         this.limpia(listadoGeneral,socios[socio]);
                         listadoGeneral.push(socios[socio]);
-                        socios[socio].marcador=this.creaTaxiMapa(mapa,socios[socio]);
+                        socios[socio].marcador=this.creaTaxiMapa(socios[socio],socios[socio].ocupado);
                         socios[socio].marcador.setIcon('./img/activo/taxi'+socios[socio].numerotaxi+'.png');
                     } else {
                         socios[socio].marcador.setIcon('null');
@@ -222,7 +230,7 @@ angular.module("starter.servicies_mapa", [])
             if(usuario.ocupado){
                 socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+socios[usuario.posicion].numerotaxi+'.png')
             }  else {
-                 socios[usuario.posicion].marcador.setIcon('./img/activo/taxi'+socios[usuario.posicion].numerotaxi+'.png')
+                socios[usuario.posicion].marcador.setIcon('./img/activo/taxi'+socios[usuario.posicion].numerotaxi+'.png')
 
             }
             console.log("PUES " + usuario.id + " Y POS " + usuario.ocupado);
