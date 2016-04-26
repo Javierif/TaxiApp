@@ -2,7 +2,7 @@
     <ion-content bindonce scroll="false">
         <!-- End controls-->
         <div id="mapa"></div>
-        <div class="row bar-header head" ng-if="!servico.estiloServicio">
+        <div class="row bar-header head" ng-if="!servicio.estiloServicio">
             <div class="col-xs-3 col-md-3">
                 <button id="" class="button button-light radius" ng-click="toggleLeft()"><i class="ion-navicon-round"></i></button>
             </div>
@@ -20,7 +20,7 @@
 
         <div id="seccionmapa">
             <button class="button button-assertive" on-hold="itemOnLongPress()" on-release="itemOnTouchEnd()"><i class="ion-mic-a"></i></button>
-            <div ng-if="servico.estiloServicio">
+            <div ng-if="servicio.estiloServicio">
                 <button class="button button-energized midbutton" on-hold="itemOnLongPress()" on-release="OnTouchEndCliente()">Hablarle al cliente</button>
                 <button class="button button-balanced midbutton" ng-click="resolver()">Resolver Servicio</button>
             </div>

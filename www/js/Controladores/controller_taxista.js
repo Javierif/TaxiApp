@@ -277,7 +277,7 @@ angular.module('starter.controllers.taxista', [])
         if(Servicio.compruebaServicio()) {
             MapaInstancia.ocupar(true);
             $scope.servicio = Servicio.getServicio();
-            console.log("EL SERVICIO CARGADO ES " + JSON.stringify(servicio));
+            console.log("EL SERVICIO CARGADO ES " + JSON.stringify($scope.servicio));
             directionsOrigen();
 
             if(servicio.latdestino) {
