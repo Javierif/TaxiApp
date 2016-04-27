@@ -119,6 +119,7 @@ angular.module('starter.controllers.taxista', [])
     }
 
     var rechazarServicio = function(motivo) {
+        console.log("RECHANZADO EL SERVICICI")
         $scope.modalPedir.hide();
         MapaInstancia.ocupar(false);
         var latdestino;
@@ -398,12 +399,15 @@ angular.module('starter.controllers.taxista', [])
                 $scope.servicio.progressValue = $scope.servicio.progressValue + 1;
                 var total =  $scope.servicio.progressValue * 10;
                 $scope.servicio.progresstyle = "width:"+total+"%";
-                if($scope.progressValue != 10) {
+                if($scope.servicio.progressValue != 10) {
                     cuenta();
+                    console.log("DANDO VUELTA");
                 } else {
+                    console.log("tiempo finish")
                     rechazarServicio("No Atendido");
                 }
             } else {
+                console.log("NO ATENDIDOOO   ")
                 $scope.servicio.progressValue = 0;
                 $scope.modalPedir.hide();
                 MapaInstancia.ocupar(true);
