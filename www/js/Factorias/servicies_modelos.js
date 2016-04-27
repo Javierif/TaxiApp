@@ -85,11 +85,14 @@ angular.module("starter.servicies_modelos", [])
             return servicio;
         },
         guardarServicio:function(servicio){
-            window.localStorage["servicio"] = servicio;
+            console.log("GUARDANDO " + JSON.stringify(servicio));
+            window.localStorage["servicio"] = JSON.stringify(servicio);
         },
         compruebaServicio: function() {
+            console.log("DETRO DE COMPRUEBA")
             var cargado = window.localStorage["servicio"];
             if (cargado != undefined && cargado != "false") {
+                console.log("A VER SERVICIO " + JSON.stringify(cargado));
                 servicio = JSON.parse(cargado);
                 console.log(servicio);
                 console.log("POS PIJO " + servicio.id);
