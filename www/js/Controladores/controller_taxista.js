@@ -427,7 +427,7 @@ angular.module('starter.controllers.taxista', [])
         $scope.socios = MapaInstancia.conectaTaxi(resp);
         try{
             if(resp.conectado) {
-                var myMedia = new Media("./img/on.wav");
+                 var myMedia = new Media("/android_asset/www/www/img/on.wav");
                 myMedia.play();
                 window.plugins.toast.showShortBottom("Se ha conectado el taxi nº" + $scope.socios[socio].numerotaxi,
                                                      function (a) {},
@@ -448,7 +448,7 @@ angular.module('starter.controllers.taxista', [])
 
     $sails.on('ubicado', function (resp) {
         try{
-            var myMedia = new Media("./img/ubicar.wav");
+            var myMedia = new Media("/android_asset/www/www/img/ubicar.wav");
             myMedia.play();
         } catch(exception) {
         }
@@ -496,8 +496,7 @@ angular.module('starter.controllers.taxista', [])
         }
     })
 
-    //Prepares File System for Audio Recording
-    audioRecord = 'recorded.wav';
+     audioRecord = 'recorded.wav';
     var myMedia;
     var urlfilesystem = false;
 
@@ -507,7 +506,7 @@ angular.module('starter.controllers.taxista', [])
         console.log("Sent = " + r.bytesSent);
         var response = JSON.parse(r.response);
         // alert("res " + response.url);
-        PostSails.postDifundirRecord({taxista:usuario.id,urlaudio:response.url});
+        postDifundirRecord({taxista:usuario.id,urlaudio:response.url});
     }
 
     var winClientes = function (r) {
@@ -516,7 +515,7 @@ angular.module('starter.controllers.taxista', [])
         console.log("Sent = " + r.bytesSent);
         var response = JSON.parse(r.response);
         // alert("res " + response.url);
-        PostSails.postDifundirClientesRecord({servicioid:$scope.servicioid,urlaudio:response.url});
+        postDifundirClientesRecord({servicioid:$scope.servicioid,urlaudio:response.url});
     }
 
     var fail = function (error) {
@@ -526,40 +525,14 @@ angular.module('starter.controllers.taxista', [])
     }
 
     var record = function () {
-        var introsound = new Media("./img/record.wav", function mediaSuccess() {
-            if (!urlfilesystem) {
-                window.requestFileSystem(
-                    LocalFileSystem.TEMPORARY,
-                    0,
-                    function (fileSystem) {
-                        urlfilesystem = fileSystem.root.toURL();
-                        /* hohohla */
-                        urlfilesystem = urlfilesystem.slice(7);
-
-                        myMedia = new Media(urlfilesystem + audioRecord);
-                        myMedia.startRecord();
-                        console.log(" 1 " + urlfilesystem + " Y AUDIO  " + audioRecord + " YMEDIA " + myMedia);
-                    },
-                    function (error) {
-                        alert('Error getting file system');
-                    }
-                );
-            } else {
-                myMedia = new Media(urlfilesystem + audioRecord);
-                myMedia.startRecord();
-                console.log(" 2 " + urlfilesystem + " Y AUDIO  " + audioRecord + " YMEDIA " + myMedia);
-            }
-        },function mediaFailure(err) {
-            console.log("An error occurred: " + err.code);
-        },function mediaStatus(status) {
-            console.log("A status change occurred: " + status.code);
-        });
-
+        var introsound = new Media("/android_asset/www/img/record.wav");
         introsound.play();
+        myMedia = new Media("/storage/emulated/0/"+audioRecord);
+        myMedia.startRecord();
+
     }
 
     var endRecord = function () {
-        console.log("MY MEDIA ES " + JSON.stringify(myMedia));
         myMedia.stopRecord();
         myMedia.play();
 
@@ -569,18 +542,18 @@ angular.module('starter.controllers.taxista', [])
         options.headers = {
             Connection: "close"
         };
+        alert(JSON.stringify(myMedia));
+
         options.fileKey = "file";
         options.fileName = audioRecord;
         options.mimeType = "audio/wav";
         var ft = new FileTransfer();
         ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/taxista/record"), win, fail, options);
     }
-
     var endRecordCliente = function () {
         myMedia.stopRecord();
-       // myMedia.play();
+        myMedia.play();
         //alert("AQUI");
-
         var options = new FileUploadOptions();
         options.chunkedMode = false;
 
