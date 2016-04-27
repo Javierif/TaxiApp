@@ -225,16 +225,16 @@ angular.module("starter.servicies_mapa", [])
             }
             return socios;
         },
-        ocupar:function() {
+        ocupar:function(ocupado) {
             usuario.ocupado = !usuario.ocupado;
-            if(usuario.ocupado){
+            if(ocupado){
                 socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+socios[usuario.posicion].numerotaxi+'.png')
             }  else {
                 socios[usuario.posicion].marcador.setIcon('./img/activo/taxi'+socios[usuario.posicion].numerotaxi+'.png')
 
             }
-            console.log("PUES " + usuario.id + " Y POS " + usuario.ocupado);
-            PostSails.postOcupar(usuario.id,usuario.ocupado)
+            console.log("PUES " + usuario.id + " Y POS " + ocupado);
+            PostSails.postOcupar(usuario.id,ocupado)
         },
         ocuparTaxi: function(idTaxi,ocupado) {
             for(socio in socios) {
