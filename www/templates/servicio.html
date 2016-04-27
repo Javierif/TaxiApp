@@ -22,22 +22,22 @@
             </div>
 
             <div class="list margintop">
-                <a class="item item-icon-right" href="#" ng-class="{opcionactiva:opcion.discapacitado}">
-                                Discapacitado
-                                <i class="icon ion-ios-body"></i>
-                            </a>
-                <a class="item item-icon-right" ng-class="{opcionactiva:opcion.mascota}" href="#" >
-                                Mascota
-                                <i class="icon ion-ios-paw"></i>
-                            </a>
+                <a class="item item-icon-right" href="#" ng-class="{opcionactiva:servicio.discapacitado}">
+                    Discapacitado
+                    <i class="icon ion-ios-body"></i>
+                </a>
+                <a class="item item-icon-right" ng-class="{opcionactiva:servicio.animal}" href="#" >
+                    Mascota
+                    <i class="icon ion-ios-paw"></i>
+                </a>
             </div>
 
             <div class="progress">
-              <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{progressValue}}"
-              aria-valuemin="0" aria-valuemax="10" style="{{progresstyle}}">
-              </div>
+                <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{servicio.progressValue}}"
+                     aria-valuemin="0" aria-valuemax="10" style="{{servicio.progresstyle}}">
+                </div>
             </div>
-            <button class="button midbutton button-assertive" ng-click="rechazar(recogidaText,destinoText,opcion.mascota,opcion.discapacitado,datetimeValue)">Rechazar</button>
+            <button class="button midbutton button-assertive" ng-click="rechazar(recogidaText,destinoText,servicio.mascota,servicio.discapacitado,datetimeValue)">Rechazar</button>
             <button class="button midbutton button-energized" ng-click="aceptar(recogidaText,destinoText)">Aceptar</button>
         </div>
     </content>

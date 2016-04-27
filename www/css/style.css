@@ -374,6 +374,11 @@
     height: 100%;
 }
 
+.full-button {
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+
 .ng-pristine {
     text-overflow: ellipsis;
     background: rgba(255, 255, 255, 0.8)!important;
