@@ -159,10 +159,13 @@ angular.module('starter.controllers.clientes', [])
             if(timeRespuesta >200){
                 $ionicLoading.hide();
                 $scope.modalPedir.hide();
-                if(timeRespuesta < 600) {
-                    window.plugins.toast.showShortBottom("Todos los taxis esta ocupados, prueba en 5 minutos",
-                                                         function (a) {},
-                                                         function (b) {});
+                if(timeRespuesta > 600) {
+                    try{
+                        window.plugins.toast.showShortBottom("Todos los taxis esta ocupados, prueba en 5 minutos",
+                                                             function (a) {},
+                                                             function (b) {});
+                    } catch(e){}
+
                 }
 
                 timeRespuesta =0;
@@ -319,6 +322,12 @@ angular.module('starter.controllers.clientes', [])
             generaRuta(new google.maps.LatLng(resp.latRecogida,resp.lngRecogida) ,new google.maps.LatLng(resp.latitud,resp.longitud));
         }
     });
+
+    $sails.on("noatendido", function(resp) {
+        if(resp.idcliente == usuario.id) {
+            timeRespuesta =700;
+        }
+    })
 
     $sails.on('movimiento', function (resp) {
         if ($scope.servicio.taxiTrackear&&$scope.servicio.taxiTrackear == resp.user) {

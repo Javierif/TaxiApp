@@ -231,7 +231,6 @@ angular.module("starter.servicies_mapa", [])
                 socios[usuario.posicion].marcador.setIcon('./img/ocupado/taxi'+socios[usuario.posicion].numerotaxi+'.png')
             }  else {
                 socios[usuario.posicion].marcador.setIcon('./img/activo/taxi'+socios[usuario.posicion].numerotaxi+'.png')
-
             }
             console.log("PUES " + usuario.id + " Y POS " + ocupado);
             PostSails.postOcupar(usuario.id,ocupado)

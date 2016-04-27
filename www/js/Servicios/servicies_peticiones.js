@@ -127,9 +127,9 @@ angular.module('starter.servicies_peticiones', [])
             });
         },
 
-        postRechazar: function(latRecogida,lngRecogida,latDestino,lngDestino,fechaRecogida,id, animal,dispacitado,idSocio) {
+        postRechazar: function(latRecogida,lngRecogida,latDestino,lngDestino,fechaRecogida,id, animal,dispacitado,idSocio,motivo) {
             $sails.post('/taxista/rechazar', {
-                idSocio: usuario.id,
+                idSocio: idSocio,
                 latRecogida: latRecogida,
                 lngRecogida: lngRecogida,
                 latDestino: latDestino,
@@ -137,21 +137,8 @@ angular.module('starter.servicies_peticiones', [])
                 fechaRecogida: fechaRecogida,
                 id:id,
                 animal:animal,
-                discapacitado: dispacitado
-            });
-        },
-
-        postRechazarUltimo: function(latRecogida,lngRecogida,latDestino,lngDestino,fechaRecogida,id, animal,dispacitado,idSocio) {
-            $sails.post('/taxista/rechazarUltimo', {
-                idSocio: usuario.id,
-                latRecogida: latRecogida,
-                lngRecogida: lngRecogida,
-                latDestino: latDestino,
-                lngDestino: lngDestino,
-                fechaRecogida: fechaRecogida,
-                id:id,
-                animal:animal,
-                discapacitado: discapacitado
+                discapacitado: dispacitado,
+                motivo:motivo
             });
         },
 
