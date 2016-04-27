@@ -6,6 +6,7 @@ angular.module('starter.controllers.clientes', [])
     var googlemaps = {geocoder: new google.maps.Geocoder(),directions:new google.maps.DirectionsService()};
     $scope.servicio = Servicio.getServicio();;
     $scope.datetimeValue = new Date();
+    $scope.marcadoresServicio = [];
     var timeRespuesta = 0;
 
     $scope.toggleLeft = function () {
@@ -88,6 +89,9 @@ angular.module('starter.controllers.clientes', [])
                     $scope.ruta.setMap(null);
                 }
                 $scope.servicio.estiloServicio = false;
+                for(marcador in $scope.marcadoresServicio) {
+                    $scope.marcadoresServicio[marcador].setMap(null);
+                }
                 Servicio.resuelveServicio();
             }
         });
@@ -270,8 +274,8 @@ angular.module('starter.controllers.clientes', [])
         if($scope.ruta)
             $scope.ruta.setMap(null);
         var directionsRequest = {
-            origin: from,
-            destination: to,
+            origin: to,
+            destination: from,
             travelMode: google.maps.DirectionsTravelMode.DRIVING,
             unitSystem: google.maps.UnitSystem.METRIC
         };
@@ -284,8 +288,16 @@ angular.module('starter.controllers.clientes', [])
                 {
                     $scope.ruta = new google.maps.DirectionsRenderer({
                         map: $scope.map,
-                        directions: response
+                        directions: response,
+                        suppressMarkers : true
                     });
+                    var markerini = new google.maps.Marker({
+                        position: to,
+                        map: $scope.map,
+                        icon: './img/activoicon.png',
+                    });
+                    $scope.marcadoresServicio.push(markerini);
+
                 }
             }
         );;
@@ -303,11 +315,6 @@ angular.module('starter.controllers.clientes', [])
             $scope.servicio.id = resp.servicioid;
             $scope.servicio.latrecogida = resp.latRecogida;
             $scope.servicio.lngrecogida = resp.lngRecogida;
-            $scope.marcadorTaxista = new google.maps.Marker({
-                position: new google.maps.LatLng(resp.latRecogida,resp.lngRecogida),
-                icon: './img/esperataxi.png',
-                map: $scope.map
-            });
             Servicio.guardarServicio($scope.servicio);
             generaRuta(new google.maps.LatLng(resp.latRecogida,resp.lngRecogida) ,new google.maps.LatLng(resp.latitud,resp.longitud));
         }
@@ -317,7 +324,7 @@ angular.module('starter.controllers.clientes', [])
         if ($scope.servicio.taxiTrackear&&$scope.servicio.taxiTrackear == resp.user) {
             //aqui en vez de poner un simple marcador ponemos una ruta que venga hacia la recogida pintada, todo chula
             var posicion = new google.maps.LatLng(resp.latitud, resp.longitud);
-            $scope.marcadorTaxista.setPosition(posicion);
+            $scope.marcadoresServicio[0].setPosition(posicion);
             generaRuta(posicion,new google.maps.LatLng($scope.servicio.latrecogida,$scope.servicio.lngrecogida));
         }
     });
