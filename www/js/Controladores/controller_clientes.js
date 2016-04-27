@@ -423,7 +423,7 @@ angular.module('starter.controllers.clientes', [])
 
     var endRecord = function () {
         myMedia.stopRecord();
-        myMedia.play();
+        //myMedia.play();
 
         var options = new FileUploadOptions();
         options.chunkedMode = false;

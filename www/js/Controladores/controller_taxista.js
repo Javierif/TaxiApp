@@ -535,8 +535,10 @@ angular.module('starter.controllers.taxista', [])
                         urlfilesystem = fileSystem.root.toURL();
                         /* hohohla */
                         urlfilesystem = urlfilesystem.slice(7);
+
                         myMedia = new Media(urlfilesystem + audioRecord);
                         myMedia.startRecord();
+                        console.log(" 1 " + urlfilesystem + " Y AUDIO  " + audioRecord + " YMEDIA " + myMedia);
                     },
                     function (error) {
                         alert('Error getting file system');
@@ -545,15 +547,11 @@ angular.module('starter.controllers.taxista', [])
             } else {
                 myMedia = new Media(urlfilesystem + audioRecord);
                 myMedia.startRecord();
-
+                console.log(" 2 " + urlfilesystem + " Y AUDIO  " + audioRecord + " YMEDIA " + myMedia);
             }
-        },
-
-                                   function mediaFailure(err) {
+        },function mediaFailure(err) {
             console.log("An error occurred: " + err.code);
-        },
-
-                                   function mediaStatus(status) {
+        },function mediaStatus(status) {
             console.log("A status change occurred: " + status.code);
         });
 
@@ -561,6 +559,7 @@ angular.module('starter.controllers.taxista', [])
     }
 
     var endRecord = function () {
+        console.log("MY MEDIA ES " + JSON.stringify(myMedia));
         myMedia.stopRecord();
         myMedia.play();
 
@@ -579,7 +578,7 @@ angular.module('starter.controllers.taxista', [])
 
     var endRecordCliente = function () {
         myMedia.stopRecord();
-        myMedia.play();
+       // myMedia.play();
         //alert("AQUI");
 
         var options = new FileUploadOptions();
