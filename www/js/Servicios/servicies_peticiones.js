@@ -191,9 +191,9 @@ angular.module('starter.servicies_peticiones', [])
             });
         },
 
-        postResolverServicio: function (res) {
+        postResolverServicio: function (servicioid,res) {
             $sails.post('/taxista/resolver', {
-                servicioid: $scope.servicioid,
+                servicioid: servicioid,
                 resultado: res
             });
         },

@@ -308,7 +308,7 @@ angular.module('starter.controllers.clientes', [])
                 icon: './img/esperataxi.png',
                 map: $scope.map
             });
-            Servicio.guardarServicioCliente($scope.servicio);
+            Servicio.guardarServicio($scope.servicio);
             generaRuta(new google.maps.LatLng(resp.latRecogida,resp.lngRecogida) ,new google.maps.LatLng(resp.latitud,resp.longitud));
         }
     });

@@ -177,8 +177,9 @@ angular.module('starter.controllers.taxista', [])
     $scope.rechazar = function(recogida,destino,mascota,discapacitado,fecha) {
         rechazarServicio("Rechazado");
     }
-
+        $scope.opcion={};
     $scope.resolver = function(){
+
         var myPopup = $ionicPopup.show({
             template: '<select ng-model="opcion.opcion"><option>Servicio resuelto correctamente</option><option>Cliente no presente</option></select>',
             title: 'Seleccione una de las opciones',
@@ -200,12 +201,13 @@ angular.module('starter.controllers.taxista', [])
         });
         myPopup.then(function (res) {
             if (!(angular.isUndefined(res)) && !(res == null)) {
+                console.log("LO RESUELTO ES " + JSON.stringify(res));
                 $scope.rutaOrigen.setMap(null);
                 if($scope.rutaDestino) {
                     $scope.rutaDestino.setMap(null)
                 }
                 Servicio.resuelveServicio();
-                PostSails.postResolverServicio(res);
+                PostSails.postResolverServicio($scope.servicio.id,JSON.stringify(res));
                 MapaInstancia.ocupar(false);
                 $scope.servicio = Servicio.limpiaServicio();
             } else {
