@@ -2,6 +2,9 @@ angular.module('starter.controllers', [])
 
     .controller('loginCtrl', function ($scope, Peticiones, $state, $ionicLoading, Usuario, $compile) {
     //screen.lockOrientation('portrait');
+    try{
+        window.plugins.insomnia.keepAwake()
+    } catch(e){console.log("ERROR EN INSOMNIA " +e)}
     $scope.taxista = false;
     Usuario.loadusuario()
     $scope.error = {

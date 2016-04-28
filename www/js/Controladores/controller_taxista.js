@@ -482,7 +482,6 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $sails.on('AudioInterno', function(resp) {
-        alert("ANTES DE REPRODUCIR DIGO QUE " + JSON.stringify(resp));
         var introsound = new Media("http://taxialcantarilla.es"+resp.url)
         introsound.play()
     })

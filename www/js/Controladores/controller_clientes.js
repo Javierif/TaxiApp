@@ -339,9 +339,7 @@ angular.module('starter.controllers.clientes', [])
     });
 
     $sails.on('AudioCliente', function(resp) {
-        alert("SERVICIO DEL RESP ES "+resp.servicioid + " MIO "+ $scope.servicioid);
         if(resp.servicioid == $scope.servicioid) {
-            alert("ANTES DE REPRODUCIR DIGO QUE " + JSON.stringify(resp));
             var introsound = new Media("http://taxialcantarilla.es"+resp.url)
             introsound.play()
         }
