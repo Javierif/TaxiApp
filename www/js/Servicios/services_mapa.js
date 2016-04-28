@@ -215,16 +215,6 @@ angular.module("starter.servicies_mapa", [])
             limpia(listadoGeneral,taxi);
             borraUbicacion(taxi);
         },
-        actualizaPosicion: function(taxi) {
-            for (socio in socios) {
-                if (socios[socio].id == taxi.id) {
-                    var posicion = new google.maps.LatLng(taxi.latitud, taxi.longitud);
-                    socios[socio].marcador.setPosition(posicion);
-                    break;
-                }
-            }
-            return socios;
-        },
         ocupar:function(ocupado) {
             usuario.ocupado = !usuario.ocupado;
             if(ocupado){
