@@ -496,7 +496,7 @@ angular.module('starter.controllers.taxista', [])
         }
     })
 
-     audioRecord = 'recorded.wav';
+     audioRecord = 'recorded.mp3';
     var myMedia;
     var urlfilesystem = false;
 
@@ -506,7 +506,7 @@ angular.module('starter.controllers.taxista', [])
         console.log("Sent = " + r.bytesSent);
         var response = JSON.parse(r.response);
         // alert("res " + response.url);
-        postDifundirRecord({taxista:usuario.id,urlaudio:response.url});
+        PostSails.postDifundirRecord({taxista:usuario.id,urlaudio:response.url});
     }
 
     var winClientes = function (r) {
@@ -515,7 +515,7 @@ angular.module('starter.controllers.taxista', [])
         console.log("Sent = " + r.bytesSent);
         var response = JSON.parse(r.response);
         // alert("res " + response.url);
-        postDifundirClientesRecord({servicioid:$scope.servicioid,urlaudio:response.url});
+        PostSails.postDifundirClientesRecord({servicioid:$scope.servicioid,urlaudio:response.url});
     }
 
     var fail = function (error) {
@@ -525,7 +525,7 @@ angular.module('starter.controllers.taxista', [])
     }
 
     var record = function () {
-        var introsound = new Media("/android_asset/www/img/record.wav");
+        var introsound = new Media("/android_asset/www/img/record.ogg");
         introsound.play();
         myMedia = new Media("/storage/emulated/0/"+audioRecord);
         myMedia.startRecord();
@@ -546,7 +546,7 @@ angular.module('starter.controllers.taxista', [])
 
         options.fileKey = "file";
         options.fileName = audioRecord;
-        options.mimeType = "audio/wav";
+        options.mimeType = "audio/mp3";
         var ft = new FileTransfer();
         ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/taxista/record"), win, fail, options);
     }
