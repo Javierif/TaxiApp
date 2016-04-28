@@ -255,7 +255,7 @@ angular.module('starter.controllers.taxista', [])
         usuario.latitud = latitud;
         usuario.longitud = longitud;
         var posicion = new google.maps.LatLng(latitud, longitud);
-        $scope.socios = MapaInstancia.actualizaPosicion(posicion);
+        $scope.socios = MapaInstancia.actualizaMiPosicon(posicion);
         $scope.map.panTo(posicion);
         valorarUbicacion(latitud, longitud);
     }
