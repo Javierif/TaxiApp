@@ -552,7 +552,7 @@ angular.module('starter.controllers.taxista', [])
     }
     var endRecordCliente = function () {
         myMedia.stopRecord();
-        myMedia.play();
+        //  myMedia.play();
         //alert("AQUI");
         var options = new FileUploadOptions();
         options.chunkedMode = false;
