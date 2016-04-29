@@ -369,7 +369,6 @@ angular.module('starter.controllers.clientes', [])
     var urlfilesystem = false;
 
     var win = function (r) {
-        alert("WIN" + JSON.stringify(r));
         console.log("Code = " + r.responseCode);
         console.log("Response = " + r.response);
         console.log("Sent = " + r.bytesSent);
@@ -378,7 +377,7 @@ angular.module('starter.controllers.clientes', [])
     }
 
     var fail = function (error) {
-        alert("FAIL " + error.code + "SORU " + error.source + " tar " + error.target);
+        //alert("FAIL " + error.code + "SORU " + error.source + " tar " + error.target);
         console.log("upload error source " + error.source);
         console.log("upload error target " + error.target);
     }
