@@ -419,7 +419,8 @@ angular.module('starter.controllers.clientes', [])
     }
 
     var endRecord = function () {
-        myMedia.stopRecord();
+        if(myMedia) {
+                    myMedia.stopRecord();
         //myMedia.play();
 
         var options = new FileUploadOptions();
@@ -433,6 +434,9 @@ angular.module('starter.controllers.clientes', [])
         options.mimeType = "audio/wav";
         var ft = new FileTransfer();
         ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/cliente/record"), win, fail, options);
+            myMedia = null;
+        }
+
     }
 
 

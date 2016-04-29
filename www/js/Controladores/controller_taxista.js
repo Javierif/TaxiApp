@@ -46,6 +46,9 @@ angular.module('starter.controllers.taxista', [])
     $scope.ubicarDisponible = MapaInstancia.getUbicarDisponible();
     $scope.servicio = Servicio.getServicio();
     var GoogleMaps = {geocoder:new google.maps.Geocoder(),directionsService:new google.maps.DirectionsService()};
+    try{
+       window.plugins.insomnia.keepAwake()
+    } catch(e) {console.log("ERROR en inmsonia "+ e)}
 
     $ionicModal.fromTemplateUrl('templates/servicio.html', function ($ionicModal) {$scope.modalPedir = $ionicModal;},
                                 {scope: $scope,animation: 'slide-in-up'});
@@ -602,39 +605,47 @@ angular.module('starter.controllers.taxista', [])
     }
 
     var endRecord = function () {
-        console.log("MY MEDIA ES " + JSON.stringify(myMedia));
-        myMedia.stopRecord();
-        myMedia.play();
+        if(myMedia) {
+            console.log("MY MEDIA ES " + JSON.stringify(myMedia));
+            myMedia.stopRecord();
+            // myMedia.play();
 
-        var options = new FileUploadOptions();
-        options.chunkedMode = false;
+            var options = new FileUploadOptions();
+            options.chunkedMode = false;
 
-        options.headers = {
-            Connection: "close"
-        };
-        options.fileKey = "file";
-        options.fileName = audioRecord;
-        options.mimeType = "audio/wav";
-        var ft = new FileTransfer();
-        ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/taxista/record"), win, fail, options);
+            options.headers = {
+                Connection: "close"
+            };
+            options.fileKey = "file";
+            options.fileName = audioRecord;
+            options.mimeType = "audio/wav";
+            var ft = new FileTransfer();
+            ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/taxista/record"), win, fail, options);
+            myMedia = null;
+        }
+
     }
 
     var endRecordCliente = function () {
-        myMedia.stopRecord();
-        // myMedia.play();
-        //alert("AQUI");
+        if(myMedia) {
+            myMedia.stopRecord();
+            // myMedia.play();
+            //alert("AQUI");
 
-        var options = new FileUploadOptions();
-        options.chunkedMode = false;
+            var options = new FileUploadOptions();
+            options.chunkedMode = false;
 
-        options.headers = {
-            Connection: "close"
-        };
-        options.fileKey = "file";
-        options.fileName = audioRecord;
-        options.mimeType = "audio/wav";
-        var ft = new FileTransfer();
-        ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/taxista/recordCliente"), winClientes, fail, options);
+            options.headers = {
+                Connection: "close"
+            };
+            options.fileKey = "file";
+            options.fileName = audioRecord;
+            options.mimeType = "audio/wav";
+            var ft = new FileTransfer();
+            ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/taxista/recordCliente"), winClientes, fail, options);
+            myMedia = null;
+        }
+
     }
 
 
