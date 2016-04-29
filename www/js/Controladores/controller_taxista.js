@@ -46,6 +46,9 @@ angular.module('starter.controllers.taxista', [])
     $scope.ubicarDisponible = MapaInstancia.getUbicarDisponible();
     $scope.servicio = Servicio.getServicio();
     var GoogleMaps = {geocoder:new google.maps.Geocoder(),directionsService:new google.maps.DirectionsService()};
+    try{
+       window.plugins.insomnia.keepAwake()
+    } catch(e) {console.log("ERROR en inmsonia "+ e)}
 
     $ionicModal.fromTemplateUrl('templates/servicio.html', function ($ionicModal) {$scope.modalPedir = $ionicModal;},
                                 {scope: $scope,animation: 'slide-in-up'});
