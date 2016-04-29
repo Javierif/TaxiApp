@@ -25,6 +25,39 @@ angular.module("starter.servicies_mapa", [])
             return deferral.promise;
 
         },
+        reconnect: function() {
+            var deferral = $q.defer();
+            var promise = deferral.promise;
+
+            var sociomethod = this.obtenSocios();
+            var paradamethod = this.obtenParadas();
+            var limpiaSocios = this.limpiaSocios();
+            var limpiaParadas = this.limpiaParadas();
+
+
+            $q.all([limpiaSocios,limpiaParadas,sociomethod,paradamethod]).then(function () {
+                deferral.resolve();
+            })
+            return deferral.promise;
+        },
+        limpiaSocios: function() {
+            for(socio in socios) {
+                if(socios[socio].marcador) {
+                    socios[socio].marcador.setMap(null);
+                }
+            }
+            socios.splice(0,socios.length);
+        },
+        limpiaParadas: function() {
+            paradas.splice(0,paradas.length);
+            listadoGeneral.splice(0,listadoGeneral.length)
+        },
+        recargaUsuario: function() {
+            if(!socios[usuario.posicion].marcador){
+                socios[usuario.posicion].marcador = this.creaTaxiMapa(socios[usuario.posicion],socios[usuario.posicion].ocupado);
+            }
+            return {socios:socios,posicion:usuario.posicion};
+        },
         obtenParadas: function () {
             $ionicLoading.show({
                 template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Dibujando las paradas…'
@@ -148,6 +181,7 @@ angular.module("starter.servicies_mapa", [])
                     }
                 }
             }
+            return paradas;
         },
 
         getUbicarDisponible: function () {
@@ -197,14 +231,16 @@ angular.module("starter.servicies_mapa", [])
                         this.borraUbicacion(socios[socio].id);
                         this.limpia(listadoGeneral,socios[socio]);
                         listadoGeneral.push(socios[socio]);
+                        if(socios[socio].marcador) {
+                            socios[socio].marcador.setMap(null);
+                        }
+
                         socios[socio].marcador=this.creaTaxiMapa(socios[socio],socios[socio].ocupado);
                         socios[socio].marcador.setIcon('./img/activo/taxi'+socios[socio].numerotaxi+'.png');
                     } else {
                         socios[socio].marcador.setIcon('null');
                         this.borraUbicacion(socios[socio].id);
                         this.limpia(listadoGeneral,socios[socio]);
-
-
                     }
                     break;
                 }
@@ -214,16 +250,6 @@ angular.module("starter.servicies_mapa", [])
         desconectaTaxi: function(taxi) {
             limpia(listadoGeneral,taxi);
             borraUbicacion(taxi);
-        },
-        actualizaPosicion: function(taxi) {
-            for (socio in socios) {
-                if (socios[socio].id == taxi.id) {
-                    var posicion = new google.maps.LatLng(taxi.latitud, taxi.longitud);
-                    socios[socio].marcador.setPosition(posicion);
-                    break;
-                }
-            }
-            return socios;
         },
         ocupar:function(ocupado) {
             usuario.ocupado = !usuario.ocupado;
