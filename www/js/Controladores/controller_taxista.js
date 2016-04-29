@@ -64,7 +64,9 @@ angular.module('starter.controllers.taxista', [])
                     template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Obteniendo tu geoposición…'
                 });
                 $scope.ubicarDisponible = MapaInstancia.getUbicarDisponible();
-                getCurrentPosition();
+                $timeout(function() {
+                    getCurrentPosition();
+                },1500);
             });
         });
     }
@@ -471,7 +473,7 @@ angular.module('starter.controllers.taxista', [])
         $scope.socios = MapaInstancia.conectaTaxi(resp);
         try{
             if(resp.conectado) {
-                 var myMedia = new Media("/android_asset/www/www/img/on.wav");
+                var myMedia = new Media("/android_asset/www/www/img/on.wav");
                 myMedia.play();
                 window.plugins.toast.showShortBottom("Se ha conectado el taxi nº" + $scope.socios[socio].numerotaxi,
                                                      function (a) {},
@@ -528,9 +530,9 @@ angular.module('starter.controllers.taxista', [])
     $sails.on('AudioInterno', function(resp) {
         var introsound;
         if(resp.urlandroid) {
-          introsound =  new Media("http://taxialcantarilla.es"+resp.urlandroid)
+            introsound =  new Media("http://taxialcantarilla.es"+resp.urlandroid)
         } else {
-          introsound =  new Media("http://taxialcantarilla.es"+resp.url)
+            introsound =  new Media("http://taxialcantarilla.es"+resp.url)
         }
         introsound.play()
     })
@@ -538,13 +540,12 @@ angular.module('starter.controllers.taxista', [])
     $sails.on('AudioCliente', function(resp) {
 
         if(resp.servicioid == $scope.servicioid) {
-            alert("ANTES DE REPRODUCIR DIGO QUE " + JSON.stringify(resp));
             var introsound = new Media("http://taxialcantarilla.es"+resp.url)
             introsound.play()
         }
     })
 
-     audioRecord = 'recorded.mp3';
+    audioRecord = 'recorded.mp3';
     var myMedia;
     var urlfilesystem = false;
 
@@ -590,7 +591,7 @@ angular.module('starter.controllers.taxista', [])
         options.headers = {
             Connection: "close"
         };
-        alert(JSON.stringify(myMedia));
+       // alert(JSON.stringify(myMedia));
 
         options.fileKey = "file";
         options.fileName = audioRecord;
@@ -609,7 +610,7 @@ angular.module('starter.controllers.taxista', [])
         };
         options.fileKey = "file";
         options.fileName = audioRecord;
-        options.mimeType = "audio/wav";
+        options.mimeType = "audio/mp3";
         var ft = new FileTransfer();
         ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/taxista/recordCliente"), winClientes, fail, options);
     }

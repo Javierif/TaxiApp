@@ -369,12 +369,11 @@ angular.module('starter.controllers.clientes', [])
     }
 
     //Prepares File System for Audio Recording
-    audioRecord = 'recorded.wav';
+    audioRecord = 'recorded.mp3';
     var myMedia;
     var urlfilesystem = false;
 
     var win = function (r) {
-        alert("WIN" + JSON.stringify(r));
         console.log("Code = " + r.responseCode);
         console.log("Response = " + r.response);
         console.log("Sent = " + r.bytesSent);
@@ -383,52 +382,22 @@ angular.module('starter.controllers.clientes', [])
     }
 
     var fail = function (error) {
-        alert("FAIL " + error.code + "SORU " + error.source + " tar " + error.target);
         console.log("upload error source " + error.source);
         console.log("upload error target " + error.target);
     }
 
     var record = function () {
-
-        var introsound = new Media("./img/record.wav", function mediaSuccess() {
-            if (!urlfilesystem) {
-                window.requestFileSystem(
-                    LocalFileSystem.TEMPORARY,
-                    0,
-                    function (fileSystem) {
-                        urlfilesystem = fileSystem.root.toURL();
-                        /* hohohla */
-                        urlfilesystem = urlfilesystem.slice(7);
-                        myMedia = new Media(urlfilesystem + audioRecord);
-                        myMedia.startRecord();
-                    },
-                    function (error) {
-                        alert('Error getting file system');
-                    }
-                );
-            } else {
-                myMedia = new Media(urlfilesystem + audioRecord);
-                myMedia.startRecord();
-
-            }
-        },
-
-                                   function mediaFailure(err) {
-            console.log("An error occurred: " + err.code);
-        },
-
-                                   function mediaStatus(status) {
-            console.log("A status change occurred: " + status.code);
-        });
-
+        var introsound = new Media("/android_asset/www/img/record.ogg");
         introsound.play();
+        myMedia = new Media("/storage/emulated/0/"+audioRecord);
+        myMedia.startRecord();
     }
 
     var endRecord = function () {
         myMedia.stopRecord();
         //myMedia.play();
 
-        var options = new FileUploadOptions();
+         var options = new FileUploadOptions();
         options.chunkedMode = false;
 
         options.headers = {
@@ -436,7 +405,7 @@ angular.module('starter.controllers.clientes', [])
         };
         options.fileKey = "file";
         options.fileName = audioRecord;
-        options.mimeType = "audio/wav";
+        options.mimeType = "audio/mp3";
         var ft = new FileTransfer();
         ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/cliente/record"), win, fail, options);
     }
