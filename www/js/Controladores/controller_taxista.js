@@ -1,10 +1,11 @@
 angular.module('starter.controllers.taxista', [])
 
-    .controller('TaxistaCtrl', function ($scope, MapaInstancia) {
+    .controller('TaxistaCtrl', function ($scope, MapaInstancia,$sails) {
     $scope.paradas = MapaInstancia.getParadas();
     $scope.socios = MapaInstancia.getSocios();
     $scope.ocupado = MapaInstancia.getOcupado();
     $scope.listadoGeneral = MapaInstancia.getListadoGeneral();
+
 
     $scope.ocupa = function() {
         console.log("OCUPANDO")
@@ -100,8 +101,8 @@ angular.module('starter.controllers.taxista', [])
         };
 
         GoogleMaps.directionsService.route(directionsRequest,
-                                function(response, status)
-                                {
+                                           function(response, status)
+                                           {
             if (status == google.maps.DirectionsStatus.OK)
             {
                 $scope.rutaDestino = new google.maps.DirectionsRenderer({
@@ -132,6 +133,17 @@ angular.module('starter.controllers.taxista', [])
         $scope.servicio = Servicio.limpiaServicio();
     }
 
+    var temporal = false;
+    $scope.temporal = function() {
+        temporal = !temporal;
+        if(temporal) {
+            muevete(37.9737026,-1.2097384)
+        } else {
+            muevete(37.9757494,-1.2135467)
+        }
+
+    }
+
     $scope.itemOnLongPress = function () {
         record();
     }
@@ -150,15 +162,9 @@ angular.module('starter.controllers.taxista', [])
 
     $scope.ubicar = function () {
         if (!$scope.ubicarDisponible.ubicado) {
-            PostSails.postUbicar($scope.ubicarDisponible.id, usuario.grupo, usuario.latitud, usuario.longitud, usuario.id)
-            $scope.paradas = MapaInstancia.ubica($scope.ubicarDisponible.id, usuario.id);
-            $scope.ubicarDisponible.ubicadoText = "Desubicar";
-            $scope.ubicarDisponible.ubicado = true;
+            ubicarDesubicar(true);
         } else {
-            PostSails.postDesUbicar($scope.ubicarDisponible.id, usuario.id, usuario.grupo);
-            $scope.paradas = MapaInstancia.borraUbicacion(usuario);
-            $scope.ubicarDisponible.ubicadoText = "Ubicar";
-            $scope.ubicarDisponible.ubicado = false;
+            ubicarDesubicar(false);
         }
     }
     //revisar y quitar mi icono cuando acepto y despues poner el del cliente
@@ -178,7 +184,7 @@ angular.module('starter.controllers.taxista', [])
     $scope.rechazar = function(recogida,destino,mascota,discapacitado,fecha) {
         rechazarServicio("Rechazado");
     }
-        $scope.opcion={};
+    $scope.opcion={};
     $scope.resolver = function(){
 
         var myPopup = $ionicPopup.show({
@@ -219,6 +225,20 @@ angular.module('starter.controllers.taxista', [])
         });
     }
 
+    var ubicarDesubicar = function(ubicar) {
+        if (ubicar) {
+            PostSails.postUbicar($scope.ubicarDisponible.id, usuario.grupo, usuario.latitud, usuario.longitud, usuario.id)
+            $scope.paradas = MapaInstancia.ubica($scope.ubicarDisponible.id, usuario.id);
+            $scope.ubicarDisponible.ubicadoText = "Desubicar";
+            $scope.ubicarDisponible.ubicado = true;
+        } else {
+            PostSails.postDesUbicar($scope.ubicarDisponible.id, usuario.id, usuario.grupo);
+            $scope.paradas = MapaInstancia.borraUbicacion(usuario);
+            $scope.ubicarDisponible.ubicadoText = "Ubicar";
+            $scope.ubicarDisponible.ubicado = false;
+        }
+    }
+
     var valorarUbicacion = function (latitud, longitud) {
         var radio = false;
         var limite = false;
@@ -230,7 +250,7 @@ angular.module('starter.controllers.taxista', [])
                     break;
                 }
             }
-            if (distancia > 0.15 && distancia < 0.3) {
+            if (distancia > 0.15 && distancia > 0.2) {
                 if (!limite) {
                     limite = true;
                 }
@@ -240,13 +260,14 @@ angular.module('starter.controllers.taxista', [])
             $scope.ubicarDisponible.id = $scope.paradas[parada].id;
             $scope.ubicarDisponible.disabled = false;
         }
-        if (!radio && !limite && $scope.paradas && $scope.paradas.length>1) {
-            console.log("ESTAS FUERA DEL RANGO WUON! y los socios son " + JSON.stringify($scope.paradas));
-            $scope.ubicarDisponible.disabled = true;
-            $scope.ubicar();
+        if (!radio && !limite) {
+
         }
-        if (limite && !radio) {
+        if (!radio) {
+            //console.log("ESTAS FUERA DEL RANGO WUON! y los socios son " + JSON.stringify($scope.paradas));
             $scope.ubicarDisponible.disabled = true;
+            ubicarDesubicar(false);
+            //$scope.ubicarDisponible.disabled = true;
         }
     }
 
@@ -310,6 +331,7 @@ angular.module('starter.controllers.taxista', [])
                     getCurrentPosition();
                 },1500);
             }
+
         }, function error(msg) {
             alert('error al obtener geo local error ' + JSON.stringify(msg));
             getCurrentPosition();
@@ -414,12 +436,34 @@ angular.module('starter.controllers.taxista', [])
             }
         }, 1000);
     }
-
+    var inicilizadoya = false;
     $sails.on('connect', function socketConnected() {
         $sails.get("/taxista/conectarse/" + usuario.id + "/" + usuario.grupo);
+        if(inicilizadoya) {
+            $ionicLoading.show({
+                template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Obteniendo los cambios…'
+            });
+            $timeout(function() {
+                MapaInstancia.reconnect().then(function() {
+                    $scope.paradas = MapaInstancia.getParadas();
+                    $scope.socios = MapaInstancia.getSocios();
+                    $scope.listadoGeneral = MapaInstancia.getListadoGeneral();
+                    var recarga = MapaInstancia.recargaUsuario();
+                    usuario.posicion = recarga.posicion;
+                    socios = recarga.socios;
+                    getCurrentPosition();
+                });
+            },3500);
+        }
+        inicilizadoya = true;
     });
 
     $sails.on('reconnect', function (transport, numAttempts) {
+
+    });
+
+    $sails.on('disconnect', function () {
+        $state.go("inicio");
     });
 
     $sails.on('conexion', function (resp) {
@@ -577,7 +621,7 @@ angular.module('starter.controllers.taxista', [])
 
     var endRecordCliente = function () {
         myMedia.stopRecord();
-       // myMedia.play();
+        // myMedia.play();
         //alert("AQUI");
 
         var options = new FileUploadOptions();

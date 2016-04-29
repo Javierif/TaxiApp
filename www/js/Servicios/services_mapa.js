@@ -40,6 +40,24 @@ angular.module("starter.servicies_mapa", [])
             })
             return deferral.promise;
         },
+        limpiaSocios: function() {
+            for(socio in socios) {
+                if(socios[socio].marcador) {
+                    socios[socio].marcador.setMap(null);
+                }
+            }
+            socios.splice(0,socios.length);
+        },
+        limpiaParadas: function() {
+            paradas.splice(0,paradas.length);
+            listadoGeneral.splice(0,listadoGeneral.length)
+        },
+        recargaUsuario: function() {
+            if(!socios[usuario.posicion].marcador){
+                socios[usuario.posicion].marcador = this.creaTaxiMapa(socios[usuario.posicion],socios[usuario.posicion].ocupado);
+            }
+            return {socios:socios,posicion:usuario.posicion};
+        },
         obtenParadas: function () {
             $ionicLoading.show({
                 template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Dibujando las paradas…'
