@@ -394,20 +394,24 @@ angular.module('starter.controllers.clientes', [])
     }
 
     var endRecord = function () {
-        myMedia.stopRecord();
-        //myMedia.play();
+        if(myMedia) {
+            myMedia.stopRecord();
+            //myMedia.play();
 
-         var options = new FileUploadOptions();
-        options.chunkedMode = false;
+            var options = new FileUploadOptions();
+            options.chunkedMode = false;
 
-        options.headers = {
-            Connection: "close"
-        };
-        options.fileKey = "file";
-        options.fileName = audioRecord;
-        options.mimeType = "audio/mp3";
-        var ft = new FileTransfer();
-        ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/cliente/record"), win, fail, options);
+            options.headers = {
+                Connection: "close"
+            };
+            options.fileKey = "file";
+            options.fileName = audioRecord;
+            options.mimeType = "audio/mp3";
+            var ft = new FileTransfer();
+            ft.upload(myMedia.src, encodeURI("http://taxialcantarilla.es/cliente/record"), win, fail, options);
+            myMedia = null;
+        }
+
     }
 
 
