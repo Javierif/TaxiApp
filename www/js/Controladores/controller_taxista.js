@@ -318,7 +318,7 @@ angular.module('starter.controllers.taxista', [])
         console.log("HEY");
         window.navigator.geolocation.getCurrentPosition(function (location) {
             console.log("ACCUARY" + location.coords.accuracy)
-            if (location.coords.accuracy < 1500) {
+            if (location.coords.accuracy < 150) {
                 $ionicLoading.hide();
                 muevete(location.coords.latitude, location.coords.longitude);
                 valorarUbicacion(location.coords.latitude, location.coords.longitude);
