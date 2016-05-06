@@ -22,6 +22,9 @@
                     <ion-item class="item item-icon-left paradaheader" nav-clear menu-close>
                         <h3>General</h3>
                     </ion-item>
+                    <ion-item class="item item-icon-left" ng-repeat="taxi in listadoUbicados" nav-clear menu-close>
+                        <h4><i class="ion-model-s"></i> Taxi Nº{{taxi.numerotaxi}}</h4>
+                    </ion-item>
                     <ion-item class="item item-icon-left" ng-repeat="taxi in listadoGeneral" nav-clear menu-close>
                         <h4><i class="ion-model-s"></i> Taxi Nº{{taxi.numerotaxi}}</h4>
                     </ion-item>

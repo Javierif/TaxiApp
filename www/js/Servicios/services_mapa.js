@@ -4,6 +4,7 @@ angular.module("starter.servicies_mapa", [])
     var usuario;
 
     var listadoGeneral;
+    var listaubicados;
     var paradas;
     var socios;
 
@@ -67,7 +68,8 @@ angular.module("starter.servicies_mapa", [])
             var instancia = this;
             paradasPeticion.then(function (result) {
                 var paradasConUbicados = result.paradas;
-                var listaGeneral = result.taxistasGeneral;
+                var listaGeneral = result.taxistanoubicados;
+                listaubicados = result.taxistaubicados;
                 console.log("PARADA CON UBICADO "+JSON.stringify(paradasConUbicados));
                 console.log("LISTA GENERAL "+ JSON.stringify(listaGeneral));
                 for(taxi in listaGeneral) {
@@ -82,6 +84,7 @@ angular.module("starter.servicies_mapa", [])
 
                     }
                 }
+
                 for(parada in paradasConUbicados) {
                     paradasConUbicados[parada].prioridad = 0;
                     instancia.creaParadaMapa(paradasConUbicados[parada].latitud,paradasConUbicados[parada].longitud)
@@ -158,6 +161,8 @@ angular.module("starter.servicies_mapa", [])
             for(p in paradas) {
                 if(paradas[p].id == parada) {
                     var taxi = this.getSocio(taxista);
+                    this.limpia(listadoGeneral,taxi);
+                    listaubicados.push(taxi)
                     paradas[p].ubicados.push(taxi);
                     paradas[p].prioridad += 1;
                     if(taxista == usuario.id) {
@@ -166,6 +171,7 @@ angular.module("starter.servicies_mapa", [])
                     break;
                 }
             }
+
             return paradas;
         },
         borraUbicacion: function (socioRecibido) {
@@ -176,6 +182,8 @@ angular.module("starter.servicies_mapa", [])
             for (p in paradas) {
                 for (ubicado in paradas[p].ubicados) {
                     if (paradas[p].ubicados[ubicado].id == socioRecibido) {
+                        this.limpia(listaubicados,paradas[p].ubicados[ubicado]);
+                        listadoGeneral.push(paradas[p].ubicados[ubicado]);
                         paradas[p].ubicados.splice(ubicado, 1);
                         paradas[p].prioridad = paradas[parada].ubicados.length;
                     }
@@ -219,18 +227,27 @@ angular.module("starter.servicies_mapa", [])
                 array.splice(encontrado.posicion,1);
             }
         },
-        pushTaxi: function(taxi) {
-            limpia(listadoGeneral,taxi);
-            listadoGeneral.push(taxi);
+        ubicadoTaxi: function(taxista) {
+          var ubicado = false;
+            for(taxi in listaubicados) {
+                if(listaubicados[taxi].id == taxista.id) {
+                    ubicado = true;
+                }
+            }
+            if(ubicado) {
+                return true;
+            } else {
+                return false;
+            }
         },
         conectaTaxi: function(taxi) {
             for (socio in socios) {
                 if (taxi.id == socios[socio].id) {
                     socios[socio].conectado = taxi.conectado;
                     if (taxi.conectado) {
-                        this.borraUbicacion(socios[socio].id);
-                        this.limpia(listadoGeneral,socios[socio]);
-                        listadoGeneral.push(socios[socio]);
+                        if(!this.ubicadoTaxi(socios[socio])) {
+                            listadoGeneral.push(socios[socio]);
+                        }
                         if(socios[socio].marcador) {
                             socios[socio].marcador.setMap(null);
                         }
@@ -247,9 +264,13 @@ angular.module("starter.servicies_mapa", [])
             }
             return socios;
         },
+        getListadoUbicados: function() {
+            return listaubicados
+        },
         desconectaTaxi: function(taxi) {
-            limpia(listadoGeneral,taxi);
-            borraUbicacion(taxi);
+            this.limpia(listadoGeneral,taxi);
+            this.limpia(listaubicados,taxi);
+            this.borraUbicacion(taxi);
         },
         ocupar:function(ocupado) {
             usuario.ocupado = !usuario.ocupado;
