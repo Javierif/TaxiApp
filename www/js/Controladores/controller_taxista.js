@@ -466,7 +466,6 @@ angular.module('starter.controllers.taxista', [])
     });
 
     $sails.on('disconnect', function () {
-        $state.go("inicio");
     });
 
     $sails.on('conexion', function (resp) {
