@@ -30,12 +30,12 @@ angular.module('starter.controllers', [])
         console.log("EMAIL "+ usuario.email+"nivel "+usuario.nivel)
         if(usuario.nivel>=0) {
             console.log("DENTROOO")
-            if (usuario.nivel > 0) {
-                $state.go("taxista.mapaTaxista");
-            } else {
-                console.log("DENTRO DE CLIENTEMAPA")
-                $state.go("clientemapa");
-            }
+           // if (usuario.nivel > 0) {
+             //   $state.go("taxista.mapaTaxista");
+            //} else {
+            //    console.log("DENTRO DE CLIENTEMAPA")
+            //    $state.go("clientemapa");
+            //}
         }
     }
 
