@@ -15,7 +15,7 @@
         <ion-nav-view name="menuContent"></ion-nav-view>
     </ion-side-menu-content>
 
-    <ion-side-menu side="left" drag-content="false">
+    <ion-side-menu side="left" drag-content="false" ng-if="menu">
             <button class="button full-button button-full" ng-class="{'button-energized' : !ocupado, 'button-assertive' : ocupado}" ng-click="ocupa()">Ocupado</button>
         <ion-content class="has-header my-menu">
                 <ion-list>

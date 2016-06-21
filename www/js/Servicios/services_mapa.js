@@ -70,11 +70,13 @@ angular.module("starter.servicies_mapa", [])
                 var paradasConUbicados = result.paradas;
                 var listaGeneral = result.taxistanoubicados;
                 listaubicados = result.taxistaubicados;
-                console.log("PARADA CON UBICADO "+JSON.stringify(paradasConUbicados));
-                console.log("LISTA GENERAL "+ JSON.stringify(listaGeneral));
+                alert("PARADA CON UBICADO "+JSON.stringify(paradasConUbicados));
+                alert("LISTA GENERAL "+ JSON.stringify(listaGeneral));
+                alert("SOCIOS SON " + JSON.stringify(socios));
                 for(taxi in listaGeneral) {
                     for(socio in socios) {
                         if(socios[socio].id == listaGeneral[taxi].id) {
+                            alert("DENTRO :)")
                             socios[socio].marcador = instancia.creaTaxiMapa(listaGeneral[taxi],listaGeneral[taxi].ocupado);
                             if(socios[socio].id == usuario.id) {
                                 usuario.ocupado = listaGeneral[taxi].ocupado;
@@ -126,22 +128,17 @@ angular.module("starter.servicies_mapa", [])
             return deferred.promise;
         },
         creaParadaMapa: function (latitud, longitud) {
-            var posicion = new google.maps.LatLng(latitud, longitud);
-            var cityCircle = new google.maps.Circle({
-                strokeColor: '#2E9AFE',
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: '#2E9AFE',
-                fillOpacity: 0.35,
-                map: mapa,
-                center: posicion,
-                radius: 100
+            var posicion = new plugin.google.maps.LatLng(latitud, longitud);
+            mapa.addCircle({
+              'center': posicion,
+              'radius': 100,
+              'strokeColor' : '#2E9AFE',
+              'stdrokeWidth': 1,
+              'fillOpacity': 0.35,
+              'fillColor': '#2E9AFE',
             });
-
         },
         creaTaxiMapa: function (taxista,ocupado) {
-            console.log("CREO TAXISTA " + taxista);
-            var posicion = new google.maps.LatLng(taxista.latitud, taxista.longitud);
             var icon;
             if(!ocupado) {
                 icon = './img/activo/taxi'+taxista.numerotaxi+'.png'
@@ -149,10 +146,13 @@ angular.module("starter.servicies_mapa", [])
                 icon = './img/ocupado/taxi'+taxista.numerotaxi+'.png'
             }
 
-            var marcador = new google.maps.Marker({
-                position: new google.maps.LatLng(taxista.latitud, taxista.longitud),
-                icon: icon,
-                map: mapa
+            var marcador
+            alert("lat " + taxista.latitud + "long " + taxista.longitud);
+            mapa.addMarker({
+                position: new plugin.google.maps.LatLng(taxista.latitud, taxista.longitud)
+            }, function(marker) {
+                marcador = marker;
+                alert("marcador " + marker)
             });
             // console.log("MARCADOR " + marcador + "ID LIST " + idListado)
             return marcador;

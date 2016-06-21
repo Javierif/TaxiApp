@@ -24,7 +24,8 @@
     "https://github.com/cogitor/PhoneGap-OrientationLock.git",
     "https://github.com/apache/cordova-plugin-file-transfer",
     "cordova-plugin-whitelist",
-    "https://github.com/EddyVerbruggen/Insomnia-PhoneGap-Plugin.git"
+    "https://github.com/EddyVerbruggen/Insomnia-PhoneGap-Plugin.git",
+    "cordova-plugin-googlemaps"
   ],
   "cordovaPlatforms": [
     "ios",

@@ -6,6 +6,7 @@ angular.module('starter.controllers.taxista', [])
     $scope.ocupado = MapaInstancia.getOcupado();
     $scope.listadoUbicados = MapaInstancia.getListadoUbicados();
     $scope.listadoGeneral = MapaInstancia.getListadoGeneral();
+    $scope.menu = false;
 
 
     $scope.ocupa = function() {
@@ -56,7 +57,7 @@ angular.module('starter.controllers.taxista', [])
     $scope.servicio = Servicio.getServicio();
     var GoogleMaps = {geocoder:new google.maps.Geocoder(),directionsService:new google.maps.DirectionsService()};
     try{
-       window.plugins.insomnia.keepAwake()
+        window.plugins.insomnia.keepAwake()
     } catch(e) {console.log("ERROR en inmsonia "+ e)}
 
     $ionicModal.fromTemplateUrl('templates/servicio.html', function ($ionicModal) {$scope.modalPedir = $ionicModal;},
@@ -67,18 +68,6 @@ angular.module('starter.controllers.taxista', [])
             template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Obteniendo el mapa…'
         });
         inicializaMapa();
-        google.maps.event.addListenerOnce($scope.map, 'idle', function () {
-            MapaInstancia.cargaMapa(usuario, $scope.map).then(function () {
-                $scope.paradas = MapaInstancia.getParadas();
-                $scope.socios = MapaInstancia.getSocios();
-                $scope.listadoGeneral = MapaInstancia.getListadoGeneral();
-                $ionicLoading.show({
-                    template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Obteniendo tu geoposición…'
-                });
-                $scope.ubicarDisponible = MapaInstancia.getUbicarDisponible();
-                getCurrentPosition();
-            });
-        });
     }
 
     var directionsOrigen = function() {
@@ -284,12 +273,33 @@ angular.module('starter.controllers.taxista', [])
     }
 
     var muevete = function (latitud, longitud) {
+        var pluginposicion = new plugin.google.maps.LatLng(latitud,longitud);
+        alert("ANTES DE MOVERTE " + latitud + " Y " + longitud);
+       /* $scope.map.moveCamera({
+            'target': pluginposicion,
+            'zoom': 17,
+            'tilt': 30
+        }, function() {
+            console.log("ANIMATION DONE")
+        });
+        */
+        var GOOGLE = new plugin.google.maps.LatLng(latitud, longitud);
+        $scope.map.moveCamera({
+            'target': GOOGLE,
+            'tilt': 30,
+            'zoom': 17,
+            'bearing': 0
+        }, function() {
+            console.log("The animation is done");
+        });
+
         PostSails.postMoviendose(usuario.id, usuario.grupo, latitud, longitud);
         usuario.latitud = latitud;
         usuario.longitud = longitud;
         var posicion = new google.maps.LatLng(latitud, longitud);
         $scope.socios = MapaInstancia.actualizaMiPosicon(posicion);
-        $scope.map.panTo(posicion);
+
+        //$scope.map.panTo(posicion);
         valorarUbicacion(latitud, longitud);
     }
 
@@ -329,6 +339,7 @@ angular.module('starter.controllers.taxista', [])
             console.log("ACCUARY" + location.coords.accuracy)
             if (location.coords.accuracy < 150) {
                 $ionicLoading.hide();
+                alert("ANTES DE ENVIARTE A MUEVETE " + location.coords.latitude + " Y " + location.coords.longitude);
                 muevete(location.coords.latitude, location.coords.longitude);
                 valorarUbicacion(location.coords.latitude, location.coords.longitude);
                 //comenzamos a observar si te mueves
@@ -361,9 +372,28 @@ angular.module('starter.controllers.taxista', [])
             mapTypeId: google.maps.MapTypeId.TERRAIN,
             disableDefaultUI: true
         };
-        $scope.map = new google.maps.Map(document.getElementById("mapa"),
-                                         mapOptions);
+        $scope.map = plugin.google.maps.Map.getMap(document.getElementById("mapa"));
+        $scope.map.on(plugin.google.maps.event.MAP_READY, onMapInit);
+
         return $scope.map;
+    }
+
+    var onMapInit = function () {
+        alert("antes de cargar");
+        $ionicLoading.hide();
+
+        MapaInstancia.cargaMapa(usuario, $scope.map).then(function () {
+            alert("entrando una vez cargado");
+            $scope.paradas = MapaInstancia.getParadas();
+            $scope.socios = MapaInstancia.getSocios();
+            $scope.listadoGeneral = MapaInstancia.getListadoGeneral();
+            $ionicLoading.show({
+                template: '<ion-spinner icon="circles" class="spinner-balanced"></ion-spinner><br> Obteniendo tu geoposición…'
+            });
+            $scope.ubicarDisponible = MapaInstancia.getUbicarDisponible();
+            getCurrentPosition();
+        });
+        $ionicLoading.hide();
     }
 
     var calculaDistancia = function (lat1, lon1, lat2, lon2) {
